@@ -1,0 +1,6 @@
+class Table {
+
+    clear() {
+
+    }
+}
