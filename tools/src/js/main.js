@@ -14,9 +14,8 @@ let Tools = {
         let ui = new UI(events);
         if (!this.fbServices.isOnline)
             this.fbServices = new FirebaseServices(this.objectTypes, ui.update);
-
-        ui.initialize();
     }
 };
 
 $(Tools.initialize());
+
