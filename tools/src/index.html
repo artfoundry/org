@@ -7,25 +7,57 @@
 </head>
 <body>
     <header>Tools</header>
-    <nav>
-        <div>DB Tool</div>
+    <nav id="navbar">
+        <span id="navlink-card" class="active nav-link">Card Entry</span>
+        <span id="navlink-board" class="nav-link">Board Entry</span>
     </nav>
 
-    <section class="input">
-        <form></form>
-    </section>
-    <section class="boards">
+    <section id="form-card" class="active">
+        <div class="title">New Card Entry</div>
+        <form>
+            <label for="logical-card">Logical</label>
+            <input id="logical-card" type="text" class="input-text" name="logical">
+            <label for="text-card">Text</label>
+            <input id="text-card" type="text" class="input-text" name="text">
+            <label for="color-card">Color</label>
+            <select id="color-card" name="color" class="input-select">
+                <option value="yellow">Yellow</option>
+                <option value="green">Green</option>
+                <option value="orange">Orange</option>
+                <option value="blue">Blue</option>
+                <option value="red">Red</option>
+            </select>
 
+            <input id="submit-card" type="submit" class="button-submit">
+        </form>
     </section>
-    <section class="cards">
 
+    <section id="list-card" class="active">
+        <div class="title">Card List</div>
+        <div class="list"></div>
+    </section>
+
+    <section id="form-board" class="inactive">
+        <div class="title">New Board Entry</div>
+        <form>
+            <label for="logical-board">Logical</label>
+            <input id="logical-board" type="text" class="input-text" name="logical">
+            <label for="text-board">Text</label>
+            <input id="text-board" type="text" class="input-text" name="text">
+
+            <input id="submit-board" type="submit" class="button-submit">
+        </form>
+    </section>
+
+    <section id="list-board" class="inactive">
+        <div class="title">Board List</div>
+        <div class="list"></div>
     </section>
 
     <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="js/firebase.js"></script>
-    <script type="text/javascript" src="js/events.js"></script>
     <script type="text/javascript" src="js/ui.js"></script>
     <script type="text/javascript" src="js/helpers.js"></script>
     <script type="text/javascript" src="js/main.js"></script>

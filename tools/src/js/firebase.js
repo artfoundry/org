@@ -36,11 +36,28 @@ class FirebaseServices {
         return initResult;
     }
 
-    saveItem(item, type) {
+    processFormData(item, type) {
+        let data = {},
+            name = '',
+            attr = '';
+
+        for (let n=0; n < item.length; n++) {
+            if (item[n].name === 'logical') {
+                name = item[n].value;
+            } else {
+                attr = item[n].name;
+                data[attr] = item[n].value;
+            }
+        }
+
+        this._setItem(name, data, type);
+    }
+
+    _setItem(name, item, type) {
+        console.log(name, item, type)
         if (this.isOnline) {
-            this.fbDatabase.ref(type + '/').push({
-                type: item
-            });
+            this.fbDatabase.ref(type + '/' + name + '/').set(item);
+            console.log('submitted');
         }
     }
 
@@ -53,15 +70,9 @@ class FirebaseServices {
     }
 
     getItems(type, callback) {
-        let newItems = [],
-            types = type + 's';
-
         if (this.isOnline) {
-            this.fbDatabase.ref('/' + types + '/').orderByKey().on('value', function(snapshot) {
-                snapshot.forEach(function(childSnapshot) {
-                    newItems.push(childSnapshot.val());
-                });
-                callback(types, newItems);
+            this.fbDatabase.ref('/' + type + '/').orderByKey().on('value', function(snapshot) {
+                callback(type, snapshot.val());
             });
         }
     }

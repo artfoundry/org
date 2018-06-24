@@ -1,5 +1,0 @@
-class Events {
-    constructor() {
-
-    }
-}
