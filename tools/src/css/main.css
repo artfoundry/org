@@ -37,7 +37,11 @@ form, .list {
     margin: 10px;
 }
 
-.title {
+input, select {
+    margin: 3px 15px 3px 5px;
+}
+
+.page-title {
     font-size: 16px;
     font-weight: bold;
 }
@@ -47,6 +51,16 @@ form, .list {
 }
 
 /* Cards */
+
+.row-header {
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+.flex-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
 
 .item-row {
     padding: 5px 0;

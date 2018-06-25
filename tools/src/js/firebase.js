@@ -9,7 +9,7 @@ class FirebaseServices {
             this.fbDatabase = firebase.database();
             this.objectTypes = types;
             for (let i=0; i < this.objectTypes.length; i++) {
-                this.getItems(this.objectTypes[i], callback);
+                this._getItems(this.objectTypes[i], callback);
             }
             this._monitorConnection();
         }
@@ -54,10 +54,9 @@ class FirebaseServices {
     }
 
     _setItem(name, item, type) {
-        console.log(name, item, type)
         if (this.isOnline) {
             this.fbDatabase.ref(type + '/' + name + '/').set(item);
-            console.log('submitted');
+            console.log('submitted ' + name);
         }
     }
 
@@ -69,7 +68,7 @@ class FirebaseServices {
         });
     }
 
-    getItems(type, callback) {
+    _getItems(type, callback) {
         if (this.isOnline) {
             this.fbDatabase.ref('/' + type + '/').orderByKey().on('value', function(snapshot) {
                 callback(type, snapshot.val());

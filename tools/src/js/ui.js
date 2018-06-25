@@ -31,10 +31,18 @@ class UI {
 
     updateList(type, objects) {
         for (let item in objects) {
-            $("#list-" + type + " > .list").append("<div id='" + item + "' class='item-row'><span class='item-name'>" + type + " name: " + item + "</span></div>");
-            let itemAttrs = objects[item];
+            let $itemID = $("#" + item),
+                itemAttrs = objects[item];
+
+            if ($itemID.length === 0) {
+                $("#list-" + type + " > .list").append("<div id='" + item + "' class='item-row'></div>");
+                $itemID = $("#" + item);
+            } else {
+                $itemID.html("");
+            }
+            $itemID.append("<span class='item-name'>" + type + " name: " + item + "</span>");
             for (let attr in itemAttrs) {
-                $("#" + item).append("<span class='item-attr'>" + attr + " : " + itemAttrs[attr] + "</span>");
+                $itemID.append("<span class='item-attr'>" + attr + " : " + itemAttrs[attr] + "</span>");
             }
         }
     }
