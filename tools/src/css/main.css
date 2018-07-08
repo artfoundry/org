@@ -50,6 +50,32 @@ input, select {
     display: none;
 }
 
+/* message */
+
+#message {
+    display: none;
+    position: absolute;
+    top: 40%;
+    left: 25%;
+    width: 50%;
+    margin: auto;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid orange;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px gray;
+    background-color: lightcyan;
+    z-index: 2;
+}
+
+#message .button-submit {
+    position: relative;
+    width: 50px;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 3px;
+}
+
 /* Cards */
 
 .row-header {

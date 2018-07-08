@@ -3,11 +3,12 @@
  */
 
 class FirebaseServices {
-    constructor(types, callback) {
+    constructor(objectTypes, allItems, callback) {
         this.isOnline = this._initialize();
         if (this.isOnline) {
             this.fbDatabase = firebase.database();
-            this.objectTypes = types;
+            this.allItems = allItems;
+            this.objectTypes = objectTypes;
             for (let i=0; i < this.objectTypes.length; i++) {
                 this._getItems(this.objectTypes[i], callback);
             }
@@ -39,10 +40,17 @@ class FirebaseServices {
     processFormData(item, type) {
         let data = {},
             name = '',
-            attr = '';
+            attr = '',
+            itemName = '';
 
         for (let n=0; n < item.length; n++) {
+            itemName = item[n].name;
             if (item[n].name === 'logical') {
+                {
+                    if (this.allItems[type].hasOwnProperty(itemName)) {
+
+                    }
+                }
                 name = item[n].value;
             } else {
                 attr = item[n].name;
@@ -69,9 +77,14 @@ class FirebaseServices {
     }
 
     _getItems(type, callback) {
+        let fbLocal = this;
         if (this.isOnline) {
             this.fbDatabase.ref('/' + type + '/').orderByKey().on('value', function(snapshot) {
-                callback(type, snapshot.val());
+                let items = snapshot.val();
+                for (let item in items) {
+                    fbLocal.allItems.setItem(type, item, items[item]);
+                }
+                callback(type, items);
             });
         }
     }

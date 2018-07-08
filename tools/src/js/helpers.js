@@ -1,5 +1,0 @@
-class Helpers {
-    constructor() {
-
-    }
-}
