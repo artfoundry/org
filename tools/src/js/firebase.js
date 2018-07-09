@@ -40,21 +40,27 @@ class FirebaseServices {
     processFormData(item, type) {
         let data = {},
             name = '',
-            attr = '',
-            itemName = '';
+            attr = '';
 
         for (let n=0; n < item.length; n++) {
-            itemName = item[n].name;
             if (item[n].name === 'logical') {
-                {
-                    if (this.allItems[type].hasOwnProperty(itemName)) {
-
-                    }
-                }
                 name = item[n].value;
             } else {
                 attr = item[n].name;
-                data[attr] = item[n].value;
+                // if this item name has multiple values
+                if (data.hasOwnProperty(attr)) {
+                    // and array is already set up
+                    if (Array.isArray(data[attr])) {
+                        data[attr].push(item[n].value);
+                    } else {
+                        // otherwise, set a new array to that key and add the previous single value as the first item
+                        // with the new value as the second item
+                        let value = data[attr];
+                        data[attr] = [value, item[n].value];
+                    }
+                } else {
+                    data[attr] = item[n].value;
+                }
             }
         }
 

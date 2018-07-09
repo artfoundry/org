@@ -53,7 +53,11 @@ class UI {
             }
             $itemID.append("<span class='item-name'>" + type + " name: " + item + "</span>");
             for (let attr in itemAttrs) {
-                $itemID.append("<span class='item-attr'>" + attr + " : " + itemAttrs[attr] + "</span>");
+                let value = itemAttrs[attr];
+                if (Array.isArray(value)) {
+                    value = value.join(', ');
+                }
+                $itemID.append("<span class='item-attr'>" + attr + " : " + value + "</span>");
             }
         }
     }
@@ -61,7 +65,7 @@ class UI {
     showMessage(message) {
         let $message = $('#message');
         $message.toggle().find('.text').text(message);
-        $message.find('.button-submit').click(function () {
+        $message.find('.button-submit').click(function() {
             $message.toggle();
         });
     }
