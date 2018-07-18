@@ -9,10 +9,6 @@ class UI {
         };
     }
 
-    toggleMain() {
-        $("#main").toggle();
-    }
-
     navbar() {
         $("#navbar .nav-link").click(function() {
             if (!$(this).hasClass("active")) {

@@ -1,0 +1,182 @@
+section {
+    margin: 20px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.firebaseui-container {
+    display: none;
+}
+
+/* navbar */
+
+nav {
+    display: inline-block;
+    margin: 0 10px 20px;
+}
+
+.nav-link {
+    display: inline-block;
+    margin: 10px;
+    color: blue;
+}
+
+.nav-link:hover {
+    color: lightblue;
+    cursor: pointer;
+}
+
+.nav-link.active {
+    border-top: 2px solid lightsalmon;
+    border-bottom: 2px solid lightsalmon;
+}
+
+/* tool */
+
+.tool-container {
+    display: flex;
+}
+
+/* list */
+
+.list-container {
+    flex-basis: 20%;
+    border-right: 2px solid blue;
+}
+
+.list {
+    margin: 10px;
+}
+
+.list-item-name {
+    color: blue;
+}
+
+.list-item-name:hover {
+    color: lightblue;
+}
+
+.list-item-row {
+    cursor: pointer;
+}
+
+/* form */
+
+.form-container {
+    flex-basis: 80%;
+}
+
+form {
+    margin: 10px;
+}
+
+input, select {
+    margin: 3px 15px 3px 5px;
+}
+
+.inactive {
+    display: none;
+}
+
+td.button-container {
+    text-align: center;
+}
+
+.button-submit {
+    width: 100px;
+    height: 30px;
+    margin: 10px;
+    color: white;
+    background-color: lightseagreen;
+    border: 1px solid blue;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.button-reset {
+    width: 100px;
+    height: 30px;
+    margin: 10px;
+    background-color: yellow;
+    border: 1px solid red;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* message */
+
+#message {
+    display: none;
+    position: absolute;
+    top: 40%;
+    left: 25%;
+    width: 50%;
+    margin: auto;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid lightsalmon;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px gray;
+    background-color: lightcyan;
+    z-index: 2;
+}
+
+#message .button-submit {
+    position: relative;
+    width: 50px;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+/* Cards */
+
+.row-header {
+    font-weight: 500;
+    padding-right: 10px;
+}
+
+.flex-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.item-row {
+    padding: 5px 0;
+}
+
+.item-row:nth-child(odd) {
+    background-color: lightcyan;
+}
+
+.item-name {
+    font-weight: 500;
+    padding: 0 5px;
+}
+
+.item-attr {
+    padding: 0 5px;
+}
+
+.yellow {
+    background-color: #f7a431;
+}
+
+.green {
+    background-color: #6aca3f;
+}
+
+.lightsalmon {
+    background-color: #fc6621;
+}
+
+.blue {
+    background-color: #0033ff;
+}
+
+.red {
+    background-color: #fe0002;
+}

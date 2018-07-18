@@ -1,13 +1,15 @@
 /**
  * Created by LCD Dreams on 4/14/18.
+ *
+ * firebase and firebaseui are in global scope
  */
 
 class FirebaseServices {
-    constructor(objectTypes, allItems, showMainCallback, updateListcallback) {
+    constructor(objectTypes, allItems, updateListcallback) {
         this.isOnline = this._initialize();
         if (this.isOnline) {
             this._initAuth();
-            this._monitorAuth(showMainCallback);
+            this._monitorAuth();
             this.fbDatabase = firebase.database();
             this.allItems = allItems;
             this.objectTypes = objectTypes;
@@ -63,11 +65,10 @@ class FirebaseServices {
             //             isNewUser = authResult.additionalUserInfo.isNewUser,
             //             providerId = authResult.additionalUserInfo.providerId,
             //             operationType = authResult.operationType;
-            //         // Do something with the returned AuthResult.
             //         // Return type determines whether we continue the redirect automatically
             //         // or whether we leave that to developer to handle.
             //         return true;
-            //     },
+            //     }
             //     signInFailure: function(error) {
             //         // Some unrecoverable error occurred during sign-in.
             //         // Return a promise when error handling is completed and FirebaseUI
@@ -87,37 +88,18 @@ class FirebaseServices {
         ui.start('#firebaseui-auth-container', uiConfig);
     }
 
-    _monitorAuth(showMainCallback) {
+    _monitorAuth() {
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 // User is signed in.
-                let displayName = user.displayName,
-                    email = user.email,
-                    emailVerified = user.emailVerified,
-                    photoURL = user.photoURL,
-                    uid = user.uid,
-                    // phoneNumber = user.phoneNumber,
-                    providerData = user.providerData;
-                user.getIdToken().then(function(accessToken) {
-                    $('#sign-in-status').text('Signed in');
-                    $('#sign-in').text('Sign out');
-                    $('#account-details').text(JSON.stringify({
-                        displayName: displayName,
-                        email: email,
-                        emailVerified: emailVerified,
-                        // phoneNumber: phoneNumber,
-                        photoURL: photoURL,
-                        uid: uid,
-                        accessToken: accessToken,
-                        providerData: providerData
-                    }, null, '  '));
+                $("#sign-out").click(function() {
+                    firebase.auth().signOut();
                 });
-                showMainCallback();
             } else {
                 // User is signed out.
-                $('#sign-in-status').text('Signed out');
-                $('#sign-in').text('Sign in');
-                $('#account-details').text('null');
+                if (window.location.pathname !== "/tools/index.html")
+                    window.location.pathname = "/tools/index.html";
+                $("#sign-out").off("click");
             }
         }, function(error) {
             console.log(error);
