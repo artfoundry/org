@@ -3,14 +3,16 @@
  */
 
 class FirebaseServices {
-    constructor(objectTypes, allItems, callback) {
+    constructor(objectTypes, allItems, showMainCallback, updateListcallback) {
         this.isOnline = this._initialize();
         if (this.isOnline) {
+            this._initAuth();
+            this._monitorAuth(showMainCallback);
             this.fbDatabase = firebase.database();
             this.allItems = allItems;
             this.objectTypes = objectTypes;
             for (let i=0; i < this.objectTypes.length; i++) {
-                this._getItems(this.objectTypes[i], callback);
+                this._getItems(this.objectTypes[i], updateListcallback);
             }
             this._monitorConnection();
         }
@@ -35,6 +37,91 @@ class FirebaseServices {
         }
 
         return initResult;
+    }
+
+    _initAuth() {
+        // FirebaseUI config.
+        let uiConfig = {
+            signInSuccessUrl: 'html/tools.html',
+            signInOptions: [
+                // Leave the lines as is for the providers you want to offer your users.
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+                // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+                // firebase.auth.GithubAuthProvider.PROVIDER_ID,
+                {
+                    provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                    // Whether the display name should be displayed in the Sign Up page.
+                    requireDisplayName: true
+                },
+                // firebase.auth.PhoneAuthProvider.PROVIDER_ID
+            ]
+            // callbacks: {
+            //     signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+            //         let user = authResult.user,
+            //             credential = authResult.credential,
+            //             isNewUser = authResult.additionalUserInfo.isNewUser,
+            //             providerId = authResult.additionalUserInfo.providerId,
+            //             operationType = authResult.operationType;
+            //         // Do something with the returned AuthResult.
+            //         // Return type determines whether we continue the redirect automatically
+            //         // or whether we leave that to developer to handle.
+            //         return true;
+            //     },
+            //     signInFailure: function(error) {
+            //         // Some unrecoverable error occurred during sign-in.
+            //         // Return a promise when error handling is completed and FirebaseUI
+            //         // will reset, clearing any UI. This commonly occurs for error code
+            //         // 'firebaseui/anonymous-upgrade-merge-conflict' when merge conflict
+            //         // occurs. Check below for more details on this.
+            //         return handleUIError(error);
+            //     }
+            // }
+            // Terms of service url.
+            // tosUrl: '<your-tos-url>'
+        };
+
+        // Initialize the FirebaseUI Widget using Firebase.
+        let ui = new firebaseui.auth.AuthUI(firebase.auth());
+        // The start method will wait until the DOM is loaded.
+        ui.start('#firebaseui-auth-container', uiConfig);
+    }
+
+    _monitorAuth(showMainCallback) {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in.
+                let displayName = user.displayName,
+                    email = user.email,
+                    emailVerified = user.emailVerified,
+                    photoURL = user.photoURL,
+                    uid = user.uid,
+                    // phoneNumber = user.phoneNumber,
+                    providerData = user.providerData;
+                user.getIdToken().then(function(accessToken) {
+                    $('#sign-in-status').text('Signed in');
+                    $('#sign-in').text('Sign out');
+                    $('#account-details').text(JSON.stringify({
+                        displayName: displayName,
+                        email: email,
+                        emailVerified: emailVerified,
+                        // phoneNumber: phoneNumber,
+                        photoURL: photoURL,
+                        uid: uid,
+                        accessToken: accessToken,
+                        providerData: providerData
+                    }, null, '  '));
+                });
+                showMainCallback();
+            } else {
+                // User is signed out.
+                $('#sign-in-status').text('Signed out');
+                $('#sign-in').text('Sign in');
+                $('#account-details').text('null');
+            }
+        }, function(error) {
+            console.log(error);
+        });
     }
 
     processFormData(item, type) {
@@ -82,7 +169,7 @@ class FirebaseServices {
         });
     }
 
-    _getItems(type, callback) {
+    _getItems(type, updateListcallback) {
         let fbLocal = this;
         if (this.isOnline) {
             this.fbDatabase.ref('/' + type + '/').orderByKey().on('value', function(snapshot) {
@@ -90,7 +177,7 @@ class FirebaseServices {
                 for (let item in items) {
                     fbLocal.allItems.setItem(type, item, items[item]);
                 }
-                callback(type, items);
+                updateListcallback(type, items);
             });
         }
     }

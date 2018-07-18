@@ -1,11 +1,22 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    background-color: #ECEFF1;
+}
+
 section {
     margin: 20px;
 }
 
 header {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 30px;
     margin: 20px 0;
+    text-align: center;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 500;
 }
 
 /* navbar */
@@ -27,13 +38,46 @@ nav {
 }
 
 .nav-link.active {
-    border-top: 2px orange solid;
-    border-bottom: 2px orange solid;
+    border-top: 2px solid lightsalmon;
+    border-bottom: 2px solid lightsalmon;
+}
+
+/* tool */
+
+.tool-container {
+    display: flex;
+}
+
+/* list */
+
+.list-container {
+    flex-basis: 20%;
+    border-right: 2px solid blue;
+}
+
+.list {
+    margin: 10px;
+}
+
+.list-item-name {
+    color: blue;
+}
+
+.list-item-name:hover {
+    color: lightblue;
+}
+
+.list-item-row {
+    cursor: pointer;
 }
 
 /* form */
 
-form, .list {
+.form-container {
+    flex-basis: 80%;
+}
+
+form {
     margin: 10px;
 }
 
@@ -41,13 +85,33 @@ input, select {
     margin: 3px 15px 3px 5px;
 }
 
-.page-title {
-    font-size: 16px;
-    font-weight: bold;
-}
-
 .inactive {
     display: none;
+}
+
+td.button-container {
+    text-align: center;
+}
+
+.button-submit {
+    width: 100px;
+    height: 30px;
+    margin: 10px;
+    color: white;
+    background-color: lightseagreen;
+    border: 1px solid blue;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.button-reset {
+    width: 100px;
+    height: 30px;
+    margin: 10px;
+    background-color: yellow;
+    border: 1px solid red;
+    border-radius: 3px;
+    cursor: pointer;
 }
 
 /* message */
@@ -61,7 +125,7 @@ input, select {
     margin: auto;
     padding: 10px;
     text-align: center;
-    border: 1px solid orange;
+    border: 1px solid lightsalmon;
     border-radius: 5px;
     box-shadow: 3px 3px 5px gray;
     background-color: lightcyan;
@@ -79,7 +143,7 @@ input, select {
 /* Cards */
 
 .row-header {
-    font-weight: bold;
+    font-weight: 500;
     padding-right: 10px;
 }
 
@@ -97,7 +161,7 @@ input, select {
 }
 
 .item-name {
-    font-weight: bold;
+    font-weight: 500;
     padding: 0 5px;
 }
 
@@ -113,7 +177,7 @@ input, select {
     background-color: #6aca3f;
 }
 
-.orange {
+.lightsalmon {
     background-color: #fc6621;
 }
 

@@ -2,10 +2,15 @@ class UI {
     constructor(allItems) {
         this.allItems = allItems;
         this.navbar();
-        this.formWatch();
+        this._listWatch();
+        this._formWatch();
         this.messages = {
-            'duplicate' : "This item already exists. Edit it below."
+            'duplicate' : "This item already exists. Select it from the list to edit."
         };
+    }
+
+    toggleMain() {
+        $("#main").toggle();
     }
 
     navbar() {
@@ -24,7 +29,18 @@ class UI {
         });
     }
 
-    formWatch() {
+    _listWatch() {
+        let ui = this;
+
+        $(".list-item-row").click(function(event) {
+            let itemName = event.currentTarget.id,
+                type = $(event.currentTarget).parents(".list-container").attr("id").substring(6);
+
+            ui.updateForm(type, itemName);
+        });
+    }
+
+    _formWatch() {
         let ui = this;
 
         $("form").submit(function(event) {
@@ -40,25 +56,30 @@ class UI {
         });
     }
 
+    updateForm(type, itemName) {
+        let item = this.allItems.getItem(type, itemName);
+
+
+        // for (let attr in item) {
+        //     let value = item[attr];
+        //     if (Array.isArray(value)) {
+        //         value = value.join(', ');
+        //     }
+        //     $itemID.append("<span class='item-attr'>" + attr + " : " + value + "</span>");
+        // }
+    }
+
     updateList(type, items) {
         for (let item in items) {
-            let $itemID = $("#" + item),
-                itemAttrs = items[item];
+            let $itemID = $("#" + item);
 
             if ($itemID.length === 0) {
-                $("#list-" + type + " > .list").append("<div id='" + item + "' class='item-row'></div>");
+                $("#list-" + type + " > .list").append("<div id='" + item + "' class='list-item-row'></div>");
                 $itemID = $("#" + item);
             } else {
                 $itemID.html("");
             }
-            $itemID.append("<span class='item-name'>" + type + " name: " + item + "</span>");
-            for (let attr in itemAttrs) {
-                let value = itemAttrs[attr];
-                if (Array.isArray(value)) {
-                    value = value.join(', ');
-                }
-                $itemID.append("<span class='item-attr'>" + attr + " : " + value + "</span>");
-            }
+            $itemID.append("<span class='list-item-name'>" + item + "</span>");
         }
     }
 

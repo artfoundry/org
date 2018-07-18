@@ -13,7 +13,7 @@ let Tools = {
             fbServices = {};
 
         if (!fbServices.isOnline)
-            this.fbServices = new FirebaseServices(objectTypes, allItems, ui.updateList);
+            this.fbServices = new FirebaseServices(objectTypes, allItems, ui.toggleMain, ui.updateList);
     }
 };
 

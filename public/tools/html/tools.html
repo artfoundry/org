@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Org Tools</title>
+        <link rel="stylesheet" type="text/css" href="../css/main.css">
+        <link rel="stylesheet" type="text/css" href="../css/firebaseui.css">
+    </head>
+    <body>
+        <header>Org Tools</header>
+
+        <div id="firebaseui-auth-container"></div>
+        <div id="sign-in-status"></div>
+        <div id="sign-in"></div>
+        <div id="account-details"></div>
+
+        <nav id="navbar">
+            <span id="navlink-card" class="active nav-link">Card Entry</span>
+            <span id="navlink-board" class="nav-link">Board Entry</span>
+        </nav>
+
+        <div class="tool-container">
+            <section id="list-card" class="active list-container">
+                <div class="title">Card List</div>
+                <div class="list"></div>
+            </section>
+
+            <section id="list-board" class="inactive list-container">
+                <div class="title">Board List</div>
+                <div class="list"></div>
+            </section>
+
+            <section id="form-card" class="active form-container">
+                <div class="title">New Card Entry</div>
+                <form>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td class="row-header">Basics: </td>
+                            <td>
+                                <label for="logical-card">Logical</label>
+                                <input id="logical-card" type="text" name="logical">
+                            </td>
+                            <td>
+                                <label for="text-card">Text</label>
+                                <input id="text-card" type="text" name="Text">
+                            </td>
+                            <td>
+                                <label for="color-card">Color</label>
+                                <select id="color-card" name="Color">
+                                    <option value="yellow">Yellow</option>
+                                    <option value="green">Green</option>
+                                    <option value="orange">Orange</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="red">Red</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">Rules: </td>
+                            <td>Designate Options</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="4">
+                                <div class="flex-grid">
+                                    <span><label for="options-card-alliance">Alliance</label><input id="options-card-alliance" name="Options" type="checkbox" value="Alliance"></span>
+                                    <span><label for="options-card-ariel">Ariel</label><input id="options-card-ariel" name="Options" type="checkbox" value="Ariel"></span>
+                                    <span><label for="options-card-callisto">Callisto</label><input id="options-card-callisto" name="Options" type="checkbox" value="Callisto"></span>
+                                    <span><label for="options-card-ceres">Ceres</label><input id="options-card-ceres" name="Options" type="checkbox" value="Ceres"></span>
+                                    <span><label for="options-card-dione">Dione</label><input id="options-card-dione" name="Options" type="checkbox" value="Dione"></span>
+                                    <span><label for="options-card-easternFed">Eastern Federation</label><input id="options-card-easternFed" name="Options" type="checkbox" value="Eastern Federation"></span>
+                                    <span><label for="options-card-eunomia">Eunomia</label><input id="options-card-eunomia" name="Options" type="checkbox" value="Eunomia"></span>
+                                    <span><label for="options-card-europa">Europa</label><input id="options-card-europa" name="Options" type="checkbox" value="Europa"></span>
+                                    <span><label for="options-card-ganymede">Ganymede</label><input id="options-card-ganymede" name="Options" type="checkbox" value="Ganymede"></span>
+                                    <span><label for="options-card-haumea">Haumea</label><input id="options-card-haumea" name="Options" type="checkbox" value="Haumea"></span>
+                                    <span><label for="options-card-hildas">Hildas</label><input id="options-card-hildas" name="Options" type="checkbox" value="Hildas Triangle"></span>
+                                    <span><label for="options-card-iapetus">Iapetus</label><input id="options-card-iapetus" name="Options" type="checkbox" value="Iapetus"></span>
+                                    <span><label for="options-card-io">Io</label><input id="options-card-io" name="Options" type="checkbox" value="Io"></span>
+                                    <span><label for="options-card-kuiperCompact">Kuiper Compact</label><input id="options-card-kuiperCompact" name="Options" type="checkbox" value="Kuiper Compact"></span>
+                                    <span><label for="options-card-luna">Luna</label><input id="options-card-luna" name="Options" type="checkbox" value="Luna"></span>
+                                    <span><label for="options-card-makemake">Makemake</label><input id="options-card-makemake" name="Options" type="checkbox" value="Makemake"></span>
+                                    <span><label for="options-card-mars">Mars</label><input id="options-card-mars" name="Options" type="checkbox" value="Mars"></span>
+                                    <span><label for="options-card-mercury">Mercury</label><input id="options-card-mercury" name="Options" type="checkbox" value="Mercury"></span>
+                                    <span><label for="options-card-miranda">Miranda</label><input id="options-card-miranda" name="Options" type="checkbox" value="Miranda"></span>
+                                    <span><label for="options-card-nereid">Nereid</label><input id="options-card-nereid" name="Options" type="checkbox" value="Nereid"></span>
+                                    <span><label for="options-card-neso">Neso</label><input id="options-card-neso" name="Options" type="checkbox" value="Neso"></span>
+                                    <span><label for="options-card-oberon">Oberon</label><input id="options-card-oberon" name="Options" type="checkbox" value="Oberon"></span>
+                                    <span><label for="options-card-oceanicLeague">Oceanic League</label><input id="options-card-oceanicLeague" name="Options" type="checkbox" value="Oceanic League"></span>
+                                    <span><label for="options-card-orcus">Orcus</label><input id="options-card-orcus" name="Options" type="checkbox" value="Orcus"></span>
+                                    <span><label for="options-card-pluto">Pluto</label><input id="options-card-pluto" name="Options" type="checkbox" value="Pluto"></span>
+                                    <span><label for="options-card-proteus">Proteus</label><input id="options-card-proteus" name="Options" type="checkbox" value="Proteus"></span>
+                                    <span><label for="options-card-rhea">Rhea</label><input id="options-card-rhea" name="Options" type="checkbox" value="Rhea"></span>
+                                    <span><label for="options-card-sedna">Sedna</label><input id="options-card-sedna" name="Options" type="checkbox" value="Sedna"></span>
+                                    <span><label for="options-card-state">State</label><input id="options-card-state" name="Options" type="checkbox" value="State"></span>
+                                    <span><label for="options-card-titania">Titania</label> <input id="options-card-titania" name="Options" type="checkbox" value="Titania"></span>
+                                    <span><label for="options-card-triton">Triton</label><input id="options-card-triton" name="Options" type="checkbox" value="Triton"></span>
+                                    <span><label for="options-card-union">Union</label><input id="options-card-union" name="Options" type="checkbox" value="Union"></span>
+                                    <span><label for="options-card-venus">Venus</label><input id="options-card-venus" name="Options" type="checkbox" value="Venus"></span>
+                                    <span><label for="options-card-vesta">Vesta</label><input id="options-card-vesta" name="Options" type="checkbox" value="Vesta"></span>
+                                    <span><label for="options-card-xena">Xena</label><input id="options-card-xena" name="Options" type="checkbox" value="Xena"></span>
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="button-container">
+                                <input id="submit-card" type="submit" value="Save" class="button-submit">
+                                <input type="reset" value="Clear form" class="button-reset">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </section>
+
+            <section id="form-board" class="inactive form-container">
+                <div class="title">New Board Entry</div>
+                <form>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <span class="row-header">Basics: </span>
+                                <label for="logical-board">Logical</label>
+                                <input id="logical-board" type="text" name="logical">
+                                <label for="text-board">Text</label>
+                                <input id="text-board" type="text" name="Text">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="button-container">
+                                <input id="submit-board" type="submit" value="Save" class="button-submit">
+                                <input type="reset" value="Clear form" class="button-reset">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </section>
+
+            <div id="message">
+                <div class="text"></div>
+                <button class="button-submit">OK</button>
+            </div>
+        </div>
+
+        <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase-database.js"></script>
+        <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="../js/storage.js"></script>
+        <script type="text/javascript" src="../js/firebase.js"></script>
+        <script type="text/javascript" src="../js/ui.js"></script>
+        <script type="text/javascript" src="../js/main.js"></script>
+    </body>
+</html>
