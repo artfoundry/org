@@ -124,14 +124,6 @@ td.button-container {
     z-index: 2;
 }
 
-#message .button-submit {
-    position: relative;
-    width: 50px;
-    margin: 5px;
-    padding: 5px;
-    border-radius: 3px;
-}
-
 /* Cards */
 
 .row-header {
@@ -161,22 +153,12 @@ td.button-container {
     padding: 0 5px;
 }
 
-.yellow {
-    background-color: #f7a431;
-}
+/*
+    Card colors
 
-.green {
-    background-color: #6aca3f;
-}
-
-.lightsalmon {
-    background-color: #fc6621;
-}
-
-.blue {
-    background-color: #0033ff;
-}
-
-.red {
-    background-color: #fe0002;
-}
+    Commercial: background-color: #f7a431;
+    Cultural:   background-color: #6aca3f;
+    Political:  background-color: #fc6621;
+    Research:   background-color: #0033ff;
+    Military:   background-color: #fe0002;
+*/

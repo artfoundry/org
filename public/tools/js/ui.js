@@ -5,7 +5,8 @@ class UI {
         this._listWatch();
         this._formWatch();
         this.messages = {
-            'duplicate' : "This item already exists. Select it from the list to edit."
+            'confirmedit' : {text: "You are about to save changes to an existing item.", hasCancel: true},
+            'noname'      : {text: "The logical name needs to be entered in order to save.", hasCancel: false}
         };
     }
 
@@ -25,12 +26,12 @@ class UI {
         });
     }
 
-    _listWatch() {
+    _listWatch(itemID) {
         let ui = this;
 
-        $(".list-item-row").click(function(event) {
+        $("#" + itemID).click(function(event) {
             let itemName = event.currentTarget.id,
-                type = $(event.currentTarget).parents(".list-container").attr("id").substring(6);
+                type = $(event.currentTarget).parents(".list-container").attr("id").substring(5);
 
             ui.updateForm(type, itemName);
         });
@@ -41,28 +42,39 @@ class UI {
 
         $("form").submit(function(event) {
             event.preventDefault();
-            let type = $(event.currentTarget).find(".button-submit").attr("id").substring(7),
-                formData = $(this).serializeArray(),
-                itemName = formData[0].value;
-            if (ui.allItems.getItem(type, itemName)) {
-                ui.showMessage(ui.messages.duplicate);
+
+            let type = $(event.currentTarget).find(".button-submit").attr("id").substring(7);
+
+            if ($("#logical-" + type)[0].value !== '') {
+                let formData = $(this).serializeArray(),
+                    itemName = formData[0].value,
+                    saveData = function() { Tools.fbServices.processFormData(formData, type); };
+
+                if (ui.allItems.getItem(type, itemName)) {
+                    ui.showMessage(ui.messages.confirmedit, saveData);
+                } else {
+                    saveData();
+                }
             } else {
-                Tools.fbServices.processFormData(formData, type);
+                ui.showMessage(ui.messages.noname);
             }
+
         });
     }
 
     updateForm(type, itemName) {
-        let item = this.allItems.getItem(type, itemName);
+        let item = this.allItems.getItem(type, itemName),
+            $form = $("#form-" + type);
 
+        $form.find("[name='logical']")[0].value = itemName;
+        for (let attr in item) {
+            let value = item[attr];
+            if (Array.isArray(value)) {
 
-        // for (let attr in item) {
-        //     let value = item[attr];
-        //     if (Array.isArray(value)) {
-        //         value = value.join(', ');
-        //     }
-        //     $itemID.append("<span class='item-attr'>" + attr + " : " + value + "</span>");
-        // }
+            } else {
+                $form.find("[name='" + attr + "']")[0].value = value;
+            }
+        }
     }
 
     updateList(type, items) {
@@ -76,14 +88,22 @@ class UI {
                 $itemID.html("");
             }
             $itemID.append("<span class='list-item-name'>" + item + "</span>");
+            this._listWatch(item);
         }
     }
 
-    showMessage(message) {
-        let $message = $('#message');
-        $message.toggle().find('.text').text(message);
-        $message.find('.button-submit').click(function() {
+    showMessage(message, callback = null) {
+        let $message = $('#message'),
+            $cancelButton = $message.find('.button-reset'),
+            ui = this;
+
+        $message.toggle().find('.text').text(message.text);
+        message.hasCancel ? $cancelButton.show() : $cancelButton.hide();
+        $message.find('button').click(function() {
             $message.toggle();
+            $message.find('button').off('click');
+            if ($(this).hasClass('button-submit') && callback !== null)
+                callback();
         });
     }
 }

@@ -11,7 +11,7 @@ let Tools = {
             allItems = new ItemStorage(objectTypes),
             ui = new UI(allItems);
 
-        this.fbServices = new FirebaseServices(objectTypes, allItems, ui.updateList);
+        this.fbServices = new FirebaseServices(objectTypes, allItems, ui.updateList.bind(ui));
     }
 };
 
