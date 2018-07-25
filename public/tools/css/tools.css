@@ -73,8 +73,12 @@ form {
     margin: 10px;
 }
 
+td {
+    padding: 5px 0;
+}
+
 input, select {
-    margin: 3px 15px 3px 5px;
+    margin: 3px 0 3px 5px;
 }
 
 .inactive {
@@ -129,11 +133,16 @@ td.button-container {
 .row-header {
     font-weight: 500;
     padding-right: 10px;
+    vertical-align: top;
 }
 
 .flex-grid {
     display: flex;
     flex-wrap: wrap;
+}
+
+.flex-item {
+    margin: 0 20px 0 0;
 }
 
 .item-row {

@@ -32,9 +32,9 @@
                 <div class="list"></div>
             </section>
 
-            <section id="form-card" class="active form-container">
-                <div class="title">New Card Entry</div>
-                <form>
+            <section id="form-container-card" class="active form-container">
+                <div class="title">Card Details</div>
+                <form id="form-card">
                     <table>
                         <tbody>
                         <tr>
@@ -45,65 +45,223 @@
                             </td>
                             <td>
                                 <label for="text-card">Text</label>
-                                <input id="text-card" type="text" name="Text">
+                                <input id="text-card" type="text" name="text">
                             </td>
                             <td>
                                 <label for="type-card">Card type</label>
-                                <select id="type-card" name="Type">
+                                <select id="type-card" name="type">
                                     <option value="commercial">Commercial</option>
                                     <option value="cultural">Cultural</option>
                                     <option value="political">Political</option>
                                     <option value="research">Research</option>
                                     <option value="military">Military</option>
+                                    <option value="polity">Polity</option>
                                 </select>
                             </td>
                         </tr>
                         <tr>
                             <td class="row-header">Rules: </td>
-                            <td>Designate Options</td>
+                            <td colspan="4">
+                                <div>Designate Options</div>
+                                <div class="flex-grid">
+                                    <span class="flex-item"><label for="options-alliance-card">Alliance</label><input id="options-alliance-card" name="options" type="checkbox" value="alliance"></span>
+                                    <span class="flex-item"><label for="options-ariel-card">Ariel</label><input id="options-ariel-card" name="options" type="checkbox" value="ariel"></span>
+                                    <span class="flex-item"><label for="options-callisto-card">Callisto</label><input id="options-callisto-card" name="options" type="checkbox" value="callisto"></span>
+                                    <span class="flex-item"><label for="options-ceres-card">Ceres</label><input id="options-ceres-card" name="options" type="checkbox" value="ceres"></span>
+                                    <span class="flex-item"><label for="options-dione-card">Dione</label><input id="options-dione-card" name="options" type="checkbox" value="dione"></span>
+                                    <span class="flex-item"><label for="options-easternFed-card">Eastern Federation</label><input id="options-easternFed-card" name="options" type="checkbox" value="eastern"></span>
+                                    <span class="flex-item"><label for="options-eunomia-card">Eunomia</label><input id="options-eunomia-card" name="options" type="checkbox" value="eunomia"></span>
+                                    <span class="flex-item"><label for="options-europa-card">Europa</label><input id="options-europa-card" name="options" type="checkbox" value="europa"></span>
+                                    <span class="flex-item"><label for="options-ganymede-card">Ganymede</label><input id="options-ganymede-card" name="options" type="checkbox" value="ganymede"></span>
+                                    <span class="flex-item"><label for="options-haumea-card">Haumea</label><input id="options-haumea-card" name="options" type="checkbox" value="haumea"></span>
+                                    <span class="flex-item"><label for="options-hildas-card">Hildas</label><input id="options-hildas-card" name="options" type="checkbox" value="hildas Triangle"></span>
+                                    <span class="flex-item"><label for="options-iapetus-card">Iapetus</label><input id="options-iapetus-card" name="options" type="checkbox" value="iapetus"></span>
+                                    <span class="flex-item"><label for="options-io-card">Io</label><input id="options-io-card" name="options" type="checkbox" value="io"></span>
+                                    <span class="flex-item"><label for="options-kuiperCompact-card">Kuiper Compact</label><input id="options-kuiperCompact-card" name="options" type="checkbox" value="kuiper"></span>
+                                    <span class="flex-item"><label for="options-luna-card">Luna</label><input id="options-luna-card" name="options" type="checkbox" value="luna"></span>
+                                    <span class="flex-item"><label for="options-makemake-card">Makemake</label><input id="options-makemake-card" name="options" type="checkbox" value="makemake"></span>
+                                    <span class="flex-item"><label for="options-mars-card">Mars</label><input id="options-mars-card" name="options" type="checkbox" value="mars"></span>
+                                    <span class="flex-item"><label for="options-mercury-card">Mercury</label><input id="options-mercury-card" name="options" type="checkbox" value="mercury"></span>
+                                    <span class="flex-item"><label for="options-miranda-card">Miranda</label><input id="options-miranda-card" name="options" type="checkbox" value="miranda"></span>
+                                    <span class="flex-item"><label for="options-nereid-card">Nereid</label><input id="options-nereid-card" name="options" type="checkbox" value="nereid"></span>
+                                    <span class="flex-item"><label for="options-neso-card">Neso</label><input id="options-neso-card" name="options" type="checkbox" value="neso"></span>
+                                    <span class="flex-item"><label for="options-oberon-card">Oberon</label><input id="options-oberon-card" name="options" type="checkbox" value="oberon"></span>
+                                    <span class="flex-item"><label for="options-oceanicLeague-card">Oceanic League</label><input id="options-oceanicLeague-card" name="options" type="checkbox" value="oceanic"></span>
+                                    <span class="flex-item"><label for="options-orcus-card">Orcus</label><input id="options-orcus-card" name="options" type="checkbox" value="orcus"></span>
+                                    <span class="flex-item"><label for="options-pluto-card">Pluto</label><input id="options-pluto-card" name="options" type="checkbox" value="pluto"></span>
+                                    <span class="flex-item"><label for="options-proteus-card">Proteus</label><input id="options-proteus-card" name="options" type="checkbox" value="proteus"></span>
+                                    <span class="flex-item"><label for="options-rhea-card">Rhea</label><input id="options-rhea-card" name="options" type="checkbox" value="rhea"></span>
+                                    <span class="flex-item"><label for="options-sedna-card">Sedna</label><input id="options-sedna-card" name="options" type="checkbox" value="sedna"></span>
+                                    <span class="flex-item"><label for="options-state-card">State</label><input id="options-state-card" name="options" type="checkbox" value="state"></span>
+                                    <span class="flex-item"><label for="options-titania-card">Titania</label> <input id="options-titania-card" name="options" type="checkbox" value="titania"></span>
+                                    <span class="flex-item"><label for="options-triton-card">Triton</label><input id="options-triton-card" name="options" type="checkbox" value="triton"></span>
+                                    <span class="flex-item"><label for="options-union-card">Union</label><input id="options-union-card" name="options" type="checkbox" value="union"></span>
+                                    <span class="flex-item"><label for="options-venus-card">Venus</label><input id="options-venus-card" name="options" type="checkbox" value="venus"></span>
+                                    <span class="flex-item"><label for="options-vesta-card">Vesta</label><input id="options-vesta-card" name="options" type="checkbox" value="vesta"></span>
+                                    <span class="flex-item"><label for="options-xena-card">Xena</label><input id="options-xena-card" name="options" type="checkbox" value="xena"></span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td></td>
                             <td colspan="4">
-                                <div class="flex-grid">
-                                    <span><label for="options-card-alliance">Alliance</label><input id="options-card-alliance" name="Options" type="checkbox" value="Alliance"></span>
-                                    <span><label for="options-card-ariel">Ariel</label><input id="options-card-ariel" name="Options" type="checkbox" value="Ariel"></span>
-                                    <span><label for="options-card-callisto">Callisto</label><input id="options-card-callisto" name="Options" type="checkbox" value="Callisto"></span>
-                                    <span><label for="options-card-ceres">Ceres</label><input id="options-card-ceres" name="Options" type="checkbox" value="Ceres"></span>
-                                    <span><label for="options-card-dione">Dione</label><input id="options-card-dione" name="Options" type="checkbox" value="Dione"></span>
-                                    <span><label for="options-card-easternFed">Eastern Federation</label><input id="options-card-easternFed" name="Options" type="checkbox" value="Eastern Federation"></span>
-                                    <span><label for="options-card-eunomia">Eunomia</label><input id="options-card-eunomia" name="Options" type="checkbox" value="Eunomia"></span>
-                                    <span><label for="options-card-europa">Europa</label><input id="options-card-europa" name="Options" type="checkbox" value="Europa"></span>
-                                    <span><label for="options-card-ganymede">Ganymede</label><input id="options-card-ganymede" name="Options" type="checkbox" value="Ganymede"></span>
-                                    <span><label for="options-card-haumea">Haumea</label><input id="options-card-haumea" name="Options" type="checkbox" value="Haumea"></span>
-                                    <span><label for="options-card-hildas">Hildas</label><input id="options-card-hildas" name="Options" type="checkbox" value="Hildas Triangle"></span>
-                                    <span><label for="options-card-iapetus">Iapetus</label><input id="options-card-iapetus" name="Options" type="checkbox" value="Iapetus"></span>
-                                    <span><label for="options-card-io">Io</label><input id="options-card-io" name="Options" type="checkbox" value="Io"></span>
-                                    <span><label for="options-card-kuiperCompact">Kuiper Compact</label><input id="options-card-kuiperCompact" name="Options" type="checkbox" value="Kuiper Compact"></span>
-                                    <span><label for="options-card-luna">Luna</label><input id="options-card-luna" name="Options" type="checkbox" value="Luna"></span>
-                                    <span><label for="options-card-makemake">Makemake</label><input id="options-card-makemake" name="Options" type="checkbox" value="Makemake"></span>
-                                    <span><label for="options-card-mars">Mars</label><input id="options-card-mars" name="Options" type="checkbox" value="Mars"></span>
-                                    <span><label for="options-card-mercury">Mercury</label><input id="options-card-mercury" name="Options" type="checkbox" value="Mercury"></span>
-                                    <span><label for="options-card-miranda">Miranda</label><input id="options-card-miranda" name="Options" type="checkbox" value="Miranda"></span>
-                                    <span><label for="options-card-nereid">Nereid</label><input id="options-card-nereid" name="Options" type="checkbox" value="Nereid"></span>
-                                    <span><label for="options-card-neso">Neso</label><input id="options-card-neso" name="Options" type="checkbox" value="Neso"></span>
-                                    <span><label for="options-card-oberon">Oberon</label><input id="options-card-oberon" name="Options" type="checkbox" value="Oberon"></span>
-                                    <span><label for="options-card-oceanicLeague">Oceanic League</label><input id="options-card-oceanicLeague" name="Options" type="checkbox" value="Oceanic League"></span>
-                                    <span><label for="options-card-orcus">Orcus</label><input id="options-card-orcus" name="Options" type="checkbox" value="Orcus"></span>
-                                    <span><label for="options-card-pluto">Pluto</label><input id="options-card-pluto" name="Options" type="checkbox" value="Pluto"></span>
-                                    <span><label for="options-card-proteus">Proteus</label><input id="options-card-proteus" name="Options" type="checkbox" value="Proteus"></span>
-                                    <span><label for="options-card-rhea">Rhea</label><input id="options-card-rhea" name="Options" type="checkbox" value="Rhea"></span>
-                                    <span><label for="options-card-sedna">Sedna</label><input id="options-card-sedna" name="Options" type="checkbox" value="Sedna"></span>
-                                    <span><label for="options-card-state">State</label><input id="options-card-state" name="Options" type="checkbox" value="State"></span>
-                                    <span><label for="options-card-titania">Titania</label> <input id="options-card-titania" name="Options" type="checkbox" value="Titania"></span>
-                                    <span><label for="options-card-triton">Triton</label><input id="options-card-triton" name="Options" type="checkbox" value="Triton"></span>
-                                    <span><label for="options-card-union">Union</label><input id="options-card-union" name="Options" type="checkbox" value="Union"></span>
-                                    <span><label for="options-card-venus">Venus</label><input id="options-card-venus" name="Options" type="checkbox" value="Venus"></span>
-                                    <span><label for="options-card-vesta">Vesta</label><input id="options-card-vesta" name="Options" type="checkbox" value="Vesta"></span>
-                                    <span><label for="options-card-xena">Xena</label><input id="options-card-xena" name="Options" type="checkbox" value="Xena"></span>
-
+                                <div>
+                                    <label for="draw-effect-card">On Draw</label>
+                                    <select id="draw-effect-card" name="draw-effect">
+                                        <option value=""></option>
+                                        <option value=""></option>
+                                    </select>
                                 </div>
                             </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="4">
+                                <div>
+                                    <label for="discard-card">Discard</label>
+                                    <select id="discard-card" name="discard">
+                                        <option value=""></option>
+                                        <option value="collect">On collect</option>
+                                        <option value="draw">After draw effect</option>
+                                        <option value="collect-2">On second collect</option>
+                                        <option value="end-turn">End of turn</option>
+                                        <option value="end-draw-2">End of next draw phase</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="4">
+                                <div>
+                                    <label for="collect-card">On Collect</label>
+                                    <select id="collect-card" name="collect">
+                                        <option value=""></option>
+                                        <option value="collect-1">Collect card</option>
+                                        <option value="eastFed-1">Eastern Federation +1 to designated</option>
+                                        <option value="eastFed-2">Eastern Federation +2 to designated</option>
+                                        <option value="eastFed-3">Eastern Federation +3 to designated</option>
+                                        <option value="state-1">State +1 to designated</option>
+                                        <option value="state-2">State +2 to designated</option>
+                                        <option value="state-3">State +3 to designated</option>
+                                        <option value="union-1">Union +1 to designated</option>
+                                        <option value="union-2">Union +2 to designated</option>
+                                        <option value="union-3">Union +3 to designated</option>
+                                        <option value="ocean-1">Oceanic League +1 to designated</option>
+                                        <option value="ocean-2">Oceanic League +2 to designated</option>
+                                        <option value="ocean-3">Oceanic League +3 to designated</option>
+                                        <option value="south-1">Southern Bloc +1 to designated</option>
+                                        <option value="south-2">Southern Bloc +2 to designated</option>
+                                        <option value="south-3">Southern Bloc +3 to designated</option>
+                                        <option value="alliance-1">Alliance +1 to designated</option>
+                                        <option value="alliance-2">Alliance +2 to designated</option>
+                                        <option value="alliance-3">Alliance +3 to designated</option>
+                                        <option value="kuiper-1">Kuiper Compact +1 to designated</option>
+                                        <option value="kuiper-2">Kuiper Compact +2 to designated</option>
+                                        <option value="kuiper-3">Kuiper Compact +3 to designated</option>
+                                        <option value="discard">All EXCEPT Winner Discard random card</option>
+                                        <option value="move">Move this card to designated</option>
+                                        <option value="move-&-collect-2">Move this card to designated & Collect on Second Collect</option>
+                                        <option value="move-helium">Move all Helium-3 tokens from one designated world to any other designated world</option>
+                                        <option value="replace-3-helium">For each 3 Helium-3 tokens present, remove these 3 tokens and replace with Helium-3 card granting specified victory points</option>
+                                        <option value="remove-commercial-1-&-collect">Remove lowest value Commercial card from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-2-&-collect">Remove 2 lowest value Commercial cards from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-3-&-collect">Remove 3 lowest value Commercial cards from winner's collection & Collect card</option>
+                                        <option value="remove-political-1-&-collect">Remove lowest value Political card from winner's collection & Collect card</option>
+                                        <option value="remove-political-2-&-collect">Remove 2 lowest value Political cards from winner's collection & Collect card</option>
+                                        <option value="remove-political-3-&-collect">Remove 3 lowest value Political cards from winner's collection & Collect card</option>
+                                        <option value="remove-research-1-&-collect">Remove lowest value Research card from winner's collection & Collect card</option>
+                                        <option value="remove-research-2-&-collect">Remove 2 lowest value Research cards from winner's collection & Collect card</option>
+                                        <option value="remove-research-3-&-collect">Remove 3 lowest value Research cards from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-1-&-collect">Remove lowest value Cultural card from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-2-&-collect">Remove 2 lowest value Cultural cards from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-3-&-collect">Remove 3 lowest value Cultural cards from winner's collection & Collect card</option>
+                                        <option value="add-3-influence">Add 3 temporary Influence to designated other world</option>
+                                        <option value="remove-polity">Remove all Polity Influence tokens from designated polity</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="4">
+                                <div>
+                                    <div>On End of Game</div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item">
+                                            <label for="end-game-commercial-card">Commercial</label>
+                                            <select id="end-game-commercial-card" name="end-game-commercial">
+                                                <option value=""></option>
+                                                <option value="-3">-3</option>
+                                                <option value="-2">-2</option>
+                                                <option value="-1">-1</option>
+                                                <option value="+1">+1</option>
+                                                <option value="+2">+2</option>
+                                                <option value="+3">+3</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="end-game-cultural-card">Cultural</label>
+                                            <select id="end-game-cultural-card" name="end-game-cultural">
+                                                <option value=""></option>
+                                                <option value="-3">-3</option>
+                                                <option value="-2">-2</option>
+                                                <option value="-1">-1</option>
+                                                <option value="+1">+1</option>
+                                                <option value="+2">+2</option>
+                                                <option value="+3">+3</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="end-game-military-card">Military</label>
+                                            <select id="end-game-military-card" name="end-game-military">
+                                                <option value=""></option>
+                                                <option value="-3">-3</option>
+                                                <option value="-2">-2</option>
+                                                <option value="-1">-1</option>
+                                                <option value="+1">+1</option>
+                                                <option value="+2">+2</option>
+                                                <option value="+3">+3</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="end-game-political-card">Political</label>
+                                            <select id="end-game-political-card" name="end-game-political">
+                                                <option value=""></option>
+                                                <option value="-3">-3</option>
+                                                <option value="-2">-2</option>
+                                                <option value="-1">-1</option>
+                                                <option value="+1">+1</option>
+                                                <option value="+2">+2</option>
+                                                <option value="+3">+3</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="end-game-research-card">Research</label>
+                                            <select id="end-game-research-card" name="end-game-research">
+                                                <option value=""></option>
+                                                <option value="-3">-3</option>
+                                                <option value="-2">-2</option>
+                                                <option value="-1">-1</option>
+                                                <option value="+1">+1</option>
+                                                <option value="+2">+2</option>
+                                                <option value="+3">+3</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">Image:</td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">Card Count:</td>
+                            <td colspan="4"></td>
                         </tr>
                         <tr>
                             <td colspan="4" class="button-container">
@@ -116,9 +274,9 @@
                 </form>
             </section>
 
-            <section id="form-board" class="inactive form-container">
+            <section id="form-container-board" class="inactive form-container">
                 <div class="title">New Board Entry</div>
-                <form>
+                <form id="form-board">
                     <table>
                         <tbody>
                         <tr>

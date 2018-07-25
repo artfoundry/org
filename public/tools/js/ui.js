@@ -5,23 +5,23 @@ class UI {
         this._listWatch();
         this._formWatch();
         this.messages = {
-            'confirmedit' : {text: "You are about to save changes to an existing item.", hasCancel: true},
-            'noname'      : {text: "The logical name needs to be entered in order to save.", hasCancel: false}
+            'confirmedit' : {text: 'You are about to save changes to an existing item.', hasCancel: true},
+            'noname'      : {text: 'The logical name needs to be entered in order to save.', hasCancel: false}
         };
     }
 
     navbar() {
-        $("#navbar .nav-link").click(function() {
-            if (!$(this).hasClass("active")) {
-                let oldTarget = $("#navbar .active").attr("id").substring(8),
-                    newTarget = $(this).attr("id").substring(8);
+        $('#navbar .nav-link').click(function() {
+            if (!$(this).hasClass('active')) {
+                let oldTarget = $('#navbar .active').attr('id').substring(8),
+                    newTarget = $(this).attr('id').substring(8);
 
-                $("#navlink-" + oldTarget).removeClass("active");
-                $("#navlink-" + newTarget).addClass("active");
-                $("#form-" + oldTarget).toggle().addClass("inactive");
-                $("#list-" + oldTarget).toggle().addClass("inactive");
-                $("#form-" + newTarget).toggle().removeClass("inactive");
-                $("#list-" + newTarget).toggle().removeClass("inactive");
+                $('#navlink-' + oldTarget).removeClass('active');
+                $('#navlink-' + newTarget).addClass('active');
+                $('#form-container-' + oldTarget).toggle().addClass('inactive');
+                $('#list-' + oldTarget).toggle().addClass('inactive');
+                $('#form-container-' + newTarget).toggle().removeClass('inactive');
+                $('#list-' + newTarget).toggle().removeClass('inactive');
             }
         });
     }
@@ -29,10 +29,11 @@ class UI {
     _listWatch(itemID) {
         let ui = this;
 
-        $("#" + itemID).click(function(event) {
+        $('#' + itemID).click(function(event) {
             let itemName = event.currentTarget.id,
-                type = $(event.currentTarget).parents(".list-container").attr("id").substring(5);
+                type = $(event.currentTarget).parents('.list-container').attr('id').substring(5);
 
+            $('#form-' + type).trigger('reset');
             ui.updateForm(type, itemName);
         });
     }
@@ -40,12 +41,12 @@ class UI {
     _formWatch() {
         let ui = this;
 
-        $("form").submit(function(event) {
+        $('form').submit(function(event) {
             event.preventDefault();
 
-            let type = $(event.currentTarget).find(".button-submit").attr("id").substring(7);
+            let type = $(event.currentTarget).find('.button-submit').attr('id').substring(7);
 
-            if ($("#logical-" + type)[0].value !== '') {
+            if ($('#logical-' + type)[0].value !== '') {
                 let formData = $(this).serializeArray(),
                     itemName = formData[0].value,
                     saveData = function() { Tools.fbServices.processFormData(formData, type); };
@@ -64,13 +65,15 @@ class UI {
 
     updateForm(type, itemName) {
         let item = this.allItems.getItem(type, itemName),
-            $form = $("#form-" + type);
+            $form = $('#form-container-' + type);
 
         $form.find("[name='logical']")[0].value = itemName;
         for (let attr in item) {
             let value = item[attr];
             if (Array.isArray(value)) {
-
+                for (let i=0; i < value.length; i++) {
+                    $form.find("[name='" + attr + "'][value='" + value[i] + "']")[0].checked = true;
+                }
             } else {
                 $form.find("[name='" + attr + "']")[0].value = value;
             }
@@ -79,13 +82,13 @@ class UI {
 
     updateList(type, items) {
         for (let item in items) {
-            let $itemID = $("#" + item);
+            let $itemID = $('#' + item);
 
             if ($itemID.length === 0) {
                 $("#list-" + type + " > .list").append("<div id='" + item + "' class='list-item-row'></div>");
-                $itemID = $("#" + item);
+                $itemID = $('#' + item);
             } else {
-                $itemID.html("");
+                $itemID.html('');
             }
             $itemID.append("<span class='list-item-name'>" + item + "</span>");
             this._listWatch(item);
