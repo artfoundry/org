@@ -5,8 +5,8 @@ class UI {
         this._listWatch();
         this._formWatch();
         this.messages = {
-            'confirmedit' : {text: 'You are about to save changes to an existing item.', hasCancel: true},
-            'noname'      : {text: 'The logical name needs to be entered in order to save.', hasCancel: false}
+            'confirmEdit' : {text: 'You are about to save changes to an existing item.', hasCancel: true},
+            'noName'      : {text: 'The logical name needs to be entered in order to save.', hasCancel: false}
         };
     }
 
@@ -52,14 +52,26 @@ class UI {
                     saveData = function() { Tools.fbServices.processFormData(formData, type); };
 
                 if (ui.allItems.getItem(type, itemName)) {
-                    ui.showMessage(ui.messages.confirmedit, saveData);
+                    ui.showMessage(ui.messages.confirmEdit, saveData);
                 } else {
                     saveData();
                 }
             } else {
-                ui.showMessage(ui.messages.noname);
+                ui.showMessage(ui.messages.noName);
             }
+        });
 
+        $('.thumbnail').click(function() {
+            $('.card-preview').toggle(function() {
+                $('.card-preview-container').css('outlineColor', 'orange'); //need data for this instead
+                $('.card-preview-thumbnail').css('backgroundImage', 'url("../images/commercial-icon.png")') //need data for this instead
+                $('.card-preview-title').text('Commercial'); //need data for this instead
+                $('.card-preview-value').text('2'); //need data for this instead
+                $('body').click(function() {
+                    $('.card-preview').hide();
+                    $(this).off();
+                });
+            });
         });
     }
 

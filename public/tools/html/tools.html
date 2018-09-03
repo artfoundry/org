@@ -109,7 +109,8 @@
                                     <label for="draw-effect-card">On Draw</label>
                                     <select id="draw-effect-card" name="draw-effect">
                                         <option value=""></option>
-                                        <option value=""></option>
+                                        <option value="discard-cultural-1">Discard all faceup Cultural 1 in game</option>
+                                        <option value="move-commercial-2">Move all Commercial 2 from Ceres, Vesta, Eunomia, The Hildas Triangle, and the Exalted Temple to Concordia</option>
                                     </select>
                                 </div>
                             </td>
@@ -164,18 +165,18 @@
                                         <option value="move-&-collect-2">Move this card to designated & Collect on Second Collect</option>
                                         <option value="move-helium">Move all Helium-3 tokens from one designated world to any other designated world</option>
                                         <option value="replace-3-helium">For each 3 Helium-3 tokens present, remove these 3 tokens and replace with Helium-3 card granting specified victory points</option>
-                                        <option value="remove-commercial-1-&-collect">Remove lowest value Commercial card from winner's collection & Collect card</option>
-                                        <option value="remove-commercial-2-&-collect">Remove 2 lowest value Commercial cards from winner's collection & Collect card</option>
-                                        <option value="remove-commercial-3-&-collect">Remove 3 lowest value Commercial cards from winner's collection & Collect card</option>
-                                        <option value="remove-political-1-&-collect">Remove lowest value Political card from winner's collection & Collect card</option>
-                                        <option value="remove-political-2-&-collect">Remove 2 lowest value Political cards from winner's collection & Collect card</option>
-                                        <option value="remove-political-3-&-collect">Remove 3 lowest value Political cards from winner's collection & Collect card</option>
-                                        <option value="remove-research-1-&-collect">Remove lowest value Research card from winner's collection & Collect card</option>
-                                        <option value="remove-research-2-&-collect">Remove 2 lowest value Research cards from winner's collection & Collect card</option>
-                                        <option value="remove-research-3-&-collect">Remove 3 lowest value Research cards from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-1-&-collect">Remove lowest value Cultural card from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-2-&-collect">Remove 2 lowest value Cultural cards from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-3-&-collect">Remove 3 lowest value Cultural cards from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-1-&-collect-1">Remove lowest value Commercial card from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-2-&-collect-1">Remove 2 lowest value Commercial cards from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-3-&-collect-1">Remove 3 lowest value Commercial cards from winner's collection & Collect card</option>
+                                        <option value="remove-political-1-&-collect-1">Remove lowest value Political card from winner's collection & Collect card</option>
+                                        <option value="remove-political-2-&-collect-1">Remove 2 lowest value Political cards from winner's collection & Collect card</option>
+                                        <option value="remove-political-3-&-collect-1">Remove 3 lowest value Political cards from winner's collection & Collect card</option>
+                                        <option value="remove-research-1-&-collect-1">Remove lowest value Research card from winner's collection & Collect card</option>
+                                        <option value="remove-research-2-&-collect-1">Remove 2 lowest value Research cards from winner's collection & Collect card</option>
+                                        <option value="remove-research-3-&-collect-1">Remove 3 lowest value Research cards from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-1-&-collect-1">Remove lowest value Cultural card from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-2-&-collect-1">Remove 2 lowest value Cultural cards from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-3-&-collect-1">Remove 3 lowest value Cultural cards from winner's collection & Collect card</option>
                                         <option value="add-3-influence">Add 3 temporary Influence to designated other world</option>
                                         <option value="remove-polity">Remove all Polity Influence tokens from designated polity</option>
                                     </select>
@@ -257,7 +258,7 @@
                         </tr>
                         <tr>
                             <td class="row-header">Image:</td>
-                            <td colspan="4"></td>
+                            <td colspan="4"><img class="thumbnail" src="../images/commercial-icon.png"><span class="hint"> <- Click to view full card (temp img)</span></td>
                         </tr>
                         <tr>
                             <td class="row-header">Card Count:</td>
@@ -272,6 +273,14 @@
                         </tbody>
                     </table>
                 </form>
+                <div class="card-preview">
+                    <div class="card-preview-container">
+                        <div class="card-preview-title"></div>
+                        <div class="card-preview-thumbnail"></div>
+                        <div class="card-preview-spacer"></div>
+                        <div class="card-preview-value"></div>
+                    </div>
+                </div>
             </section>
 
             <section id="form-container-board" class="inactive form-container">
