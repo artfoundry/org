@@ -5,16 +5,15 @@
  */
 
 class FirebaseServices {
-    constructor(objectTypes, allItems, updateListcallback) {
+    constructor() {
         this.isOnline = this._initialize();
         if (this.isOnline) {
             this._initAuth();
             this._monitorAuth();
             this.fbDatabase = firebase.database();
-            this.allItems = allItems;
-            this.objectTypes = objectTypes;
+            this.objectTypes = Tools.objectTypes;
             for (let i=0; i < this.objectTypes.length; i++) {
-                this._getItems(this.objectTypes[i], updateListcallback);
+                this._getItems(this.objectTypes[i]);
             }
             this._monitorConnection();
         }
@@ -89,10 +88,10 @@ class FirebaseServices {
     }
 
     _monitorAuth() {
-        firebase.auth().onAuthStateChanged(function(user) {
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 // User is signed in.
-                $("#sign-out").click(function() {
+                $("#sign-out").click(() => {
                     firebase.auth().signOut();
                 });
             } else {
@@ -101,7 +100,7 @@ class FirebaseServices {
                     window.location.pathname = "/tools/index.html";
                 $("#sign-out").off("click");
             }
-        }, function(error) {
+        }, (error) => {
             console.log(error);
         });
     }
@@ -132,7 +131,6 @@ class FirebaseServices {
                 }
             }
         }
-
         this._setItem(name, data, type);
     }
 
@@ -151,15 +149,14 @@ class FirebaseServices {
         });
     }
 
-    _getItems(type, updateListcallback) {
-        let fbLocal = this;
+    _getItems(type) {
         if (this.isOnline) {
-            this.fbDatabase.ref('/' + type + '/').orderByKey().on('value', function(snapshot) {
+            this.fbDatabase.ref('/' + type + '/').orderByKey().on('value', (snapshot) => {
                 let items = snapshot.val();
                 for (let item in items) {
-                    fbLocal.allItems.setItem(type, item, items[item]);
+                    Tools.allItems.setItem(type, item, items[item]);
                 }
-                updateListcallback(type, items);
+                Tools.ui.updateList(type);
             });
         }
     }

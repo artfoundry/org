@@ -74,7 +74,24 @@ form {
 }
 
 td {
+    width: 200px;
     padding: 5px 0;
+}
+
+.row-header {
+    width: 100px;
+    font-weight: 500;
+    padding-right: 10px;
+    vertical-align: top;
+}
+
+.flex-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flex-item {
+    margin: 0 20px 0 0;
 }
 
 input, select {
@@ -110,6 +127,33 @@ td.button-container {
     cursor: pointer;
 }
 
+#card-thumb {
+    width: 80px;
+    height: 120px;
+    border: 1px solid blue;
+    cursor: pointer;
+}
+
+#card-thumb .card-container {
+    display: none;
+}
+
+#card-thumb .card-faction {
+    font-size: 40%;
+}
+
+#card-thumb .card-value {
+    font-size: 80%;
+}
+
+.modal-open {
+    cursor: pointer;
+}
+
+.shadow {
+    box-shadow: 3px 3px 5px gray;
+}
+
 /* message */
 
 #message {
@@ -123,51 +167,69 @@ td.button-container {
     text-align: center;
     border: 1px solid lightsalmon;
     border-radius: 5px;
-    box-shadow: 3px 3px 5px gray;
     background-color: lightcyan;
     z-index: 2;
 }
 
-/* Cards */
+/* Card preview */
 
-.row-header {
-    font-weight: 500;
-    padding-right: 10px;
-    vertical-align: top;
+.modal {
+    position: fixed;
+    display: none;
+    left: calc(50% - 200px);
+    top: calc(50% - 300px);
+    width: 400px;
+    height: 600px;
 }
 
-.flex-grid {
-    display: flex;
-    flex-wrap: wrap;
+.card-container {
+    width: 100%;
+    height: 100%;
+    text-align: center;
 }
 
-.flex-item {
-    margin: 0 20px 0 0;
+.card-interior {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    top: 10%;
+    margin: auto;
+    background-color: white;
 }
 
-.item-row {
-    padding: 5px 0;
+.card-faction {
+    font-size: 200%;
+    padding: 5% 0;
+    margin: 0;
 }
 
-.item-row:nth-child(odd) {
-    background-color: lightcyan;
+.card-icon {
+    position: relative;
+    width: 40%;
+    height: 27%;
+    left: 30%;
+    margin: 0;
+    border: 1px solid black;
 }
 
-.item-name {
-    font-weight: 500;
-    padding: 0 5px;
+.card-value {
+    position: relative;
+    width: 40%;
+    height: 27%;
+    left: 30%;
+    top: 23%;
+    font-size: 400%;
+    line-height: 200%;
+    color: white;
+    background-color: black;
+    border-radius: 100px;
 }
 
-.item-attr {
-    padding: 0 5px;
-}
+/*Card colors*/
+.color-commercial { background-color: #f7a431; }
+.color-cultural { background-color: #6aca3f; }
+.color-political { background-color: #fc6621; }
+.color-research { background-color: #0033ff; }
+.color-military { background-color: #fe0002; }
+.color-polity { background-color: gray; }
 
-/*
-    Card colors
-
-    Commercial: background-color: #f7a431;
-    Cultural:   background-color: #6aca3f;
-    Political:  background-color: #fc6621;
-    Research:   background-color: #0033ff;
-    Military:   background-color: #fe0002;
-*/

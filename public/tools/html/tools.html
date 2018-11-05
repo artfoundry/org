@@ -21,7 +21,7 @@
             <span id="navlink-board" class="nav-link">Board Entry</span>
         </nav>
 
-        <div class="tool-container">
+        <main class="tool-container">
             <section id="list-card" class="active list-container">
                 <div class="title">Card List</div>
                 <div class="list"></div>
@@ -61,7 +61,7 @@
                         </tr>
                         <tr>
                             <td class="row-header">Rules: </td>
-                            <td colspan="4">
+                            <td colspan="3">
                                 <div>Designate Options</div>
                                 <div class="flex-grid">
                                     <span class="flex-item"><label for="options-alliance-card">Alliance</label><input id="options-alliance-card" name="options" type="checkbox" value="alliance"></span>
@@ -103,20 +103,21 @@
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td colspan="4">
+                            <td class="row-header"></td>
+                            <td colspan="3">
                                 <div>
                                     <label for="draw-effect-card">On Draw</label>
                                     <select id="draw-effect-card" name="draw-effect">
                                         <option value=""></option>
-                                        <option value=""></option>
+                                        <option value="discard-cultural-1">Discard all faceup Cultural 1 in game</option>
+                                        <option value="move-commercial-2">Move all Commercial 2 from Ceres, Vesta, Eunomia, The Hildas Triangle, and the Exalted Temple to Concordia</option>
                                     </select>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td colspan="4">
+                            <td class="row-header"></td>
+                            <td colspan="3">
                                 <div>
                                     <label for="discard-card">Discard</label>
                                     <select id="discard-card" name="discard">
@@ -131,8 +132,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td colspan="4">
+                            <td class="row-header"></td>
+                            <td colspan="3">
                                 <div>
                                     <label for="collect-card">On Collect</label>
                                     <select id="collect-card" name="collect">
@@ -164,18 +165,18 @@
                                         <option value="move-&-collect-2">Move this card to designated & Collect on Second Collect</option>
                                         <option value="move-helium">Move all Helium-3 tokens from one designated world to any other designated world</option>
                                         <option value="replace-3-helium">For each 3 Helium-3 tokens present, remove these 3 tokens and replace with Helium-3 card granting specified victory points</option>
-                                        <option value="remove-commercial-1-&-collect">Remove lowest value Commercial card from winner's collection & Collect card</option>
-                                        <option value="remove-commercial-2-&-collect">Remove 2 lowest value Commercial cards from winner's collection & Collect card</option>
-                                        <option value="remove-commercial-3-&-collect">Remove 3 lowest value Commercial cards from winner's collection & Collect card</option>
-                                        <option value="remove-political-1-&-collect">Remove lowest value Political card from winner's collection & Collect card</option>
-                                        <option value="remove-political-2-&-collect">Remove 2 lowest value Political cards from winner's collection & Collect card</option>
-                                        <option value="remove-political-3-&-collect">Remove 3 lowest value Political cards from winner's collection & Collect card</option>
-                                        <option value="remove-research-1-&-collect">Remove lowest value Research card from winner's collection & Collect card</option>
-                                        <option value="remove-research-2-&-collect">Remove 2 lowest value Research cards from winner's collection & Collect card</option>
-                                        <option value="remove-research-3-&-collect">Remove 3 lowest value Research cards from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-1-&-collect">Remove lowest value Cultural card from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-2-&-collect">Remove 2 lowest value Cultural cards from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-3-&-collect">Remove 3 lowest value Cultural cards from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-1-&-collect-1">Remove lowest value Commercial card from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-2-&-collect-1">Remove 2 lowest value Commercial cards from winner's collection & Collect card</option>
+                                        <option value="remove-commercial-3-&-collect-1">Remove 3 lowest value Commercial cards from winner's collection & Collect card</option>
+                                        <option value="remove-political-1-&-collect-1">Remove lowest value Political card from winner's collection & Collect card</option>
+                                        <option value="remove-political-2-&-collect-1">Remove 2 lowest value Political cards from winner's collection & Collect card</option>
+                                        <option value="remove-political-3-&-collect-1">Remove 3 lowest value Political cards from winner's collection & Collect card</option>
+                                        <option value="remove-research-1-&-collect-1">Remove lowest value Research card from winner's collection & Collect card</option>
+                                        <option value="remove-research-2-&-collect-1">Remove 2 lowest value Research cards from winner's collection & Collect card</option>
+                                        <option value="remove-research-3-&-collect-1">Remove 3 lowest value Research cards from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-1-&-collect-1">Remove lowest value Cultural card from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-2-&-collect-1">Remove 2 lowest value Cultural cards from winner's collection & Collect card</option>
+                                        <option value="remove-cultural-3-&-collect-1">Remove 3 lowest value Cultural cards from winner's collection & Collect card</option>
                                         <option value="add-3-influence">Add 3 temporary Influence to designated other world</option>
                                         <option value="remove-polity">Remove all Polity Influence tokens from designated polity</option>
                                     </select>
@@ -183,7 +184,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
+                            <td class="row-header"></td>
                             <td colspan="4">
                                 <div>
                                     <div>On End of Game</div>
@@ -249,22 +250,30 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div>
-
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="row-header" colspan="1">Image:</td>
+                            <td colspan="1"><input id="load-image" type="file" name="card-icon"></td>
+                            <td colspan="1">
+                                <div id="card-thumb">
+                                    <div class="card-container">
+                                        <div class="card-interior">
+                                            <h3 class="card-faction"></h3>
+                                            <figure class="card-icon"></figure>
+                                            <div class="card-value"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td class="row-header">Image:</td>
-                            <td colspan="4"></td>
-                        </tr>
-                        <tr>
                             <td class="row-header">Card Count:</td>
-                            <td colspan="4"></td>
+                            <td colspan="3"></td>
                         </tr>
                         <tr>
-                            <td colspan="4" class="button-container">
+                            <td colspan="3" class="button-container">
                                 <input id="submit-card" type="submit" value="Save" class="button-submit">
                                 <input type="reset" value="Clear form" class="button-reset">
                             </td>
@@ -272,6 +281,15 @@
                         </tbody>
                     </table>
                 </form>
+                <div id="card-preview" class="modal">
+                    <div class="card-container shadow">
+                        <div class="card-interior">
+                            <h3 class="card-faction"></h3>
+                            <figure class="card-icon"></figure>
+                            <div class="card-value"></div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="form-container-board" class="inactive form-container">
@@ -280,8 +298,8 @@
                     <table>
                         <tbody>
                         <tr>
+                            <td class="row-header">Basics:</td>
                             <td>
-                                <span class="row-header">Basics: </span>
                                 <label for="logical-board">Logical</label>
                                 <input id="logical-board" type="text" name="logical">
                                 <label for="text-board">Text</label>
@@ -289,7 +307,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="4" class="button-container">
+                            <td colspan="3" class="button-container">
                                 <input id="submit-board" type="submit" value="Save" class="button-submit">
                                 <input type="reset" value="Clear form" class="button-reset">
                             </td>
@@ -299,12 +317,12 @@
                 </form>
             </section>
 
-            <div id="message">
+            <div id="message" class="shadow">
                 <div class="text"></div>
                 <button class="button-submit">OK</button>
                 <button class="button-reset">Cancel</button>
             </div>
-        </div>
+        </main>
 
         <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase-auth.js"></script>

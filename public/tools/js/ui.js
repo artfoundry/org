@@ -1,9 +1,12 @@
+'use strict';
+
 class UI {
-    constructor(allItems) {
-        this.allItems = allItems;
+    constructor(initialType) {
         this.navbar();
         this._listWatch();
         this._formWatch();
+        this.currentType = initialType;
+        this.currentItemName = '';
         this.messages = {
             'confirmedit' : {text: 'You are about to save changes to an existing item.', hasCancel: true},
             'noname'      : {text: 'The logical name needs to be entered in order to save.', hasCancel: false}
@@ -11,94 +14,108 @@ class UI {
     }
 
     navbar() {
-        $('#navbar .nav-link').click(function() {
-            if (!$(this).hasClass('active')) {
-                let oldTarget = $('#navbar .active').attr('id').substring(8),
-                    newTarget = $(this).attr('id').substring(8);
+        $('#navbar .nav-link').click(() => {
+            if (!$(`#${event.target.id}`).hasClass('active')) {
+                let newTargetId = event.target.id.substring(8);
+                let oldTargetId = $('#navbar .active').attr('id').substring(8);
 
-                $('#navlink-' + oldTarget).removeClass('active');
-                $('#navlink-' + newTarget).addClass('active');
-                $('#form-container-' + oldTarget).toggle().addClass('inactive');
-                $('#list-' + oldTarget).toggle().addClass('inactive');
-                $('#form-container-' + newTarget).toggle().removeClass('inactive');
-                $('#list-' + newTarget).toggle().removeClass('inactive');
+                $(`#navlink-${oldTargetId}`).removeClass('active');
+                $(`#navlink-${newTargetId}`).addClass('active');
+                $(`#form-container-${oldTargetId}`).toggle().addClass('inactive');
+                $(`#list-${oldTargetId}`).toggle().addClass('inactive');
+                $(`#form-container-${newTargetId}`).toggle().removeClass('inactive');
+                $(`#list-${newTargetId}`).toggle().removeClass('inactive');
+                this.currentType = newTargetId;
             }
         });
     }
 
     _listWatch(itemID) {
-        let ui = this;
-
-        $('#' + itemID).click(function(event) {
-            let itemName = event.currentTarget.id,
-                type = $(event.currentTarget).parents('.list-container').attr('id').substring(5);
-
-            $('#form-' + type).trigger('reset');
-            ui.updateForm(type, itemName);
+        $(`#${itemID}`).click((event) => {
+            this.currentItemName = event.currentTarget.id;
+            $(`#form-${this.currentType}`).trigger('reset');
+            $('#card-thumb .card-container').show();
+            $('#card-thumb').click(() => { this._showModal(); });
+            this.updateForm();
         });
     }
 
     _formWatch() {
-        let ui = this;
-
-        $('form').submit(function(event) {
+        $('form').submit((event) => {
             event.preventDefault();
-
-            let type = $(event.currentTarget).find('.button-submit').attr('id').substring(7);
-
-            if ($('#logical-' + type)[0].value !== '') {
-                let formData = $(this).serializeArray(),
+            if ($(`#logical-${this.currentType}`)[0].value !== '') {
+                let formData = $('form').serializeArray(),
                     itemName = formData[0].value,
-                    saveData = function() { Tools.fbServices.processFormData(formData, type); };
+                    saveData = () => { Tools.fbServices.processFormData(formData, this.currentType); };
 
-                if (ui.allItems.getItem(type, itemName)) {
-                    ui.showMessage(ui.messages.confirmedit, saveData);
+                if (Tools.allItems.getItem(this.currentType, itemName)) {
+                    this.showMessage(this.messages.confirmedit, saveData);
                 } else {
                     saveData();
                 }
             } else {
-                ui.showMessage(ui.messages.noname);
+                this.showMessage(this.messages.noname);
             }
-
         });
     }
 
-    updateForm(type, itemName) {
-        let item = this.allItems.getItem(type, itemName),
-            $form = $('#form-container-' + type);
+    updateForm() {
+        let item = Tools.allItems.getItem(this.currentType, this.currentItemName),
+            $form = $(`#form-container-${this.currentType}`);
 
-        $form.find("[name='logical']")[0].value = itemName;
-        for (let attr in item) {
-            let value = item[attr];
-            if (Array.isArray(value)) {
-                for (let i=0; i < value.length; i++) {
-                    $form.find("[name='" + attr + "'][value='" + value[i] + "']")[0].checked = true;
+        $form.find('[name="logical"]')[0].value = this.currentItemName;
+        if (item) {
+            let faction = item.type;
+            for (let attr in item) {
+                let value = item[attr];
+                if (Array.isArray(value)) {
+                    for (let i=0; i < value.length; i++) {
+                        $form.find(`[name="${attr}"][value="${value[i]}"]`)[0].checked = true;
+                    }
+                } else {
+                    $form.find(`[name="${attr}"]`)[0].value = value;
                 }
-            } else {
-                $form.find("[name='" + attr + "']")[0].value = value;
+            }
+            $('.card-container').addClass(`color-${faction}`);
+            $('.card-faction').text(faction.charAt(0).toUpperCase() + faction.slice(1));
+            // Uncomment once we have icon images ready
+            // $('.card-icon').css('background-image', `url(${item.cardIcon})`);
+            if (item[`end-game-${faction}`]) {
+                $('.card-value').text(item[`end-game-${faction}`].slice(1));
             }
         }
     }
 
-    updateList(type, items) {
-        for (let item in items) {
-            let $itemID = $('#' + item);
+    updateList(type) {
+        for (let item in Tools.allItems.getAllItems(type)) {
+            let $itemID = $(`#${item}`);
 
             if ($itemID.length === 0) {
-                $("#list-" + type + " > .list").append("<div id='" + item + "' class='list-item-row'></div>");
-                $itemID = $('#' + item);
+                $(`#list-${type} > .list`).append(`<div id="${item}" class="list-item-row"></div>`);
+                $itemID = $(`#${item}`);
             } else {
                 $itemID.html('');
             }
-            $itemID.append("<span class='list-item-name'>" + item + "</span>");
+            $itemID.append(`<span class="list-item-name">${item}</span>`);
             this._listWatch(item);
         }
     }
 
+    _showModal() {
+        let $body = $('body');
+
+        $('#card-preview').show(() => {
+            $body.addClass('modal-open');
+            $body.click(() => {
+                $('#card-preview').hide();
+                $('body').off('click').removeClass('modal-open');
+            });
+        });
+    }
+
     showMessage(message, callback = null) {
         let $message = $('#message'),
-            $cancelButton = $message.find('.button-reset'),
-            ui = this;
+            $cancelButton = $message.find('.button-reset');
 
         $message.toggle().find('.text').text(message.text);
         message.hasCancel ? $cancelButton.show() : $cancelButton.hide();

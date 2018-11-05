@@ -7,11 +7,13 @@
 
 let Tools = {
     'initialize' : function() {
-        let objectTypes = ['card', 'board'],
-            allItems = new ItemStorage(objectTypes),
-            ui = new UI(allItems);
+        let initialDisplayType = '';
 
-        this.fbServices = new FirebaseServices(objectTypes, allItems, ui.updateList.bind(ui));
+        this.objectTypes = ['card', 'board'];
+        initialDisplayType = this.objectTypes[0];
+        this.allItems = new ItemStorage();
+        this.ui = new UI(initialDisplayType);
+        this.fbServices = new FirebaseServices();
     }
 };
 

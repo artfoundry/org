@@ -3,22 +3,26 @@
  */
 
 class ItemStorage {
-    constructor(objectTypes) {
-        this.objects = {};
-        this._initialize(objectTypes);
+    constructor() {
+        this._objects = {};
+        this._initialize(Tools.objectTypes);
     }
 
     _initialize(objectTypes) {
-        for(let i=0; i < objectTypes.length; i++) {
-            this.objects[objectTypes[i]] = {};
+        for (let i=0; i < objectTypes.length; i++) {
+            this._objects[objectTypes[i]] = {};
         }
     }
 
     getItem(type, itemName) {
-        return this.objects[type][itemName] || null;
+        return this._objects[type][itemName] || null;
+    }
+
+    getAllItems(type) {
+        return this._objects[type];
     }
 
     setItem(type, itemName, item) {
-        this.objects[type][itemName] = item;
+        this._objects[type][itemName] = item;
     }
 }
