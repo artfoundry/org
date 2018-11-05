@@ -57,6 +57,10 @@ class UI {
                 this.showMessage(this.messages.noname);
             }
         });
+        $('#reset-card').click(() => {
+            $('#card-thumb .card-container').hide();
+            $('#card-thumb').off('click');
+        });
     }
 
     updateForm() {
