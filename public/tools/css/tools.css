@@ -2,6 +2,10 @@ section {
     margin: 20px;
 }
 
+header {
+    margin: 0 auto;
+}
+
 .title {
     font-size: 16px;
     font-weight: 500;
@@ -232,4 +236,3 @@ td.button-container {
 .color-research { background-color: #0033ff; }
 .color-military { background-color: #fe0002; }
 .color-polity { background-color: gray; }
-

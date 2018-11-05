@@ -8,8 +8,8 @@ class UI {
         this.currentType = initialType;
         this.currentItemName = '';
         this.messages = {
-            'confirmedit' : {text: 'You are about to save changes to an existing item.', hasCancel: true},
-            'noname'      : {text: 'The logical name needs to be entered in order to save.', hasCancel: false}
+            'confirmEdit' : {text: 'You are about to save changes to an existing item.', hasCancel: true},
+            'noName'      : {text: 'The logical name needs to be entered in order to save.', hasCancel: false}
         };
     }
 

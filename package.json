@@ -1,0 +1,11 @@
+{
+  "name": "org",
+  "version": "0.1.0",
+  "description": "Online version of Org card game",
+  "repository": "https://github.com/artfoundry/org.git",
+  "author": "David Markowitz",
+  "main": "public",
+  "dependencies": {
+    "firebase": "5.5.0"
+  }
+}
