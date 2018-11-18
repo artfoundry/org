@@ -44,17 +44,17 @@ class UI {
         $('form').submit((event) => {
             event.preventDefault();
             if ($(`#logical-${this.currentType}`)[0].value !== '') {
-                let formData = $('form').serializeArray(),
+                let formData = $(`#form-${this.currentType}`).serializeArray(),
                     itemName = formData[0].value,
                     saveData = () => { Tools.fbServices.processFormData(formData, this.currentType); };
 
                 if (Tools.allItems.getItem(this.currentType, itemName)) {
-                    this.showMessage(this.messages.confirmedit, saveData);
+                    this.showMessage(this.messages.confirmEdit, saveData);
                 } else {
                     saveData();
                 }
             } else {
-                this.showMessage(this.messages.noname);
+                this.showMessage(this.messages.noName);
             }
         });
         $('#reset-card').click(() => {
@@ -70,6 +70,8 @@ class UI {
         $form.find('[name="logical"]')[0].value = this.currentItemName;
         if (item) {
             let faction = item.type;
+            let imageClass = item[`${this.currentType}-image`];
+
             for (let attr in item) {
                 let value = item[attr];
                 if (Array.isArray(value)) {
@@ -80,12 +82,13 @@ class UI {
                     $form.find(`[name="${attr}"]`)[0].value = value;
                 }
             }
-            $('.card-container').addClass(`color-${faction}`);
-            $('.card-faction').text(faction.charAt(0).toUpperCase() + faction.slice(1));
-            // Uncomment once we have icon images ready
-            // $('.card-icon').css('background-image', `url(${item.cardIcon})`);
-            if (item[`end-game-${faction}`]) {
-                $('.card-value').text(item[`end-game-${faction}`].slice(1));
+            $(`.${this.currentType}-container`).attr('class', `${this.currentType}-container color-${faction}`);
+            $(`.${this.currentType}-faction`).text(faction.charAt(0).toUpperCase() + faction.slice(1));
+            $(`.${this.currentType}-image`).attr('class', `${this.currentType}-image ${imageClass}`);
+            if (this.currentType === 'card') {
+                if (item[`end-game-${faction}`]) {
+                    $('.card-value').text(item[`end-game-${faction}`].slice(1));
+                }
             }
         }
     }

@@ -207,19 +207,19 @@ td.button-container {
     margin: 0;
 }
 
-.card-icon {
+.card-image {
     position: relative;
     width: 40%;
     height: 27%;
     left: 30%;
     margin: 0;
-    border: 1px solid black;
+    background-size: contain;
 }
 
 .card-value {
     position: relative;
     width: 40%;
-    height: 27%;
+    height: 26%;
     left: 30%;
     top: 23%;
     font-size: 400%;
@@ -229,10 +229,30 @@ td.button-container {
     border-radius: 100px;
 }
 
-/*Card colors*/
+/* Card colors */
 .color-commercial { background-color: #f7a431; }
 .color-cultural { background-color: #6aca3f; }
 .color-political { background-color: #fc6621; }
 .color-research { background-color: #0033ff; }
 .color-military { background-color: #fe0002; }
 .color-polity { background-color: gray; }
+
+/* Card images */
+.image-card-commercial {
+    background-image: url('../images/card/image-commercial.png');
+}
+.image-card-cultural {
+    background-image: url('../images/card/image-cultural.png');
+}
+.image-card-political {
+    background-image: url('../images/card/image-political.png');
+}
+.image-card-research {
+    background-image: url('../images/card/image-research.png');
+}
+.image-card-military {
+    background-image: url('../images/card/image-military.png');
+}
+.image-card-polity {
+    background-color: white;
+}

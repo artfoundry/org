@@ -254,14 +254,24 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="row-header" colspan="1">Image:</td>
-                            <td colspan="1"><input id="load-image" type="file" name="card-icon"></td>
+                            <td class="row-header" colspan="1">Image and Preview:</td>
+                            <td colspan="1">
+                                <label for="image-card">Card image type</label>
+                                <select id="image-card" name="card-image">
+                                    <option value="image-card-commercial">Commercial</option>
+                                    <option value="image-card-cultural">Cultural</option>
+                                    <option value="image-card-political">Political</option>
+                                    <option value="image-card-research">Research</option>
+                                    <option value="image-card-military">Military</option>
+                                    <option value="image-card-polity">Polity</option>
+                                </select>
+                            </td>
                             <td colspan="1">
                                 <div id="card-thumb">
                                     <div class="card-container">
                                         <div class="card-interior">
                                             <h3 class="card-faction"></h3>
-                                            <figure class="card-icon"></figure>
+                                            <figure class="card-image"></figure>
                                             <div class="card-value"></div>
                                         </div>
                                     </div>
@@ -273,7 +283,7 @@
                             <td colspan="3"></td>
                         </tr>
                         <tr>
-                            <td colspan="3" class="button-container">
+                            <td colspan="4" class="button-container">
                                 <input id="submit-card" type="submit" value="Save" class="button-submit">
                                 <input id="reset-card" type="reset" value="Clear form" class="button-reset">
                             </td>
@@ -286,7 +296,7 @@
                     <div class="card-container shadow">
                         <div class="card-interior">
                             <h3 class="card-faction"></h3>
-                            <figure class="card-icon"></figure>
+                            <figure class="card-image"></figure>
                             <div class="card-value"></div>
                         </div>
                     </div>
@@ -294,7 +304,7 @@
             </section>
 
             <section id="form-container-board" class="inactive form-container">
-                <div class="title">New Board Entry</div>
+                <div class="title">Board Details</div>
                 <form id="form-board">
                     <table>
                         <tbody>
