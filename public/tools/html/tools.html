@@ -40,86 +40,506 @@
                         <tr>
                             <td class="row-header">Basics: </td>
                             <td>
-                                <label for="logical-card">Logical</label>
-                                <input id="logical-card" type="text" name="logical">
+                                <label for="logical-card" class="rule-header">Logical</label>
+                                <input id="logical-card" type="text" name="logical" size="40">
                             </td>
                             <td>
-                                <label for="text-card">Text</label>
-                                <input id="text-card" type="text" name="text">
+                                <label for="text-card" class="rule-header">Text</label>
+                                <input id="text-card" type="text" name="text" size="40">
                             </td>
                             <td>
-                                <label for="type-card">Card type</label>
+                                <label for="type-card" class="rule-header">Card type</label>
                                 <select id="type-card" name="type">
+                                    <option value=""></option>
                                     <option value="commercial">Commercial</option>
                                     <option value="cultural">Cultural</option>
                                     <option value="political">Political</option>
                                     <option value="research">Research</option>
                                     <option value="military">Military</option>
                                     <option value="polity">Polity</option>
+                                    <option value="event">Event</option>
                                 </select>
                             </td>
                         </tr>
                         <tr>
+                            <td class="row-header" colspan="1">Image and Preview:</td>
+                            <td colspan="1">
+                                <div id="card-thumb">
+                                    <div class="card-container">
+                                        <div class="card-interior">
+                                            <h3 class="card-faction"></h3>
+                                            <figure class="card-image"></figure>
+                                            <div class="card-value"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="row-header">Rules: </td>
-                            <td colspan="3">
-                                <div>Designate Options</div>
-                                <div class="flex-grid">
-                                    <span class="flex-item"><label for="options-alliance-card">Alliance</label><input id="options-alliance-card" name="options" type="checkbox" value="alliance"></span>
-                                    <span class="flex-item"><label for="options-ariel-card">Ariel</label><input id="options-ariel-card" name="options" type="checkbox" value="ariel"></span>
-                                    <span class="flex-item"><label for="options-callisto-card">Callisto</label><input id="options-callisto-card" name="options" type="checkbox" value="callisto"></span>
-                                    <span class="flex-item"><label for="options-ceres-card">Ceres</label><input id="options-ceres-card" name="options" type="checkbox" value="ceres"></span>
-                                    <span class="flex-item"><label for="options-dione-card">Dione</label><input id="options-dione-card" name="options" type="checkbox" value="dione"></span>
-                                    <span class="flex-item"><label for="options-easternFed-card">Eastern Federation</label><input id="options-easternFed-card" name="options" type="checkbox" value="eastern"></span>
-                                    <span class="flex-item"><label for="options-eunomia-card">Eunomia</label><input id="options-eunomia-card" name="options" type="checkbox" value="eunomia"></span>
-                                    <span class="flex-item"><label for="options-europa-card">Europa</label><input id="options-europa-card" name="options" type="checkbox" value="europa"></span>
-                                    <span class="flex-item"><label for="options-ganymede-card">Ganymede</label><input id="options-ganymede-card" name="options" type="checkbox" value="ganymede"></span>
-                                    <span class="flex-item"><label for="options-haumea-card">Haumea</label><input id="options-haumea-card" name="options" type="checkbox" value="haumea"></span>
-                                    <span class="flex-item"><label for="options-hildas-card">Hildas</label><input id="options-hildas-card" name="options" type="checkbox" value="hildas Triangle"></span>
-                                    <span class="flex-item"><label for="options-iapetus-card">Iapetus</label><input id="options-iapetus-card" name="options" type="checkbox" value="iapetus"></span>
-                                    <span class="flex-item"><label for="options-io-card">Io</label><input id="options-io-card" name="options" type="checkbox" value="io"></span>
-                                    <span class="flex-item"><label for="options-kuiperCompact-card">Kuiper Compact</label><input id="options-kuiperCompact-card" name="options" type="checkbox" value="kuiper"></span>
-                                    <span class="flex-item"><label for="options-luna-card">Luna</label><input id="options-luna-card" name="options" type="checkbox" value="luna"></span>
-                                    <span class="flex-item"><label for="options-makemake-card">Makemake</label><input id="options-makemake-card" name="options" type="checkbox" value="makemake"></span>
-                                    <span class="flex-item"><label for="options-mars-card">Mars</label><input id="options-mars-card" name="options" type="checkbox" value="mars"></span>
-                                    <span class="flex-item"><label for="options-mercury-card">Mercury</label><input id="options-mercury-card" name="options" type="checkbox" value="mercury"></span>
-                                    <span class="flex-item"><label for="options-miranda-card">Miranda</label><input id="options-miranda-card" name="options" type="checkbox" value="miranda"></span>
-                                    <span class="flex-item"><label for="options-nereid-card">Nereid</label><input id="options-nereid-card" name="options" type="checkbox" value="nereid"></span>
-                                    <span class="flex-item"><label for="options-neso-card">Neso</label><input id="options-neso-card" name="options" type="checkbox" value="neso"></span>
-                                    <span class="flex-item"><label for="options-oberon-card">Oberon</label><input id="options-oberon-card" name="options" type="checkbox" value="oberon"></span>
-                                    <span class="flex-item"><label for="options-oceanicLeague-card">Oceanic League</label><input id="options-oceanicLeague-card" name="options" type="checkbox" value="oceanic"></span>
-                                    <span class="flex-item"><label for="options-orcus-card">Orcus</label><input id="options-orcus-card" name="options" type="checkbox" value="orcus"></span>
-                                    <span class="flex-item"><label for="options-pluto-card">Pluto</label><input id="options-pluto-card" name="options" type="checkbox" value="pluto"></span>
-                                    <span class="flex-item"><label for="options-proteus-card">Proteus</label><input id="options-proteus-card" name="options" type="checkbox" value="proteus"></span>
-                                    <span class="flex-item"><label for="options-rhea-card">Rhea</label><input id="options-rhea-card" name="options" type="checkbox" value="rhea"></span>
-                                    <span class="flex-item"><label for="options-sedna-card">Sedna</label><input id="options-sedna-card" name="options" type="checkbox" value="sedna"></span>
-                                    <span class="flex-item"><label for="options-state-card">State</label><input id="options-state-card" name="options" type="checkbox" value="state"></span>
-                                    <span class="flex-item"><label for="options-titania-card">Titania</label> <input id="options-titania-card" name="options" type="checkbox" value="titania"></span>
-                                    <span class="flex-item"><label for="options-triton-card">Triton</label><input id="options-triton-card" name="options" type="checkbox" value="triton"></span>
-                                    <span class="flex-item"><label for="options-union-card">Union</label><input id="options-union-card" name="options" type="checkbox" value="union"></span>
-                                    <span class="flex-item"><label for="options-venus-card">Venus</label><input id="options-venus-card" name="options" type="checkbox" value="venus"></span>
-                                    <span class="flex-item"><label for="options-vesta-card">Vesta</label><input id="options-vesta-card" name="options" type="checkbox" value="vesta"></span>
-                                    <span class="flex-item"><label for="options-xena-card">Xena</label><input id="options-xena-card" name="options" type="checkbox" value="xena"></span>
+                            <td colspan="3" class="bottom-divider">
+                                <div>
+                                    <label for="options-card" class="rule-header">Designate Options</label>
+                                </div>
+                                <select id="options-card" class="location-select" name="options" multiple size="5">
+                                    <option value="alliance">Alliance</option>
+                                    <option value="ariel">Ariel</option>
+                                    <option value="callisto">Callisto</option>
+                                    <option value="ceres">Ceres</option>
+                                    <option value="dione">Dione</option>
+                                    <option value="eastern">Eastern Federation</option>
+                                    <option value="eunomia">Eunomia</option>
+                                    <option value="europa">Europa</option>
+                                    <option value="ganymede">Ganymede</option>
+                                    <option value="haumea">Haumea</option>
+                                    <option value="hildas triangle">Hildas Triangle</option>
+                                    <option value="iapetus">Iapetus</option>
+                                    <option value="io">Io</option>
+                                    <option value="kuiper">Kuiper Compact</option>
+                                    <option value="luna">Luna</option>
+                                    <option value="makemake">Makemake</option>
+                                    <option value="mars">Mars</option>
+                                    <option value="mercury">Mercury</option>
+                                    <option value="miranda">Miranda</option>
+                                    <option value="nereid">Nereid</option>
+                                    <option value="neso">Neso</option>
+                                    <option value="oberon">Oberon</option>
+                                    <option value="oceanic">Oceanic League</option>
+                                    <option value="orcus">Orcus</option>
+                                    <option value="pluto">Pluto</option>
+                                    <option value="proteus">Proteus</option>
+                                    <option value="rhea">Rhea</option>
+                                    <option value="sedna">Sedna</option>
+                                    <option value="state">State</option>
+                                    <option value="titania">Titania</option>
+                                    <option value="triton">Triton</option>
+                                    <option value="union">Union</option>
+                                    <option value="venus">Venus</option>
+                                    <option value="vesta">Vesta</option>
+                                    <option value="xena">Xena</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="row-header"></td>
+                            <td colspan="3" class="bottom-divider">
+                                <div>
+                                    <div class="rule-header">On Draw</div>
+                                    <div><u>Rule 1)</u></div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item full-width-item">
+                                            <div>Conditional:</div>
+                                            <span>
+                                                <label for="draw-cond-cardtype-card">Card type:</label>
+                                                <select id="draw-cond-cardtype-card" name="draw-cond-cardtype">
+                                                    <option value=""></option>
+                                                    <option value="commercial">Commercial</option>
+                                                    <option value="cultural">Cultural</option>
+                                                    <option value="political">Political</option>
+                                                    <option value="research">Research</option>
+                                                    <option value="military">Military</option>
+                                                    <option value="polity">Polity</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond-loc1-card">Location:</label>
+                                                <select id="draw-cond-loc1-card" name="draw-cond-loc1">
+                                                    <option value=""></option>
+                                                    <option value="alliance">Alliance</option>
+                                                    <option value="ariel">Ariel</option>
+                                                    <option value="callisto">Callisto</option>
+                                                    <option value="ceres">Ceres</option>
+                                                    <option value="dione">Dione</option>
+                                                    <option value="eastern">Eastern Federation</option>
+                                                    <option value="eunomia">Eunomia</option>
+                                                    <option value="europa">Europa</option>
+                                                    <option value="ganymede">Ganymede</option>
+                                                    <option value="haumea">Haumea</option>
+                                                    <option value="hildas triangle">Hildas Triangle</option>
+                                                    <option value="iapetus">Iapetus</option>
+                                                    <option value="io">Io</option>
+                                                    <option value="kuiper">Kuiper Compact</option>
+                                                    <option value="luna">Luna</option>
+                                                    <option value="makemake">Makemake</option>
+                                                    <option value="mars">Mars</option>
+                                                    <option value="mercury">Mercury</option>
+                                                    <option value="miranda">Miranda</option>
+                                                    <option value="nereid">Nereid</option>
+                                                    <option value="neso">Neso</option>
+                                                    <option value="oberon">Oberon</option>
+                                                    <option value="oceanic">Oceanic League</option>
+                                                    <option value="orcus">Orcus</option>
+                                                    <option value="pluto">Pluto</option>
+                                                    <option value="proteus">Proteus</option>
+                                                    <option value="rhea">Rhea</option>
+                                                    <option value="sedna">Sedna</option>
+                                                    <option value="state">State</option>
+                                                    <option value="titania">Titania</option>
+                                                    <option value="triton">Triton</option>
+                                                    <option value="union">Union</option>
+                                                    <option value="venus">Venus</option>
+                                                    <option value="vesta">Vesta</option>
+                                                    <option value="xena">Xena</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond-op-card">Operation</label>
+                                                <select id="draw-cond-op-card" name="draw-cond-math">
+                                                    <option value=""></option>
+                                                    <option value=">">&gt;</option>
+                                                    <option value="<">&lt;</option>
+                                                    <option value="=">&#61;</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond-comp-card">Comparison:</label>
+                                                <select id="draw-cond-comp-card" name="draw-cond-comp">
+                                                    <option value=""></option>
+                                                    <option value="value">value (enter ->)</option>
+                                                    <option value="alliance">Alliance</option>
+                                                    <option value="ariel">Ariel</option>
+                                                    <option value="callisto">Callisto</option>
+                                                    <option value="ceres">Ceres</option>
+                                                    <option value="dione">Dione</option>
+                                                    <option value="eastern">Eastern Federation</option>
+                                                    <option value="eunomia">Eunomia</option>
+                                                    <option value="europa">Europa</option>
+                                                    <option value="ganymede">Ganymede</option>
+                                                    <option value="haumea">Haumea</option>
+                                                    <option value="hildas triangle">Hildas Triangle</option>
+                                                    <option value="iapetus">Iapetus</option>
+                                                    <option value="io">Io</option>
+                                                    <option value="kuiper">Kuiper Compact</option>
+                                                    <option value="luna">Luna</option>
+                                                    <option value="makemake">Makemake</option>
+                                                    <option value="mars">Mars</option>
+                                                    <option value="mercury">Mercury</option>
+                                                    <option value="miranda">Miranda</option>
+                                                    <option value="nereid">Nereid</option>
+                                                    <option value="neso">Neso</option>
+                                                    <option value="oberon">Oberon</option>
+                                                    <option value="oceanic">Oceanic League</option>
+                                                    <option value="orcus">Orcus</option>
+                                                    <option value="pluto">Pluto</option>
+                                                    <option value="proteus">Proteus</option>
+                                                    <option value="rhea">Rhea</option>
+                                                    <option value="sedna">Sedna</option>
+                                                    <option value="state">State</option>
+                                                    <option value="titania">Titania</option>
+                                                    <option value="triton">Triton</option>
+                                                    <option value="union">Union</option>
+                                                    <option value="venus">Venus</option>
+                                                    <option value="vesta">Vesta</option>
+                                                    <option value="xena">Xena</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond-comp-value-card">Value:</label>
+                                                <input type="text" id="draw-cond-comp-value-card" name="draw-cond-comp-value" size="5" disabled>
+                                            </span>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-action-card">Action:</label>
+                                            <select id="draw-action-card" name="draw-action">
+                                                <option value=""></option>
+                                                <option value="discard">Discard</option>
+                                                <option value="move">Move</option>
+                                                <option value="draw">Draw</option>
+                                                <option value="carry">Carry to next turn</option>
+                                                <option value="turn-over">Turn over</option>
+                                                <option value="draw-fewer">Draw on second draw phase</option>
+                                            </select>
+                                            <input type="text" id="draw-numcards-card" name="draw-numcards" size="5">
+                                            <label for="draw-numcards-card"> card(s)</label>
+                                            <div>(include '-' for fewer cards)</div>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-quantifier-card">Quantifier:</label>
+                                            <select id="draw-quantifier-card" name="draw-quantifier">
+                                                <option value=""></option>
+                                                <option value="all-faceup">All faceup</option>
+                                                <option value="lowest-value">Lowest value</option>
+                                                <option value="highest-value">Highest value</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-subject-card">Subject(s):</label>
+                                            <select id="draw-subject-card" name="draw-subject" multiple size="5">
+                                                <option value="commercial">Commercial</option>
+                                                <option value="cultural">Cultural</option>
+                                                <option value="cultural-1">Cultural 1</option>
+                                                <option value="commercial-2">Commercial 2</option>
+                                                <option value="political">Political</option>
+                                                <option value="research">Research</option>
+                                                <option value="research-1">Research 1</option>
+                                                <option value="military">Military</option>
+                                                <option value="polity">Polity</option>
+                                                <option value="titania-oberon-ariel-miranda">Titania, Oberon, Ariel, and Miranda</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-source-card">Source(s):</label>
+                                            <select id="draw-source-card" class="location-select" name="draw-source" multiple size="5">
+                                                <option value="current-world">Current world</option>
+                                                <option value="alliance">Alliance</option>
+                                                <option value="ariel">Ariel</option>
+                                                <option value="callisto">Callisto</option>
+                                                <option value="ceres">Ceres</option>
+                                                <option value="dione">Dione</option>
+                                                <option value="eastern">Eastern Federation</option>
+                                                <option value="eunomia">Eunomia</option>
+                                                <option value="europa">Europa</option>
+                                                <option value="ganymede">Ganymede</option>
+                                                <option value="haumea">Haumea</option>
+                                                <option value="hildas triangle">Hildas Triangle</option>
+                                                <option value="iapetus">Iapetus</option>
+                                                <option value="io">Io</option>
+                                                <option value="kuiper">Kuiper Compact</option>
+                                                <option value="luna">Luna</option>
+                                                <option value="makemake">Makemake</option>
+                                                <option value="mars">Mars</option>
+                                                <option value="mercury">Mercury</option>
+                                                <option value="miranda">Miranda</option>
+                                                <option value="nereid">Nereid</option>
+                                                <option value="neso">Neso</option>
+                                                <option value="oberon">Oberon</option>
+                                                <option value="oceanic">Oceanic League</option>
+                                                <option value="orcus">Orcus</option>
+                                                <option value="pluto">Pluto</option>
+                                                <option value="proteus">Proteus</option>
+                                                <option value="rhea">Rhea</option>
+                                                <option value="sedna">Sedna</option>
+                                                <option value="state">State</option>
+                                                <option value="titania">Titania</option>
+                                                <option value="triton">Triton</option>
+                                                <option value="union">Union</option>
+                                                <option value="venus">Venus</option>
+                                                <option value="vesta">Vesta</option>
+                                                <option value="xena">Xena</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-destination-card">Destination(s):</label>
+                                            <select id="draw-destination-card" disabled name="draw-destination">
+                                                <option value=""></option>
+                                                <option value="concordia">Concordia</option>
+                                                <option value="europa">Europa</option>
+                                                <option value="io">Io</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div><u>Rule 2)</u></div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item full-width-item">
+                                            <div>Conditional:</div>
+                                            <span>
+                                                <label for="draw-cond2-cardtype-card">Card type:</label>
+                                                <select id="draw-cond2-cardtype-card" name="draw-cond2-cardtype">
+                                                    <option value=""></option>
+                                                    <option value="commercial">Commercial</option>
+                                                    <option value="cultural">Cultural</option>
+                                                    <option value="political">Political</option>
+                                                    <option value="research">Research</option>
+                                                    <option value="military">Military</option>
+                                                    <option value="polity">Polity</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond2-loc1-card">Location:</label>
+                                                <select id="draw-cond2-loc1-card" name="draw-cond2-loc1">
+                                                    <option value=""></option>
+                                                    <option value="alliance">Alliance</option>
+                                                    <option value="ariel">Ariel</option>
+                                                    <option value="callisto">Callisto</option>
+                                                    <option value="ceres">Ceres</option>
+                                                    <option value="dione">Dione</option>
+                                                    <option value="eastern">Eastern Federation</option>
+                                                    <option value="eunomia">Eunomia</option>
+                                                    <option value="europa">Europa</option>
+                                                    <option value="ganymede">Ganymede</option>
+                                                    <option value="haumea">Haumea</option>
+                                                    <option value="hildas triangle">Hildas Triangle</option>
+                                                    <option value="iapetus">Iapetus</option>
+                                                    <option value="io">Io</option>
+                                                    <option value="kuiper">Kuiper Compact</option>
+                                                    <option value="luna">Luna</option>
+                                                    <option value="makemake">Makemake</option>
+                                                    <option value="mars">Mars</option>
+                                                    <option value="mercury">Mercury</option>
+                                                    <option value="miranda">Miranda</option>
+                                                    <option value="nereid">Nereid</option>
+                                                    <option value="neso">Neso</option>
+                                                    <option value="oberon">Oberon</option>
+                                                    <option value="oceanic">Oceanic League</option>
+                                                    <option value="orcus">Orcus</option>
+                                                    <option value="pluto">Pluto</option>
+                                                    <option value="proteus">Proteus</option>
+                                                    <option value="rhea">Rhea</option>
+                                                    <option value="sedna">Sedna</option>
+                                                    <option value="state">State</option>
+                                                    <option value="titania">Titania</option>
+                                                    <option value="triton">Triton</option>
+                                                    <option value="union">Union</option>
+                                                    <option value="venus">Venus</option>
+                                                    <option value="vesta">Vesta</option>
+                                                    <option value="xena">Xena</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond2-op-card">Operation</label>
+                                                <select id="draw-cond2-op-card" name="draw-cond2-math">
+                                                    <option value=""></option>
+                                                    <option value=">">&gt;</option>
+                                                    <option value="<">&lt;</option>
+                                                    <option value="=">&#61;</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond2-comp-card">Comparison:</label>
+                                                <select id="draw-cond2-comp-card" name="draw-cond2-comp">
+                                                    <option value=""></option>
+                                                    <option value="value">value (enter ->)</option>
+                                                    <option value="alliance">Alliance</option>
+                                                    <option value="ariel">Ariel</option>
+                                                    <option value="callisto">Callisto</option>
+                                                    <option value="ceres">Ceres</option>
+                                                    <option value="dione">Dione</option>
+                                                    <option value="eastern">Eastern Federation</option>
+                                                    <option value="eunomia">Eunomia</option>
+                                                    <option value="europa">Europa</option>
+                                                    <option value="ganymede">Ganymede</option>
+                                                    <option value="haumea">Haumea</option>
+                                                    <option value="hildas triangle">Hildas Triangle</option>
+                                                    <option value="iapetus">Iapetus</option>
+                                                    <option value="io">Io</option>
+                                                    <option value="kuiper">Kuiper Compact</option>
+                                                    <option value="luna">Luna</option>
+                                                    <option value="makemake">Makemake</option>
+                                                    <option value="mars">Mars</option>
+                                                    <option value="mercury">Mercury</option>
+                                                    <option value="miranda">Miranda</option>
+                                                    <option value="nereid">Nereid</option>
+                                                    <option value="neso">Neso</option>
+                                                    <option value="oberon">Oberon</option>
+                                                    <option value="oceanic">Oceanic League</option>
+                                                    <option value="orcus">Orcus</option>
+                                                    <option value="pluto">Pluto</option>
+                                                    <option value="proteus">Proteus</option>
+                                                    <option value="rhea">Rhea</option>
+                                                    <option value="sedna">Sedna</option>
+                                                    <option value="state">State</option>
+                                                    <option value="titania">Titania</option>
+                                                    <option value="triton">Triton</option>
+                                                    <option value="union">Union</option>
+                                                    <option value="venus">Venus</option>
+                                                    <option value="vesta">Vesta</option>
+                                                    <option value="xena">Xena</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label for="draw-cond2-comp-value-card">Value:</label>
+                                                <input type="text" id="draw-cond2-comp-value-card" name="draw-cond2-comp-value" size="5" disabled>
+                                            </span>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-action2-card">Action:</label>
+                                            <select id="draw-action2-card" name="draw-action2">
+                                                <option value=""></option>
+                                                <option value="discard">Discard</option>
+                                                <option value="move">Move</option>
+                                                <option value="draw">Draw</option>
+                                                <option value="carry">Carry to next turn</option>
+                                                <option value="turn-over">Turn over</option>
+                                                <option value="draw-fewer">Draw on second draw phase</option>
+                                            </select>
+                                            <input type="text" id="draw-numcards2-card" name="draw-numcards2" size="5">
+                                            <label for="draw-numcards2-card"> card(s)</label>
+                                            <div>(include '-' for fewer cards)</div>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-quantifier2-card">Quantifier:</label>
+                                            <select id="draw-quantifier2-card" name="draw-quantifier2">
+                                                <option value=""></option>
+                                                <option value="all-faceup">All faceup</option>
+                                                <option value="lowest-value">Lowest value</option>
+                                                <option value="highest-value">Highest value</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-subject2-card">Subject(s):</label>
+                                            <select id="draw-subject2-card" name="draw-subject2" multiple size="5">
+                                                <option value="commercial">Commercial</option>
+                                                <option value="cultural">Cultural</option>
+                                                <option value="cultural-1">Cultural 1</option>
+                                                <option value="commercial-2">Commercial 2</option>
+                                                <option value="political">Political</option>
+                                                <option value="research">Research</option>
+                                                <option value="research-1">Research 1</option>
+                                                <option value="military">Military</option>
+                                                <option value="polity">Polity</option>
+                                                <option value="titania-oberon-ariel-miranda">Titania, Oberon, Ariel, and Miranda</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-source2-card">Source(s):</label>
+                                            <select id="draw-source2-card" class="location-select" name="draw-source2" multiple size="5">
+                                                <option value="current-world">Current world</option>
+                                                <option value="alliance">Alliance</option>
+                                                <option value="ariel">Ariel</option>
+                                                <option value="callisto">Callisto</option>
+                                                <option value="ceres">Ceres</option>
+                                                <option value="dione">Dione</option>
+                                                <option value="eastern">Eastern Federation</option>
+                                                <option value="eunomia">Eunomia</option>
+                                                <option value="europa">Europa</option>
+                                                <option value="ganymede">Ganymede</option>
+                                                <option value="haumea">Haumea</option>
+                                                <option value="hildas triangle">Hildas Triangle</option>
+                                                <option value="iapetus">Iapetus</option>
+                                                <option value="io">Io</option>
+                                                <option value="kuiper">Kuiper Compact</option>
+                                                <option value="luna">Luna</option>
+                                                <option value="makemake">Makemake</option>
+                                                <option value="mars">Mars</option>
+                                                <option value="mercury">Mercury</option>
+                                                <option value="miranda">Miranda</option>
+                                                <option value="nereid">Nereid</option>
+                                                <option value="neso">Neso</option>
+                                                <option value="oberon">Oberon</option>
+                                                <option value="oceanic">Oceanic League</option>
+                                                <option value="orcus">Orcus</option>
+                                                <option value="pluto">Pluto</option>
+                                                <option value="proteus">Proteus</option>
+                                                <option value="rhea">Rhea</option>
+                                                <option value="sedna">Sedna</option>
+                                                <option value="state">State</option>
+                                                <option value="titania">Titania</option>
+                                                <option value="triton">Triton</option>
+                                                <option value="union">Union</option>
+                                                <option value="venus">Venus</option>
+                                                <option value="vesta">Vesta</option>
+                                                <option value="xena">Xena</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-item">
+                                            <label for="draw-destination2-card">Destination(s):</label>
+                                            <select id="draw-destination2-card" disabled name="draw-destination2">
+                                                <option value=""></option>
+                                                <option value="concordia">Concordia</option>
+                                                <option value="europa">Europa</option>
+                                                <option value="io">Io</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td class="row-header"></td>
-                            <td colspan="3">
+                            <td colspan="3" class="bottom-divider">
                                 <div>
-                                    <label for="draw-effect-card">On Draw</label>
-                                    <select id="draw-effect-card" name="draw-effect">
-                                        <option value=""></option>
-                                        <option value="discard-cultural-1">Discard all faceup Cultural 1 in game</option>
-                                        <option value="move-commercial-2">Move all Commercial 2 from Ceres, Vesta, Eunomia, The Hildas Triangle, and the Exalted Temple to Concordia</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="row-header"></td>
-                            <td colspan="3">
-                                <div>
-                                    <label for="discard-card">Discard</label>
+                                    <label for="discard-card" class="rule-header">Discard</label>
                                     <select id="discard-card" name="discard">
                                         <option value=""></option>
                                         <option value="collect">On collect</option>
@@ -133,9 +553,9 @@
                         </tr>
                         <tr>
                             <td class="row-header"></td>
-                            <td colspan="3">
+                            <td colspan="3" class="bottom-divider">
                                 <div>
-                                    <label for="collect-card">On Collect</label>
+                                    <label for="collect-card" class="rule-header">On Collect</label>
                                     <select id="collect-card" name="collect">
                                         <option value=""></option>
                                         <option value="collect-1">Collect card</option>
@@ -187,7 +607,7 @@
                             <td class="row-header"></td>
                             <td colspan="4">
                                 <div>
-                                    <div>On End of Game</div>
+                                    <div class="rule-header">On End of Game</div>
                                     <div class="flex-grid">
                                         <div class="flex-item">
                                             <label for="end-game-commercial-card">Commercial</label>
@@ -248,31 +668,6 @@
                                                 <option value="+2">+2</option>
                                                 <option value="+3">+3</option>
                                             </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="row-header" colspan="1">Image and Preview:</td>
-                            <td colspan="1">
-                                <label for="image-card">Card image type</label>
-                                <select id="image-card" name="card-image">
-                                    <option value="image-card-commercial">Commercial</option>
-                                    <option value="image-card-cultural">Cultural</option>
-                                    <option value="image-card-political">Political</option>
-                                    <option value="image-card-research">Research</option>
-                                    <option value="image-card-military">Military</option>
-                                    <option value="image-card-polity">Polity</option>
-                                </select>
-                            </td>
-                            <td colspan="1">
-                                <div id="card-thumb">
-                                    <div class="card-container">
-                                        <div class="card-interior">
-                                            <h3 class="card-faction"></h3>
-                                            <figure class="card-image"></figure>
-                                            <div class="card-value"></div>
                                         </div>
                                     </div>
                                 </div>

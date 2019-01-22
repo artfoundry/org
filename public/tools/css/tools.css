@@ -78,8 +78,7 @@ form {
 }
 
 td {
-    width: 200px;
-    padding: 5px 0;
+    padding: 10px 0;
 }
 
 .row-header {
@@ -89,17 +88,33 @@ td {
     vertical-align: top;
 }
 
+.rule-header {
+    font-style: italic;
+    padding-bottom: 5px;
+}
+
 .flex-grid {
+    width: 875px;
     display: flex;
     flex-wrap: wrap;
 }
 
 .flex-item {
-    margin: 0 20px 0 0;
+    flex-basis: 200px;
+    margin: 0 20px 10px 0;
+}
+
+.flex-item.full-width-item {
+    flex-basis: 100%;
 }
 
 input, select {
-    margin: 3px 0 3px 5px;
+    margin: 3px 5px 3px 0;
+}
+
+.location-select {
+    width: 150px;
+    height: 67px;
 }
 
 .inactive {
@@ -156,6 +171,10 @@ td.button-container {
 
 .shadow {
     box-shadow: 3px 3px 5px gray;
+}
+
+.bottom-divider {
+    border-bottom: 1px solid gray;
 }
 
 /* message */
@@ -236,6 +255,7 @@ td.button-container {
 .color-research { background-color: #0033ff; }
 .color-military { background-color: #fe0002; }
 .color-polity { background-color: gray; }
+.color-event { background-color: gray; }
 
 /* Card images */
 .image-card-commercial {
@@ -254,5 +274,8 @@ td.button-container {
     background-image: url('../images/card/image-military.png');
 }
 .image-card-polity {
+    background-color: white;
+}
+.image-card-event {
     background-color: white;
 }

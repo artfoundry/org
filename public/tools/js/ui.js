@@ -2,11 +2,11 @@
 
 class UI {
     constructor(initialType) {
+        this.currentType = initialType;
+        this.currentItemName = '';
         this.navbar();
         this._listWatch();
         this._formWatch();
-        this.currentType = initialType;
-        this.currentItemName = '';
         this.messages = {
             'confirmEdit' : {text: 'You are about to save changes to an existing item.', hasCancel: true},
             'noName'      : {text: 'The logical name needs to be entered in order to save.', hasCancel: false}
@@ -34,10 +34,28 @@ class UI {
         $(`#${itemID}`).click((event) => {
             this.currentItemName = event.currentTarget.id;
             $(`#form-${this.currentType}`).trigger('reset');
-            $('#card-thumb .card-container').show();
-            $('#card-thumb').click(() => { this._showModal(); });
+            this._activateItemPreview();
             this.updateForm();
         });
+    }
+
+    _activateItemPreview() {
+        $(`#${this.currentType}-thumb .${this.currentType}-container`).show();
+        $(`#${this.currentType}-thumb`).click(() => { this._showModal(); });
+    }
+
+    _setItemPreview(faction, item) {
+        let imageClass = `image-${this.currentType}-${faction}`;
+
+        $(`.${this.currentType}-container`).attr('class', `${this.currentType}-container color-${faction}`);
+        $(`.${this.currentType}-faction`).text(faction.charAt(0).toUpperCase() + faction.slice(1));
+        if (imageClass)
+            $(`.${this.currentType}-image`).attr('class', `${this.currentType}-image ${imageClass}`);
+        if (item && this.currentType === 'card') {
+            if (item[`end-game-${faction}`]) {
+                $('.card-value').text(item[`end-game-${faction}`].slice(1));
+            }
+        }
     }
 
     _formWatch() {
@@ -57,9 +75,42 @@ class UI {
                 this.showMessage(this.messages.noName);
             }
         });
-        $('#reset-card').click(() => {
-            $('#card-thumb .card-container').hide();
-            $('#card-thumb').off('click');
+        $(`#reset-${this.currentType}`).click(() => {
+            $(`#${this.currentType}-thumb .${this.currentType}-container`).hide();
+            $(`#${this.currentType}-thumb`).off('click');
+        });
+        $(`#draw-action-${this.currentType}`).on('change', (el) => {
+            if ($(el.currentTarget).val() === 'move') {
+                $(`#draw-destination-${this.currentType}`).prop('disabled', false);
+            } else {
+                $(`#draw-destination-${this.currentType}`).prop('disabled', true);
+            }
+        });
+        $(`#draw-action2-${this.currentType}`).on('change', (el) => {
+            if ($(el.currentTarget).val() === 'move') {
+                $(`#draw-destination2-${this.currentType}`).prop('disabled', false);
+            } else {
+                $(`#draw-destination2-${this.currentType}`).prop('disabled', true);
+            }
+        });
+        $(`#draw-cond-comp-${this.currentType}`).on('change', (el) => {
+            if ($(el.currentTarget).val() === 'value') {
+                $(`#draw-cond-comp-value-${this.currentType}`).prop('disabled', false);
+            } else {
+                $(`#draw-cond-comp-value-${this.currentType}`).prop('disabled', true);
+            }
+        });
+        $(`#draw-cond2-comp-${this.currentType}`).on('change', (el) => {
+            if ($(el.currentTarget).val() === 'value') {
+                $(`#draw-cond2-comp-value-${this.currentType}`).prop('disabled', false);
+            } else {
+                $(`#draw-cond2-comp-value-${this.currentType}`).prop('disabled', true);
+            }
+        });
+        $(`#type-${this.currentType}`).on('change', (el) => {
+            let faction = $(el.currentTarget).val();
+            this._activateItemPreview();
+            this._setItemPreview(faction);
         });
     }
 
@@ -70,7 +121,6 @@ class UI {
         $form.find('[name="logical"]')[0].value = this.currentItemName;
         if (item) {
             let faction = item.type;
-            let imageClass = item[`${this.currentType}-image`];
 
             for (let attr in item) {
                 let value = item[attr];
@@ -82,14 +132,7 @@ class UI {
                     $form.find(`[name="${attr}"]`)[0].value = value;
                 }
             }
-            $(`.${this.currentType}-container`).attr('class', `${this.currentType}-container color-${faction}`);
-            $(`.${this.currentType}-faction`).text(faction.charAt(0).toUpperCase() + faction.slice(1));
-            $(`.${this.currentType}-image`).attr('class', `${this.currentType}-image ${imageClass}`);
-            if (this.currentType === 'card') {
-                if (item[`end-game-${faction}`]) {
-                    $('.card-value').text(item[`end-game-${faction}`].slice(1));
-                }
-            }
+            this._setItemPreview(faction, item);
         }
     }
 
