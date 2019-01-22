@@ -108,11 +108,15 @@ td {
     flex-basis: 100%;
 }
 
+label {
+    vertical-align: text-top;
+}
+
 input, select {
     margin: 3px 5px 3px 0;
 }
 
-.location-select {
+.multiple-select {
     width: 150px;
     height: 67px;
 }
@@ -254,8 +258,8 @@ td.button-container {
 .color-political { background-color: #fc6621; }
 .color-research { background-color: #0033ff; }
 .color-military { background-color: #fe0002; }
-.color-polity { background-color: gray; }
-.color-event { background-color: gray; }
+.color-polity { background-color: black; }
+.color-event { background-color: black; }
 
 /* Card images */
 .image-card-commercial {
