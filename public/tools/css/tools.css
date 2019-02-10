@@ -81,6 +81,10 @@ td {
     padding: 10px 0;
 }
 
+select {
+    max-width: 200px;
+}
+
 .row-header {
     width: 100px;
     font-weight: 500;

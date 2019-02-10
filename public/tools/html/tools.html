@@ -726,52 +726,95 @@
                         <tr>
                             <td class="row-header"></td>
                             <td colspan="3" class="bottom-divider">
-                                <div>
-                                    <label for="collect-card" class="rule-header">On Collect</label>
-                                    <select id="collect-card" name="collect">
-                                        <option value=""></option>
-                                        <option value="collect-1">Collect card</option>
-                                        <option value="eastFed-1">Eastern Federation +1 to designated</option>
-                                        <option value="eastFed-2">Eastern Federation +2 to designated</option>
-                                        <option value="eastFed-3">Eastern Federation +3 to designated</option>
-                                        <option value="state-1">State +1 to designated</option>
-                                        <option value="state-2">State +2 to designated</option>
-                                        <option value="state-3">State +3 to designated</option>
-                                        <option value="union-1">Union +1 to designated</option>
-                                        <option value="union-2">Union +2 to designated</option>
-                                        <option value="union-3">Union +3 to designated</option>
-                                        <option value="ocean-1">Oceanic League +1 to designated</option>
-                                        <option value="ocean-2">Oceanic League +2 to designated</option>
-                                        <option value="ocean-3">Oceanic League +3 to designated</option>
-                                        <option value="south-1">Southern Bloc +1 to designated</option>
-                                        <option value="south-2">Southern Bloc +2 to designated</option>
-                                        <option value="south-3">Southern Bloc +3 to designated</option>
-                                        <option value="alliance-1">Alliance +1 to designated</option>
-                                        <option value="alliance-2">Alliance +2 to designated</option>
-                                        <option value="alliance-3">Alliance +3 to designated</option>
-                                        <option value="kuiper-1">Kuiper Compact +1 to designated</option>
-                                        <option value="kuiper-2">Kuiper Compact +2 to designated</option>
-                                        <option value="kuiper-3">Kuiper Compact +3 to designated</option>
-                                        <option value="discard">All EXCEPT Winner Discard random card</option>
-                                        <option value="move">Move this card to designated</option>
-                                        <option value="move-&-collect-2">Move this card to designated & Collect on Second Collect</option>
-                                        <option value="move-helium">Move all Helium-3 tokens from one designated world to any other designated world</option>
-                                        <option value="replace-3-helium">For each 3 Helium-3 tokens present, remove these 3 tokens and replace with Helium-3 card granting specified victory points</option>
-                                        <option value="remove-commercial-1-&-collect-1">Remove lowest value Commercial card from winner's collection & Collect card</option>
-                                        <option value="remove-commercial-2-&-collect-1">Remove 2 lowest value Commercial cards from winner's collection & Collect card</option>
-                                        <option value="remove-commercial-3-&-collect-1">Remove 3 lowest value Commercial cards from winner's collection & Collect card</option>
-                                        <option value="remove-political-1-&-collect-1">Remove lowest value Political card from winner's collection & Collect card</option>
-                                        <option value="remove-political-2-&-collect-1">Remove 2 lowest value Political cards from winner's collection & Collect card</option>
-                                        <option value="remove-political-3-&-collect-1">Remove 3 lowest value Political cards from winner's collection & Collect card</option>
-                                        <option value="remove-research-1-&-collect-1">Remove lowest value Research card from winner's collection & Collect card</option>
-                                        <option value="remove-research-2-&-collect-1">Remove 2 lowest value Research cards from winner's collection & Collect card</option>
-                                        <option value="remove-research-3-&-collect-1">Remove 3 lowest value Research cards from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-1-&-collect-1">Remove lowest value Cultural card from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-2-&-collect-1">Remove 2 lowest value Cultural cards from winner's collection & Collect card</option>
-                                        <option value="remove-cultural-3-&-collect-1">Remove 3 lowest value Cultural cards from winner's collection & Collect card</option>
-                                        <option value="add-3-influence">Add 3 temporary Influence to designated other world</option>
-                                        <option value="remove-polity">Remove all Polity Influence tokens from designated polity</option>
-                                    </select>
+                                <div class="flex-grid">
+                                    <div class="flex-item full-width-item">
+                                        <div class="rule-header">On Collect</div>
+                                        <span>
+                                            <label for="on-collect-action1-card">First action:</label>
+                                            <select id="on-collect-action1-card" name="on-collect-action1">
+                                                <option value=""></option>
+                                                <option value="add">Add to designated</option>
+                                                <option value="add-influence">Add temporary influence to designated other world</option>
+                                                <option value="move">Move to designated</option>
+                                                <option value="remove">Remove lowest value card from winner's collection</option>
+                                                <option value="remove">Remove Polity Influence tokens from designated polity</option>
+                                                <option value="collect">Collect card</option>
+                                                <option value="discard">All except winner discards random card</option>
+                                            </select>
+                                        </span>
+                                        <span>
+                                            <label for="on-collect-val-card">Value:</label>
+                                            <select id="on-collect-val-card" name="on-collect-val">
+                                                <option value=""></option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="all">All</option>
+                                            </select>
+                                        </span>
+                                        <span>
+                                            <label for="on-collect-loc-card">Location:</label>
+                                            <select id="on-collect-loc-card" name="on-collect-loc">
+                                                <option value=""></option>
+                                                <option value="alliance">Alliance</option>
+                                                <option value="ariel">Ariel</option>
+                                                <option value="callisto">Callisto</option>
+                                                <option value="ceres">Ceres</option>
+                                                <option value="dione">Dione</option>
+                                                <option value="eastern">Eastern Federation</option>
+                                                <option value="eunomia">Eunomia</option>
+                                                <option value="europa">Europa</option>
+                                                <option value="ganymede">Ganymede</option>
+                                                <option value="haumea">Haumea</option>
+                                                <option value="hildas triangle">Hildas Triangle</option>
+                                                <option value="iapetus">Iapetus</option>
+                                                <option value="io">Io</option>
+                                                <option value="kuiper">Kuiper Compact</option>
+                                                <option value="luna">Luna</option>
+                                                <option value="makemake">Makemake</option>
+                                                <option value="mars">Mars</option>
+                                                <option value="mercury">Mercury</option>
+                                                <option value="miranda">Miranda</option>
+                                                <option value="nereid">Nereid</option>
+                                                <option value="neso">Neso</option>
+                                                <option value="oberon">Oberon</option>
+                                                <option value="oceanic">Oceanic League</option>
+                                                <option value="orcus">Orcus</option>
+                                                <option value="pluto">Pluto</option>
+                                                <option value="proteus">Proteus</option>
+                                                <option value="rhea">Rhea</option>
+                                                <option value="sedna">Sedna</option>
+                                                <option value="state">State</option>
+                                                <option value="titania">Titania</option>
+                                                <option value="triton">Triton</option>
+                                                <option value="union">Union</option>
+                                                <option value="venus">Venus</option>
+                                                <option value="vesta">Vesta</option>
+                                                <option value="xena">Xena</option>
+                                            </select>
+                                        </span>
+                                        <span>
+                                            <label for="on-collect-cardtype-card">Card type:</label>
+                                            <select id="on-collect-cardtype-card" name="on-collect-cardtype">
+                                                <option value=""></option>
+                                                <option value="commercial">Commercial</option>
+                                                <option value="cultural">Cultural</option>
+                                                <option value="political">Political</option>
+                                                <option value="research">Research</option>
+                                                <option value="military">Military</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                    <div class="flex-item full-width-item">
+                                        <span>
+                                            <label for="on-collect-action1-card">Second action:</label>
+                                            <select id="on-collect-action1-card" name="on-collect-action1">
+                                                <option value=""></option>
+                                                <option value="collect">Collect card</option>
+                                                <option value="2nd-collect">Collect on Second Collect</option>
+                                            </select>
+                                        </span>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
