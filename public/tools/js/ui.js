@@ -124,12 +124,11 @@ class UI {
 
             for (let attr in item) {
                 let value = item[attr];
-                if (Array.isArray(value)) {
-                    for (let i=0; i < value.length; i++) {
-                        $form.find(`[name="${attr}"][value="${value[i]}"]`)[0].checked = true;
-                    }
+
+                if (attr === 'text') {
+                    $form.find(`[name="${attr}"]`)[0].innerText = value;
                 } else {
-                    $form.find(`[name="${attr}"]`)[0].value = value;
+                    $($form.find(`[name="${attr}"]`)[0]).val(value);
                 }
             }
             this._setItemPreview(faction, item);

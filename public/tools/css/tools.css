@@ -85,6 +85,10 @@ select {
     max-width: 200px;
 }
 
+textarea {
+    vertical-align: middle;
+}
+
 .row-header {
     width: 100px;
     font-weight: 500;
