@@ -125,10 +125,10 @@
                             <td colspan="3" class="bottom-divider">
                                 <div>
                                     <div class="rule-header">On Draw</div>
-                                    <div><u>Rule 1</u></div>
+                                    <div class="row-header"><u>Rule 1</u></div>
                                     <div class="flex-grid">
                                         <div class="flex-item full-width-item">
-                                            <div>Conditional:</div>
+                                            <div>Conditional</div>
                                             <span>
                                                 <label for="draw-cond-cardtype-rule1-card">Card type:</label>
                                                 <select id="draw-cond-cardtype-rule1-card" name="draw-cond-cardtype-rule1">
@@ -238,6 +238,7 @@
                                                 <input type="text" id="draw-cond-comp-value-rule1-card" name="draw-cond-comp-value-rule1" size="5" disabled>
                                             </span>
                                         </div>
+                                        <div class="flex-item full-width-item">Behavior</div>
                                         <div class="flex-item">
                                             <label for="draw-action-rule1-card">Action:</label>
                                             <select id="draw-action-rule1-card" name="draw-action-rule1">
@@ -268,7 +269,7 @@
                                                 <option value="highest-value">Highest value</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
+                                        <div class="flex-item force-wrap">
                                             <label for="draw-subject-rule1-card">Subject(s):</label>
                                             <select id="draw-subject-rule1-card" class="multiple-select" name="draw-subject-rule1" multiple size="5">
                                                 <option value="commercial">Commercial</option>
@@ -330,7 +331,7 @@
                                                 <option value="xena">Xena</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
+                                        <div class="flex-item force-wrap">
                                             <label for="draw-source-rule1-card">Source(s):</label>
                                             <select id="draw-source-rule1-card" class="multiple-select" name="draw-source-rule1" multiple size="5">
                                                 <option value="current-world">Current world</option>
@@ -415,10 +416,10 @@
                                         </div>
                                     </div>
 
-                                    <div><u>Rule 2</u></div>
+                                    <div class="row-header"><u>Rule 2</u></div>
                                     <div class="flex-grid">
                                         <div class="flex-item full-width-item">
-                                            <div>Conditional:</div>
+                                            <div>Conditional</div>
                                             <span>
                                                 <label for="draw-cond-cardtype-rule2-card">Card type:</label>
                                                 <select id="draw-cond-cardtype-rule2-card" name="draw-cond-cardtype-rule2">
@@ -528,6 +529,7 @@
                                                 <input type="text" id="draw-cond-comp-value-rule2-card" name="draw-cond-comp-value-rule2" size="5" disabled>
                                             </span>
                                         </div>
+                                        <div class="flex-item full-width-item">Behavior</div>
                                         <div class="flex-item">
                                             <label for="draw-action-rule2-card">Action:</label>
                                             <select id="draw-action-rule2-card" name="draw-action-rule2">
@@ -558,7 +560,7 @@
                                                 <option value="highest-value">Highest value</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
+                                        <div class="flex-item force-wrap">
                                             <label for="draw-subject-rule2-card">Subject(s):</label>
                                             <select id="draw-subject-rule2-card" class="multiple-select" name="draw-subject-rule2" multiple size="5">
                                                 <option value="commercial">Commercial</option>
@@ -620,7 +622,7 @@
                                                 <option value="xena">Xena</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
+                                        <div class="flex-item force-wrap">
                                             <label for="draw-source-rule2-card">Source(s):</label>
                                             <select id="draw-source-rule2-card" class="multiple-select" name="draw-source-rule2" multiple size="5">
                                                 <option value="current-world">Current world</option>
@@ -824,8 +826,8 @@
                                 <div>
                                     <div class="rule-header">On End of Game</div>
                                     <div class="flex-grid">
-                                        <div class="flex-item">
-                                            <label for="end-game-commercial-card">Commercial</label>
+                                        <div class="flex-item min-width-item">
+                                            <label for="end-game-commercial-card">Commercial:</label>
                                             <select id="end-game-commercial-card" name="end-game-commercial">
                                                 <option value=""></option>
                                                 <option value="-3">-3</option>
@@ -836,8 +838,8 @@
                                                 <option value="+3">+3</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
-                                            <label for="end-game-cultural-card">Cultural</label>
+                                        <div class="flex-item min-width-item">
+                                            <label for="end-game-cultural-card">Cultural:</label>
                                             <select id="end-game-cultural-card" name="end-game-cultural">
                                                 <option value=""></option>
                                                 <option value="-3">-3</option>
@@ -848,8 +850,8 @@
                                                 <option value="+3">+3</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
-                                            <label for="end-game-military-card">Military</label>
+                                        <div class="flex-item min-width-item">
+                                            <label for="end-game-military-card">Military:</label>
                                             <select id="end-game-military-card" name="end-game-military">
                                                 <option value=""></option>
                                                 <option value="-3">-3</option>
@@ -860,8 +862,8 @@
                                                 <option value="+3">+3</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
-                                            <label for="end-game-political-card">Political</label>
+                                        <div class="flex-item min-width-item">
+                                            <label for="end-game-political-card">Political:</label>
                                             <select id="end-game-political-card" name="end-game-political">
                                                 <option value=""></option>
                                                 <option value="-3">-3</option>
@@ -872,8 +874,8 @@
                                                 <option value="+3">+3</option>
                                             </select>
                                         </div>
-                                        <div class="flex-item">
-                                            <label for="end-game-research-card">Research</label>
+                                        <div class="flex-item min-width-item">
+                                            <label for="end-game-research-card">Research:</label>
                                             <select id="end-game-research-card" name="end-game-research">
                                                 <option value=""></option>
                                                 <option value="-3">-3</option>
@@ -890,7 +892,179 @@
                         </tr>
                         <tr>
                             <td class="row-header">Card Count:</td>
-                            <td colspan="3"></td>
+                            <td colspan="3">
+                                <div>
+                                    <div class="rule-header">The Inner Worlds</div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-mercury-card">Mercury:</label>
+                                            <input id="count-mercury-card" type="text" name="count-mercury" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-venus-card">Venus:</label>
+                                            <input id="count-venus-card" type="text" name="count-venus" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-earth-card">Earth:</label>
+                                            <input id="count-earth-card" type="text" name="count-earth" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-luna-card">Luna:</label>
+                                            <input id="count-luna-card" type="text" name="count-luna" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-mars-card">Mars:</label>
+                                            <input id="count-mars-card" type="text" name="count-mars" size="5">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="rule-header">The Belt</div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-ceres-card">Ceres:</label>
+                                            <input id="count-ceres-card" type="text" name="count-ceres" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-vesta-card">Vesta:</label>
+                                            <input id="count-vesta-card" type="text" name="count-vesta" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-eunomia-card">Eunomia:</label>
+                                            <input id="count-eunomia-card" type="text" name="count-eunomia" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-exalted-card">Exalted Temple:</label>
+                                            <input id="count-exalted-card" type="text" name="count-exalted" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-hildas-card">Hildas Triangle:</label>
+                                            <input id="count-hildas-card" type="text" name="count-hildas" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-concordia-card">Concordia:</label>
+                                            <input id="count-concordia-card" type="text" name="count-concordia" size="5">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="rule-header">The Galilean Conflict</div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-io-card">Io:</label>
+                                            <input id="count-io-card" type="text" name="count-io" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-europa-card">Europa:</label>
+                                            <input id="count-europa-card" type="text" name="count-europa" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-callisto-card">Callisto:</label>
+                                            <input id="count-callisto-card" type="text" name="count-callisto" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-ganymede-card">Ganymede:</label>
+                                            <input id="count-ganymede-card" type="text" name="count-ganymede" size="5">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="rule-header">The Transjovian War</div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-titan-card">Titan:</label>
+                                            <input id="count-titan-card" type="text" name="count-titan" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-rhea-card">Rhea:</label>
+                                            <input id="count-rhea-card" type="text" name="count-rhea" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-dione-card">Dione:</label>
+                                            <input id="count-dione-card" type="text" name="count-dione" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-iapetus-card">Iapetus:</label>
+                                            <input id="count-iapetus-card" type="text" name="count-iapetus" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-oberon-card">Oberon:</label>
+                                            <input id="count-oberon-card" type="text" name="count-oberon" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-ariel-card">Ariel:</label>
+                                            <input id="count-ariel-card" type="text" name="count-ariel" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-miranda-card">Miranda:</label>
+                                            <input id="count-miranda-card" type="text" name="count-miranda" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-titania-card">Titania:</label>
+                                            <input id="count-titania-card" type="text" name="count-titania" size="5">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="rule-header">The Long War</div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-triton-card">Triton:</label>
+                                            <input id="count-triton-card" type="text" name="count-triton" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-proteus-card">Proteus:</label>
+                                            <input id="count-proteus-card" type="text" name="count-proteus" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-nereid-card">Nereid:</label>
+                                            <input id="count-nereid-card" type="text" name="count-nereid" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-neso-card">Neso:</label>
+                                            <input id="count-neso-card" type="text" name="count-neso" size="5">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="rule-header">The Kulper Belt</div>
+                                    <div class="flex-grid">
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-pluto-card">Pluto:</label>
+                                            <input id="count-pluto-card" type="text" name="count-pluto" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-makemake-card">Makemake:</label>
+                                            <input id="count-makemake-card" type="text" name="count-makemake" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-xena-card">Xena:</label>
+                                            <input id="count-xena-card" type="text" name="count-xena" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-sedna-card">Sedna:</label>
+                                            <input id="count-sedna-card" type="text" name="count-sedna" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-haumea-card">Haumea:</label>
+                                            <input id="count-haumea-card" type="text" name="count-haumea" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-quorum-card">The Quorum:</label>
+                                            <input id="count-quorum-card" type="text" name="count-quorum" size="5">
+                                        </div>
+                                        <div class="flex-item min-width-item">
+                                            <label for="count-orcus-card">Orcus:</label>
+                                            <input id="count-orcus-card" type="text" name="count-orcus" size="5">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="4" class="button-container">

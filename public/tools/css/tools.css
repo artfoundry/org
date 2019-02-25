@@ -1,5 +1,5 @@
 section {
-    margin: 20px;
+    margin: 10px;
 }
 
 header {
@@ -47,7 +47,7 @@ nav {
 /* list */
 
 .list-container {
-    flex-basis: 20%;
+    flex-basis: 12%;
     border-right: 2px solid blue;
 }
 
@@ -78,7 +78,8 @@ form {
 }
 
 td {
-    padding: 10px 0;
+    max-width: 350px;
+    padding: 10px;
 }
 
 select {
@@ -90,7 +91,7 @@ textarea {
 }
 
 .row-header {
-    width: 100px;
+    width: 80px;
     font-weight: 500;
     padding-right: 10px;
     vertical-align: top;
@@ -102,18 +103,26 @@ textarea {
 }
 
 .flex-grid {
-    width: 875px;
+    width: 1160px;
     display: flex;
     flex-wrap: wrap;
 }
 
 .flex-item {
-    flex-basis: 200px;
+    flex-basis: 250px;
     margin: 0 20px 10px 0;
 }
 
 .flex-item.full-width-item {
     flex-basis: 100%;
+}
+
+.flex-item.min-width-item {
+    flex-basis: initial;
+}
+
+.flex-item.force-wrap {
+    flex-basis: 0;
 }
 
 label {
@@ -187,13 +196,15 @@ td.button-container {
 
 .bottom-divider {
     border-bottom: 1px solid gray;
+    margin-top: 10px;
+    width: 100%;
 }
 
 /* message */
 
 #message {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 40%;
     left: 25%;
     width: 50%;
