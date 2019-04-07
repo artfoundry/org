@@ -111,7 +111,7 @@ class FirebaseServices {
             attr = '';
 
         for (let n=0; n < item.length; n++) {
-            if (item[n].name === 'logical') {
+            if (item[n].name === 'item-name') {
                 name = item[n].value;
             } else {
                 attr = item[n].name;

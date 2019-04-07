@@ -47,11 +47,11 @@ class UI {
     _setItemPreview(faction, item) {
         let imageClass = `image-${this.currentType}-${faction}`;
 
-        $(`.${this.currentType}-container`).attr('class', `${this.currentType}-container color-${faction}`);
-        $(`.${this.currentType}-faction`).text(faction.charAt(0).toUpperCase() + faction.slice(1));
         if (imageClass)
             $(`.${this.currentType}-image`).attr('class', `${this.currentType}-image ${imageClass}`);
         if (item && this.currentType === 'card') {
+            $(`.${this.currentType}-container`).attr('class', `${this.currentType}-container color-${faction}`);
+            $(`.${this.currentType}-faction`).text(faction.charAt(0).toUpperCase() + faction.slice(1));
             if (item[`end-game-${faction}`]) {
                 $('.card-value').text(item[`end-game-${faction}`].slice(1));
             }
@@ -61,7 +61,7 @@ class UI {
     _formWatch() {
         $('form').submit((event) => {
             event.preventDefault();
-            if ($(`#logical-${this.currentType}`)[0].value !== '') {
+            if ($(`#item-name-${this.currentType}`)[0].value !== '') {
                 let formData = $(`#form-${this.currentType}`).serializeArray(),
                     itemName = formData[0].value,
                     saveData = () => { Tools.fbServices.processFormData(formData, this.currentType); };
@@ -118,7 +118,7 @@ class UI {
         let item = Tools.allItems.getItem(this.currentType, this.currentItemName),
             $form = $(`#form-container-${this.currentType}`);
 
-        $form.find('[name="logical"]')[0].value = this.currentItemName;
+        $form.find('[name="item-name"]')[0].value = this.currentItemName;
         if (item) {
             let faction = item.type;
 
@@ -127,6 +127,8 @@ class UI {
 
                 if (attr === 'text') {
                     $form.find(`[name="${attr}"]`)[0].innerText = value;
+                } else if (attr.indexOf('polities') === 0) {
+                    $form.find(`[name="${attr}"]`)[0].checked = true;
                 } else {
                     $($form.find(`[name="${attr}"]`)[0]).val(value);
                 }

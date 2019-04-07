@@ -40,8 +40,8 @@
                         <tr>
                             <td class="row-header">Basics: </td>
                             <td>
-                                <label for="logical-card">Logical:</label>
-                                <input id="logical-card" type="text" name="logical" size="40">
+                                <label for="item-name-card">Logical:</label>
+                                <input id="item-name-card" type="text" name="item-name" size="40">
                             </td>
                             <td>
                                 <label for="text-card">Text:</label>
@@ -1095,10 +1095,111 @@
                         <tr>
                             <td class="row-header">Basics:</td>
                             <td>
-                                <label for="logical-board">Logical</label>
-                                <input id="logical-board" type="text" name="logical">
-                                <label for="text-board">Text</label>
-                                <input id="text-board" type="text" name="Text">
+                                <label for="set-board">Set</label>
+                                <select id="set-board" name="set">
+                                    <option value=""></option>
+                                    <option value="innerworlds">The Inner Worlds</option>
+                                    <option value="belt">The Belt</option>
+                                    <option value="galilean">The Galilean Conflict</option>
+                                    <option value="transjovian">The Transjovian War</option>
+                                    <option value="longwar">The Long War</option>
+                                    <option value="kuiper">The Kuiper Belt</option>
+                                </select>
+                            </td>
+                            <td>
+                                <label for="orbit-board">Orbit</label>
+                                <select id="orbit-board" name="orbit">
+                                    <option value=""></option>
+                                    <option value="mercury">Mercury</option>
+                                    <option value="venus">Venus</option>
+                                    <option value="earth">Earth</option>
+                                    <option value="mars">Mars</option>
+                                    <option value="belt">Belt</option>
+                                    <option value="jupiter">Jupiter</option>
+                                    <option value="saturn">Saturn</option>
+                                    <option value="uranus">Uranus</option>
+                                    <option value="neptune">Neptune</option>
+                                    <option value="kuiper">Kuiper Belt</option>
+                                </select>
+                            </td>
+                            <td>
+                                <label for="display-order-board">Display Order:</label>
+                                <input id="display-order-board" type="text" name="display-order" size="10">
+                            </td>
+                            <td>
+                                <label for="item-name-board">Region</label>
+                                <select id="item-name-board" name="item-name">
+                                    <option value=""></option>
+                                    <option value="mercury">Mercury</option>
+                                    <option value="venus">Venus</option>
+                                    <option value="earth">Earth</option>
+                                    <option value="luna">Luna</option>
+                                    <option value="mars">Mars</option>
+                                    <option value="ceres">Ceres</option>
+                                    <option value="vesta">Vesta</option>
+                                    <option value="eunomia">Eunomia</option>
+                                    <option value="exalted">Exalted Temple</option>
+                                    <option value="hildas">Hildas Triangle</option>
+                                    <option value="concordia">Concordia</option>
+                                    <option value="io">Io</option>
+                                    <option value="europa">Europa</option>
+                                    <option value="callisto">Callisto</option>
+                                    <option value="ganymede">Ganymede</option>
+                                    <option value="titan">Titan</option>
+                                    <option value="rhea">Rhea</option>
+                                    <option value="dione">Dione</option>
+                                    <option value="iapetus">Iapetus</option>
+                                    <option value="oberon">Oberon</option>
+                                    <option value="ariel">Ariel</option>
+                                    <option value="miranda">Miranda</option>
+                                    <option value="titania">Titania</option>
+                                    <option value="triton">Triton</option>
+                                    <option value="proteus">Proteus</option>
+                                    <option value="nereid">Nereid</option>
+                                    <option value="neso">Neso</option>
+                                    <option value="pluto">Pluto</option>
+                                    <option value="makemake">Makemake</option>
+                                    <option value="xena">Xena</option>
+                                    <option value="sedna">Sedna</option>
+                                    <option value="haumea">Haumea</option>
+                                    <option value="quorum">The Quorum</option>
+                                    <option value="orcus">Orcus</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">Polities that can influence:</td>
+                            <td colspan="4">
+                                <div class="flex-grid">
+                                    <div class="flex-item min-width-item">
+                                        <input id="polities-easternfed-board" name="polities-easternfed" type="checkbox">
+                                        <label for="polities-easternfed-board">Eastern Federation</label>
+                                    </div>
+                                    <div class="flex-item min-width-item">
+                                        <input id="polities-state-board" name="polities-state" type="checkbox">
+                                        <label for="polities-state-board">State</label>
+                                    </div>
+                                    <div class="flex-item min-width-item">
+                                        <input id="polities-union-board" name="polities-union" type="checkbox">
+                                        <label for="polities-union-board">Union</label>
+                                    </div>
+                                    <div class="flex-item min-width-item">
+                                        <input id="polities-oceanic-board" name="polities-oceanic" type="checkbox">
+                                        <label for="polities-oceanic-board">Oceanic League</label>
+                                    </div>
+                                    <div class="flex-item min-width-item">
+                                        <input id="polities-southern-board" name="polities-southern" type="checkbox">
+                                        <label for="polities-southern-board">Southern Bloc</label>
+                                    </div>
+                                    <div class="flex-item min-width-item">
+                                        <input id="polities-alliance-board" name="polities-alliance" type="checkbox">
+                                        <label for="polities-alliance-board">Alliance</label>
+                                    </div>
+                                    <div class="flex-item min-width-item">
+                                        <input id="polities-kuiper-board" name="polities-kuiper" type="checkbox">
+                                        <label for="polities-kuiper-board">Kuiper Compact</label>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         <tr>
