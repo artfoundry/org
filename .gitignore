@@ -1,1 +1,7 @@
-.idea/
+.idea/*
+/references
+/node_modules
+firebase-debug.log
+/.firebase
+npm-debug.log
+database-debug.log
