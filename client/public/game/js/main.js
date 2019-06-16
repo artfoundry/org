@@ -6,7 +6,6 @@
  */
 
 let Game = {
-    'initialGame' : true,
     'gameSettings' : {
         audioOptions : {
             musicOn : true,
@@ -17,43 +16,35 @@ let Game = {
     'helpers' : new Helpers(),
     'platform' : '',
     'getOS' : function() {
-        let userAgent = window.navigator.userAgent,
-            platform = window.navigator.platform,
+        let platform = window.navigator.platform,
+            // userAgent = window.navigator.userAgent,
             macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
             windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
-            iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+            // iosPlatforms = ['iPhone', 'iPad', 'iPod'],
             os = null;
 
         if (macosPlatforms.indexOf(platform) !== -1) {
             os = 'Mac OS';
-        } else if (iosPlatforms.indexOf(platform) !== -1) {
-            os = 'iOS';
         } else if (windowsPlatforms.indexOf(platform) !== -1) {
             os = 'Windows';
-        } else if (/Android/.test(userAgent)) {
-            os = 'Android';
-        } else if (!os && /Linux/.test(platform)) {
-            os = 'Linux';
+        // } else if (!os && /Linux/.test(platform)) {
+        //     os = 'Linux';
+        // } else if (iosPlatforms.indexOf(platform) !== -1) {
+        //     os = 'iOS';
+        // } else if (/Android/.test(userAgent)) {
+        //     os = 'Android';
         }
-
-        return (os === 'iOS' || os === 'Android') ? 'mobile' : 'desktop';
+        return os;
     },
     'initialize' : function() {
-        if (this.initialGame) {
-            this.platform = this.getOS();
-            this.initialGame = false;
-        }
+        this.platform = this.getOS();
         if (!this.fbServices.isOnline)
             this.fbServices = new FirebaseServices();
         let audio = new Audio();
         let events = new Events();
         let ui = new UI(audio, events);
         let table = new Table();
-        if (!this.initialGame)
-            table.clear();
-
         let players = {};
-
         let turnController = new TurnController(ui, players, events, table);
 
         ui.initialize();
