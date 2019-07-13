@@ -2,6 +2,8 @@
  * Created by LCD Dreams on 4/14/18.
  */
 
+const firebase = require('firebase');
+
 class FirebaseServices {
     constructor() {
         this.isOnline = this._initialize();

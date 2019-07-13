@@ -1,9 +1,13 @@
+'use strict';
+
 /**
  * Org
  * Created by LCD Dreams on 4/14/18.
  *
  * Instantiates global objects and starts the app
  */
+
+const ORG_SERVER = 'http://localhost:3000';
 
 let Game = {
     'gameSettings' : {
@@ -12,7 +16,7 @@ let Game = {
             soundOn : true
         }
     },
-    'fbServices' : {},
+    'socket' : io(ORG_SERVER),
     'helpers' : new Helpers(),
     'platform' : '',
     'getOS' : function() {
@@ -38,8 +42,9 @@ let Game = {
     },
     'initialize' : function() {
         this.platform = this.getOS();
-        if (!this.fbServices.isOnline)
-            this.fbServices = new FirebaseServices();
+        this.socket.on('connect', () => {
+            console.log('Connected to server');
+        });
         let audio = new Audio();
         let events = new Events();
         let ui = new UI(audio, events);
