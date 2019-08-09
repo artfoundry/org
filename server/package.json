@@ -14,7 +14,7 @@
   "main": "public",
   "dependencies": {
     "express": "^4.17.1",
-    "firebase": "^5.11.1",
+    "firebase-admin": "^8.3.0",
     "jqueryui": "^1.11.1",
     "socket.io": "^2.2.0"
   }

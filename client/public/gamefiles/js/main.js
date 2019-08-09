@@ -17,6 +17,10 @@ let Game = {
         }
     },
     'socket' : io(ORG_SERVER),
+    'getUserId' : function() {
+        // need info about jubal account
+        return 'test';
+    },
     'helpers' : new Helpers(),
     'platform' : '',
     'getOS' : function() {
@@ -41,19 +45,19 @@ let Game = {
         return os;
     },
     'initialize' : function() {
+        this.userId = this.getUserId();
         this.platform = this.getOS();
         this.socket.on('connect', () => {
             console.log('Connected to server');
         });
+        let player = new Player(this.userId, this.socket);
         let audio = new Audio();
-        let events = new Events();
-        let ui = new UI(audio, events);
-        let table = new Table();
+        let table = new Table(this.socket);
+        let ui = new UI(player, table, audio);
+        let eventsController = new EventsController(ui);
         let players = {};
-        let turnController = new TurnController(ui, players, events, table);
+        let turnController = new TurnController(ui, players, eventsController, table);
 
-        ui.initialize();
-        turnController.initialize();
     }
 };
 

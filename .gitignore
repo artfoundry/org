@@ -1,10 +1,11 @@
-.idea/*
 /references
 /client/node_modules
 /server/node_modules
-/client/firebase-debug.log
-/server/firebase-debug.log
-/.firebase
+/client/firebaseServices-debug.log
+/server/firebaseServices-debug.log
+/.firebaseServices
 npm-debug.log
 /client/database-debug.log
 /server/database-debug.log
+.firebase/
+.idea/
