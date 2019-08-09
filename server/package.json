@@ -17,5 +17,8 @@
     "firebase-admin": "^8.3.0",
     "jqueryui": "^1.11.1",
     "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.15"
   }
 }
