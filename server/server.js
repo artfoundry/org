@@ -86,8 +86,8 @@ class FirebaseServices {
             gameAdded: null
         };
 
-        gameAddStatus.newGameId = gameIdList ? gameIdList[gameIdList.length - 1] + 1 : 1;
         if (this.isOnline) {
+            gameAddStatus.newGameId = gameIdList ? gameIdList[gameIdList.length - 1] + 1 : 1;
             gameAddStatus.listUpdated = await this.fbDatabase.ref('/gameIdList/' + gameAddStatus.newGameId).set(userId, this.completionCallback);
             gameAddStatus.gameAdded = await this.fbDatabase.ref('/userIdList/' + userId + '/' + 'gameIds' + '/').push(gameAddStatus.newGameId, this.completionCallback);
         }
@@ -106,7 +106,6 @@ class FirebaseServices {
 
 function startServer(fbServices) {
     app.get('/', (req, res) => {
-        //     res.sendFile(__dirname + '/gamefiles/index.html');
         res.send('Org server started');
     });
 
@@ -141,13 +140,13 @@ function initListeners(socket, fbServices) {
         let results = await fbServices.addGame(userId, gameIdList);
 
         if (results.listUpdated !== true) {
-            console.log('Error updating game list: ' + results.listUpdated);
+            console.log('Error updating game list: ' + results.listUpdated.error);
         }
         if (results.gameAdded === true) {
             console.log('Game ' + results.gameId + ' added by ' + userId);
             socket.emit('assigned-game', gameId);
         } else {
-            console.log('Error adding game: ' + results.gameAdded);
+            console.log('Error adding game: ' + results.gameAdded.error);
         }
     });
 }
