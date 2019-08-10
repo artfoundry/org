@@ -17,11 +17,12 @@ class UI {
 
         $('#main-nav').click((evt)=> {
             let $button = $(evt.target);
+            let gameName = 'testgame'; //need to get name from dialog
 
             if ($button.hasClass('nav-view-info')) {
                 this.fetchUser();
             } else if ($button.hasClass('nav-create-game')) {
-                this.table.createGame(this.player);
+                this.table.createGame(this.player, gameName);
             } else if ($button.hasClass('nav-join-game')) {
                 this.table.joinGame(this.player);
             }
@@ -39,7 +40,22 @@ class UI {
         console.log(data);
     }
 
-    displayGame(game) {
-        $('main').text(game.gameId + ' started by ' + game.player0);
+    /*************************
+     * displayGame
+     *
+     * @type {{
+     *  gameData: {
+     *      creator: string,
+     *      name: string,
+     *      playerCount: int,
+     *      playerIds: array of strings,
+     *      sets: array of strings
+     *      },
+     *  gameId: string
+     * }}
+     *************************/
+
+    displayGame(gameData) {
+        $('main').text(gameData.name + ' started by ' + gameData.creator);
     }
 }

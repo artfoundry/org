@@ -5,16 +5,13 @@ class Table {
     }
 
     // player: obj from player.js
-    createGame(player) {
-        this.socket.on('assigned-game', (gameId) => {
-            this.game = {
-                'player0' : player,
-                'gameId' : gameId
-            };
-            let updateEvent = new Event('display-game', {detail: this.game});
-            window.dispatchEvent(updateEvent);
+    createGame(player, gameName) {
+        this.socket.on('assigned-game', (gameData) => {
+            let gameCreated = new CustomEvent('display-game', {detail: gameData});
+            window.dispatchEvent(gameCreated);
         });
-        this.socket.emit('create-game', player.userId);
+
+        this.socket.emit('create-game', player.userId, gameName);
     }
 
     // player: obj from player.js

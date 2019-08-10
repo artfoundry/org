@@ -71,27 +71,37 @@ class FirebaseServices {
         return userId + ': userinfo';
     }
 
-    getGameIdList() {
+    async getGameIdList() {
         if (this.isOnline) {
-            this.fbDatabase.ref('/gameIdList/').once('value', (snapshot) => {
+            await this.fbDatabase.ref('/gameIdList/').once('value', (snapshot) => {
+                console.log('test', snapshot.val());
                 return snapshot.val();
             });
         }
     }
 
-    async addGame(userId, gameIdList) {
-        let gameAddStatus = {
-            newGameId: null,
-            listUpdated: null,
-            gameAdded: null
+    async addGame(userId, gameName) {
+        let gameData = {
+            creator: userId,
+            name: gameName,
+            playerCount: 1,
+            playerIds: [userId],
+            sets: []
         };
+        let results = null;
 
         if (this.isOnline) {
-            gameAddStatus.newGameId = gameIdList ? gameIdList[gameIdList.length - 1] + 1 : 1;
-            gameAddStatus.listUpdated = await this.fbDatabase.ref('/gameIdList/' + gameAddStatus.newGameId).set(userId, this.completionCallback);
-            gameAddStatus.gameAdded = await this.fbDatabase.ref('/userIdList/' + userId + '/' + 'gameIds' + '/').push(gameAddStatus.newGameId, this.completionCallback);
+            let newGameKey = this.fbDatabase.ref('/gameIdList/').push().key;
+            let updates = {};
+
+            updates['/gameIdList/' + newGameKey] = gameData;
+            updates['/userIdList/' + userId + '/' + 'gameIds' + '/' + newGameKey] = gameData;
+
+            await this.fbDatabase.ref().update(updates, this.completionCallback).then(() => {
+                results = {gameData: gameData, gameId: newGameKey};
+            });
+            return results;
         }
-        return gameAddStatus;
     }
 }
 
@@ -135,18 +145,16 @@ function initListeners(socket, fbServices) {
         console.log('getting user info');
         socket.emit('userinfo', userInfo);
     });
-    socket.on('create-game', async (userId) => {
-        let gameIdList = await fbServices.getGameIdList();
-        let results = await fbServices.addGame(userId, gameIdList);
+    socket.on('create-game', async (userId, gameName) => {
+        let results = await fbServices.addGame(userId, gameName);
 
-        if (results.listUpdated !== true) {
-            console.log('Error updating game list: ' + results.listUpdated.error);
-        }
-        if (results.gameAdded === true) {
-            console.log('Game ' + results.gameId + ' added by ' + userId);
-            socket.emit('assigned-game', gameId);
+        console.log(results);
+
+        if (results.error) {
+            console.log('Error adding game: ' + results.error);
         } else {
-            console.log('Error adding game: ' + results.gameAdded.error);
+            console.log('Game ' + gameName + ' added by ' + userId);
+            socket.emit('assigned-game', results.gameData);
         }
     });
 }

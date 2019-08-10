@@ -6,7 +6,6 @@ class EventsController {
 
     initListeners() {
         window.addEventListener('display-game', (evt) => {
-            console.log(evt)
             this.ui.displayGame(evt.detail);
         });
     }

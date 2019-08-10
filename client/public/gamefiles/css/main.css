@@ -20,9 +20,14 @@ header {
     font-weight: 500;
 }
 
+#main-nav {
+    margin: 10px 0;
+}
+
 .nav-button {
+    display: inline-block;
     width: 100px;
-    height: 30px;
+    line-height: 30px;
     padding: 10px;
     border-radius: 3px;
     color: darkblue;

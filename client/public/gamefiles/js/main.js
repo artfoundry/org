@@ -19,7 +19,7 @@ let Game = {
     'socket' : io(ORG_SERVER),
     'getUserId' : function() {
         // need info about jubal account
-        return 'test';
+        return 'testuser';
     },
     'helpers' : new Helpers(),
     'platform' : '',
