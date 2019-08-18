@@ -1,8 +1,8 @@
 class Player {
     constructor(userId, socket) {
         this.userId = userId;
-        this.userInfo = {};
         this.socket = socket;
+        this.userInfo = null;
     }
 
     getInfo(callback) {

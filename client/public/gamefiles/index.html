@@ -7,16 +7,32 @@
         <link rel="stylesheet" type="text/css" href="css/main.css">
     </head>
     <body>
-        <header>Org</header>
-
-        <nav id="main-nav">
-            <a href="#" class="nav-button nav-view-info">View user info</a>
-            <a href="#" class="nav-button nav-create-game">Create game</a>
-            <a href="#" class="nav-button nav-join-game">Join game</a>
-        </nav>
+        <section id="header">
+            <div class="title">Org</div>
+            <nav id="main-nav">
+                <span class="button nav-button nav-view-info">View account</span>
+                <span class="button nav-button nav-create-game">Create game</span>
+                <span class="button nav-button nav-join-game">Join game</span>
+            </nav>
+        </section>
 
         <main>
-
+            <div id="game-container">
+                <section id="actions">
+                    <header>Actions</header>
+                    <span class="button action-button">Play card</span>
+                    <span class="button action-button">Place marker</span>
+                </section>
+                <section id="players">
+                    <header>Players</header>
+                    <span class="player-box user">User 1</span>
+                    <span class="player-box">User 2</span>
+                </section>
+                <section id="game-board">
+                    <div id="messages"></div>
+                </section>
+            </div>
+            <div id="modal"></div>
         </main>
 
         <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js"></script>

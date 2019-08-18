@@ -5,9 +5,10 @@ class Table {
     }
 
     // player: obj from player.js
-    createGame(player, gameName) {
+    createGame(player, gameName, callback) {
         this.socket.on('assigned-game', (gameData) => {
-            let gameCreated = new CustomEvent('display-game', {detail: gameData});
+            let eventDetails = {data: gameData, callback: callback};
+            let gameCreated = new CustomEvent('update-ui', {detail: eventDetails});
             window.dispatchEvent(gameCreated);
         });
 

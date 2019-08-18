@@ -148,8 +148,6 @@ function initListeners(socket, fbServices) {
     socket.on('create-game', async (userId, gameName) => {
         let results = await fbServices.addGame(userId, gameName);
 
-        console.log(results);
-
         if (results.error) {
             console.log('Error adding game: ' + results.error);
         } else {

@@ -5,30 +5,12 @@ class EventsController {
     }
 
     initListeners() {
-        window.addEventListener('display-game', (evt) => {
-            this.ui.displayGame(evt.detail);
+        window.addEventListener('update-ui', (evt) => {
+            evt.detail.callback(evt.detail.data);
         });
     }
 
-    /**********************************
-        uiHandler()
-        Store event listeners for UI
-        vars:
-        listeners: obj - format: {[DOM selector]: [callback]}
-     **********************************/
-    uiHandler(listeners) {
-        for (let selector in listeners) {
-            if (listeners.hasOwnProperty(selector)) {
-                let callback = listeners[selector].callback;
-                let params = listeners[selector].params;
-                this.events.navigation = $(selector).click(() => {
-                    callback(params);
-                });
-            }
-        }
-    }
-
-    removeListeners(listeners) {
+    removeListener(listener) {
 
     }
 
