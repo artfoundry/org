@@ -7,7 +7,7 @@
  * Instantiates global objects and starts the app
  */
 
-const ORG_SERVER = 'http://localhost:3000';
+const ORG_SERVER = 'http://localhost:4000';
 
 let Game = {
     'gameSettings' : {
@@ -50,10 +50,14 @@ let Game = {
         this.socket.on('connect', () => {
             console.log('Connected to server');
         });
+        this.socket.on('connect_error', (error) => {
+            console.log('Error connecting to server: ', error);
+        });
         let player = new Player(this.userId, this.socket);
         let audio = new Audio();
         let table = new Table(this.socket);
-        let ui = new UI(player, table, audio);
+        let board = new Board();
+        let ui = new UI(this.socket, player, table, board, audio);
         let eventsController = new EventsController(ui);
         let players = {};
         let turnController = new TurnController(ui, players, eventsController, table);

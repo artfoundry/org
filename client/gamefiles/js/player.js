@@ -5,10 +5,10 @@ class Player {
         this.userInfo = null;
     }
 
-    getInfo(callback) {
+    getInfo() {
         this.socket.on('userinfo', (data) => {
             this.userInfo = data;
-            callback(this.userInfo);
+            return this.userInfo;
         });
         this.socket.emit('get-user', this.userId);
     }

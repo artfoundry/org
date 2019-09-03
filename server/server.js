@@ -5,7 +5,7 @@
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const PORT = 3000;
+const PORT = 4000;
 const admin = require("firebase-admin");
 // Fetch the service account key JSON file contents
 const serviceAccount = require("./org-board-25cea87fa1fa.json");
@@ -116,7 +116,7 @@ class FirebaseServices {
 
 function startServer(fbServices) {
     app.get('/', (req, res) => {
-        res.send('Org server started');
+        res.send('Org backend server started');
     });
 
     http.listen(PORT, () => console.log(`Org server listening on port ${PORT}!`));
@@ -153,6 +153,16 @@ function initListeners(socket, fbServices) {
         } else {
             console.log('Game ' + gameName + ' added by ' + userId);
             socket.emit('assigned-game', results.gameData);
+        }
+    });
+    socket.on('get-game-list', async () => {
+        let results = await fbServices.getGameIdList();
+
+        if (results.error) {
+            console.log('Error retrieving game list: ' + results.error);
+        } else {
+            console.log('Game list retrieved');
+            socket.emit('game-list-sent', results);
         }
     });
 }

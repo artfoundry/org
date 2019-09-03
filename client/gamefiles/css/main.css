@@ -79,7 +79,7 @@ header {
     display: inline-block;
     position: relative;
     width: 120px;
-    height: 20px;
+    height: 50px;
     margin: 0 3px;
     padding: 10px;
     border: 2px solid black;
@@ -114,6 +114,53 @@ header {
     color: gainsboro;
 }
 
+#modal {
+    display: none;
+    position: fixed;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 20px;
+    text-align: center;
+    background-color: lightgray;
+    border: 4px solid white;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px black;
+    z-index: 3;
+}
+
+#modal-backdrop {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: black;
+    opacity: 0.5;
+}
+
+.modal-title {
+    padding-bottom: 20px;
+    font-size: 20px;
+    color: darkblue;
+}
+
+.text-line-entry {
+    margin: 10px;
+    font-size: 16px;
+}
+
+.error-text {
+    display: none;
+    color: red;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+}
+
 @media (min-width: 1000px) {
     #game-container {
         grid-template-columns: 1fr 1fr;
@@ -125,17 +172,9 @@ header {
         grid-row: 1 / 1;
     }
 
-    #players .player-box {
-        height: 50px;
-    }
-
     #actions {
         grid-column: 1 / 1;
         grid-row: 1 / 1;
         flex-flow: wrap;
-    }
-
-    #actions .action-button {
-        line-height: 5px;
     }
 }
