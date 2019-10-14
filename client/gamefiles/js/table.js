@@ -15,9 +15,10 @@ class Table {
         let player = data.player;
         let gameName = data.gameData.name;
         let callback = data.callback;
+        let messageType = data.messageType;
 
         this.socket.on('assigned-game', (gameData) => {
-            callback(gameData);
+            callback(gameData, messageType);
         });
 
         this.socket.emit('create-game', player.userId, gameName);
@@ -33,13 +34,14 @@ class Table {
         let player = data.player;
         let gameId = data.gameData.id;
         let callback = data.callback;
+        let messageType = data.messageType;
 
         this.socket.on('joined-game', (gameData) => {
-            callback(gameData);
+            callback(gameData, messageType);
+        console.log(player.userId + ' joined game ' + data.gameData.name);
         });
 
         this.socket.emit('join-game', player.userId, gameId);
-        console.log(player.userId + ' joined game');
     }
 
 }

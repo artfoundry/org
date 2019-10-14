@@ -6,7 +6,7 @@ class EventsController {
 
     initListeners() {
         window.addEventListener('update-ui', (evt) => {
-            evt.detail.callback(evt.detail.data);
+            this.ui[evt.detail.callback](evt.detail.data);
         });
     }
 
