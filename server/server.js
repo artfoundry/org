@@ -31,7 +31,6 @@ class FirebaseServices {
             this.ref.once("value", function(snapshot) {
                 console.log(snapshot.val());
             });
-            this._monitorConnection();
         }
     }
 
@@ -52,11 +51,16 @@ class FirebaseServices {
         return initResult;
     }
 
-    _monitorConnection() {
-        let connectedRef = this.fbDatabase.ref(".info/connected");
-        connectedRef.on("value", (snap) => {
+    _monitorFbConnection(socket) {
+        let connectedRef = this.fbDatabase.ref('.info/connected');
+        connectedRef.on('value', (snap) => {
             this.isOnline = snap.val();
-            this.isOnline ? console.log("Connection with Firebase server is good") : console.log("No connection with Firebase server");
+            if (this.isOnline) {
+                console.log('Connection with Firebase server is good')
+            } else {
+                console.log('No connection with Firebase server');
+                socket.emit('connect_error', 'No connection with Firebase server');
+            }
         });
     }
 
@@ -171,6 +175,7 @@ class FirebaseServices {
 
             gameInfo.data.playerIds.push(userId);
             gameData.name = gameInfo.data.name;
+            gameData.player = userId;
             gameData.playerCount = gameInfo.data.playerCount + 1;
             gameData.playerIds = gameInfo.data.playerIds;
             gameData.sets = gameInfo.data.sets || gameData.sets;
@@ -194,7 +199,6 @@ class FirebaseServices {
     const fbServices = new FirebaseServices();
 
     startServer(fbServices);
-
 })();
 
 
@@ -209,6 +213,8 @@ function startServer(fbServices) {
     // io.set('heartbeat interval', 25000);
     io.on('connection', (socket) => {
         console.log('connected to client');
+
+        fbServices._monitorFbConnection(socket);
 
         initListeners(socket, fbServices);
         // socket.on('', () => {

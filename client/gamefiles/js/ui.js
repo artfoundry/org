@@ -19,7 +19,6 @@ class UI {
         this._loadTemplates();
 
         this.getGameList = this.getGameList.bind(this);
-        this.getGameChoice = this.getGameChoice.bind(this);
         this.processGameNameEntry = this.processGameNameEntry.bind(this);
         this.displayError = this.displayError.bind(this);
         this.hideError = this.hideError.bind(this);
@@ -28,6 +27,7 @@ class UI {
         this.renderGameList = this.renderGameList.bind(this);
         this.updateGame = this.updateGame.bind(this);
 
+        this._initSocketListener();
         this._initNav();
     }
 
@@ -63,13 +63,13 @@ class UI {
             if ($button.hasClass('nav-view-info')) {
                 dialogOptions = {
                     template: this.$templates.userInfo,
-                    processContent: {action: getPlayerInfo, callback: null}
+                    processContent: getPlayerInfo
                 };
 
             } else if ($button.hasClass('nav-create-game')) {
                 dialogOptions = {
                     template: this.$templates.createGame,
-                    processContent: {action: typeListener, callback: null},
+                    processContent: typeListener,
                     processInput: this.processGameNameEntry,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
                     callback: this.table.createGame.bind(this.table)
@@ -78,13 +78,19 @@ class UI {
             } else if ($button.hasClass('nav-join-game')) {
                 dialogOptions = {
                     template: this.$templates.joinGame,
-                    processContent: {action: this.getGameList, callback: this.renderGameList},
-                    processInput: this.getGameChoice,
+                    processContent: this.getGameList,
+                    processInput: null,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'join-game'},
                     callback: this.table.joinGame.bind(this.table)
                 };
             }
             this.displayDialog(dialogOptions);
+        });
+    }
+
+    _initSocketListener() {
+        this.socket.on('game-list-sent', (gameList) => {
+            this.renderGameList(gameList);
         });
     }
 
@@ -147,11 +153,6 @@ class UI {
         });
     }
 
-    getGameChoice() {
-        this.game.id = $('#modal .game-list .game-list-row-selected .game-list-text-name').data('game');
-        return true;
-    }
-
     displayError(selector) {
         $(selector + ' .error-text').show();
     }
@@ -174,10 +175,7 @@ class UI {
      *
      * processInput function for displayDialog
      *************************/
-    getGameList(callback) {
-        this.socket.on('game-list-sent', (gameList) => {
-            callback(gameList);
-        });
+    getGameList() {
         this.socket.emit('get-game-list');
     }
 
@@ -188,23 +186,33 @@ class UI {
      * @param gameList: object of game data objects
      *************************/
     renderGameList(gameList) {
-        let gameText = '';
+        let $gameText = null;
         let ui = this;
-        let $gameList = $('#modal .game-list');
+        let $gameListMarkup = $('#modal .game-list');
 
-        $gameList.html('');
+        $gameListMarkup.html('');
         for (let game in gameList) {
             if (gameList.hasOwnProperty(game)) {
-                gameText = $(document.createElement('div')).addClass('game-list-row').html(`
+                $gameText = $(document.createElement('div')).addClass('game-list-row').html(`
                     <span class="game-list-text game-list-text-name" data-game="${game}">${gameList[game].name}</span>
                     <span class="game-list-text">${gameList[game].creator}</span>
                     <span class="game-list-text">${gameList[game].playerCount}</span>
                 `);
-                $gameList.append(gameText[0]);
-                $('.game-list-row').click(function() {
-                    $(this).addClass('game-list-row-selected');
-                    ui.game.id = game;
+                $gameText.click(function() {
+                    let $prevSelected = $('.game-list-row-selected');
+
+                    if ($(this).hasClass('game-list-row-selected')) {
+                        $(this).removeClass('game-list-row-selected');
+                        ui.game.id = '';
+                    } else {
+                        if ($prevSelected.length > 0) {
+                            $prevSelected.removeClass('game-list-row-selected');
+                        }
+                        $(this).addClass('game-list-row-selected');
+                        ui.game.id = game;
+                    }
                 });
+                $gameListMarkup.append($gameText);
             }
         }
     }
@@ -268,11 +276,10 @@ class UI {
         let $modal = $('#modal').html(dialogOptions.template);
         let $modalBackdrop = $('#modal-backdrop');
         let $cancelButton = $modal.find('#button-cancel');
-        let processContent = dialogOptions.processContent ? dialogOptions.processContent.action : null;
-        let contentFollowup = dialogOptions.processContent ? dialogOptions.processContent.callback : null;
+        let processContent = dialogOptions.processContent;
 
         if (processContent) {
-            contentFollowup ? processContent(contentFollowup) : processContent();
+            processContent();
         }
 
         $modal.show();
@@ -289,7 +296,7 @@ class UI {
             if (dialogOptions.processInput) {
                 inputValid = await dialogOptions.processInput();
             }
-            if (inputValid) {
+            if (inputValid || inputValid === null) {
                 this.hideError('#modal');
                 $modal.hide();
                 $modalBackdrop.hide();

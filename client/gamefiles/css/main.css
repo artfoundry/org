@@ -158,7 +158,7 @@ header {
     overflow: scroll;
     border-top: 2px solid gray;
     border-bottom: 2px solid gray;
-    box-shadow: 0 0 5px 5px inset darkslategrey;
+    box-shadow: 0 0 5px 2px inset darkslategrey;
 }
 
 .game-list-header {
@@ -179,10 +179,18 @@ header {
 
 .game-list-row:hover {
     background-color: whitesmoke;
+    opacity: 0.5;
+    color: blue;
 }
 
 .game-list-row.game-list-row-selected {
     background-color: coral;
+    opacity: 0.6;
+    color: blue;
+}
+
+.game-list-text {
+    pointer-events: none;
 }
 
 .game-list-text-name {

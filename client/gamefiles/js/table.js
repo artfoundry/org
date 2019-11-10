@@ -12,7 +12,7 @@ class Table {
      * @param data.callback: function
      ***********************/
     createGame(data) {
-        let player = data.player;
+        let playerId = data.player.userId;
         let gameName = data.gameData.name;
         let callback = data.callback;
         let messageType = data.messageType;
@@ -21,7 +21,7 @@ class Table {
             callback(gameData, messageType);
         });
 
-        this.socket.emit('create-game', player.userId, gameName);
+        this.socket.emit('create-game', playerId, gameName);
     }
 
     /************************
@@ -31,17 +31,17 @@ class Table {
      * @param data.callback: function
      */
     joinGame(data) {
-        let player = data.player;
+        let playerId = data.player.userId;
         let gameId = data.gameData.id;
         let callback = data.callback;
         let messageType = data.messageType;
 
         this.socket.on('joined-game', (gameData) => {
             callback(gameData, messageType);
-        console.log(player.userId + ' joined game ' + data.gameData.name);
+            console.log(playerId + ' joined game ' + data.gameData.name);
         });
 
-        this.socket.emit('join-game', player.userId, gameId);
+        this.socket.emit('join-game', playerId, gameId);
     }
 
 }
