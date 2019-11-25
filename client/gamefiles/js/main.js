@@ -19,7 +19,7 @@ let Game = {
     'socket' : io(ORG_SERVER),
     'getUserId' : function() {
         // need info about jubal account
-        return 'testuser';
+        return 'testuser' + Math.round(Math.random() * 10);
     },
     'helpers' : new Helpers(),
     'platform' : '',
@@ -58,9 +58,9 @@ let Game = {
         let table = new Table(this.socket);
         let board = new Board();
         let ui = new UI(this.socket, player, table, board, audio);
-        let eventsController = new EventsController(ui);
-        let players = {};
-        let turnController = new TurnController(ui, players, eventsController, table);
+        // let eventsController = new EventsController(ui);
+        // let players = {};
+        // let turnController = new TurnController(ui, players, eventsController, table);
 
     }
 };

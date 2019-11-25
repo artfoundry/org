@@ -32,13 +32,12 @@ class Table {
      */
     joinGame(data) {
         let playerId = data.player.userId;
-        let gameId = data.gameData.id;
+        let gameId = data.gameData.gameId;
         let callback = data.callback;
         let messageType = data.messageType;
 
         this.socket.on('joined-game', (gameData) => {
             callback(gameData, messageType);
-            console.log(playerId + ' joined game ' + data.gameData.name);
         });
 
         this.socket.emit('join-game', playerId, gameId);

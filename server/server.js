@@ -20,6 +20,7 @@ const serviceAccount = require("./org-board-25cea87fa1fa.json");
 // const fs = require('fs');
 // const { parse } = require('querystring');
 
+const MAX_PLAYER_COUNT = 4;
 
 class FirebaseServices {
     constructor() {
@@ -94,14 +95,20 @@ class FirebaseServices {
         }
     }
 
-    async getGameIdList() {
+    async getGameIdList(userId) {
         let results = {
             data: null,
             error: null
         };
         if (this.isOnline) {
             await this.fbDatabase.ref('/gameIdList/').once('value').then((snapshot) => {
-                results.data = snapshot.val();
+                let rawData = snapshot.val();
+                // Only send back list of games that still have openings and in which user is not already playing
+                results.data = rawData ?
+                    Object.values(rawData).filter(game => {
+                        return game.playerIds.length <= MAX_PLAYER_COUNT && !game.playerIds.includes(userId);
+                    }) :
+                    [];
             }).catch((error) => {
                 results.error = error;
             });
@@ -117,6 +124,7 @@ class FirebaseServices {
         if (this.isOnline) {
             await this.fbDatabase.ref(`/gameIdList/${gameId}`).once('value').then((snapshot) => {
                 results.data = snapshot.val();
+                console.log('getGameInfo: ', snapshot.val())
             }).catch((error) => {
                 results.error = error;
             });
@@ -158,7 +166,7 @@ class FirebaseServices {
     async joinGame(userId, gameId) {
         let gameData = {
             gameId,
-            creator: userId,
+            creator: null,
             name: null,
             playerCount: null,
             playerIds: [],
@@ -170,25 +178,31 @@ class FirebaseServices {
         };
 
         if (this.isOnline) {
-            let updates = {};
             let gameInfo = await this.getGameInfo(gameId);
+            let updates = {};
 
-            gameInfo.data.playerIds.push(userId);
-            gameData.name = gameInfo.data.name;
-            gameData.player = userId;
-            gameData.playerCount = gameInfo.data.playerCount + 1;
-            gameData.playerIds = gameInfo.data.playerIds;
-            gameData.sets = gameInfo.data.sets || gameData.sets;
+            if (gameInfo.error) {
+                results.error = gameInfo.error;
+            } else {
+                gameInfo.data.playerIds.push(userId);
+                gameData.name = gameInfo.data.name;
+                gameData.player = userId;
+                gameData.playerIds = gameInfo.data.playerIds;
+                gameData.playerCount = gameInfo.data.playerCount + 1;
+                gameData.creator = gameInfo.data.creator;
+                gameData.sets = gameInfo.data.sets || gameData.sets;
 
-            updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
-            updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
-            updates[`/userIdList/${userId}/gameIds/${gameId}`] = gameData;
+                updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
+                updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                updates[`/userIdList/${userId}/gameIds/${gameId}`] = gameData;
 
-            await this.fbDatabase.ref().update(updates).then(() => {
-                results.data = gameData;
-            }).catch((error) => {
-                results.error = error;
-            });
+                await this.fbDatabase.ref().update(updates).then(() => {
+                    results.data = gameData;
+                }).catch((error) => {
+                    results.error = error;
+                });
+            }
+
             return results;
         }
     }
@@ -233,7 +247,7 @@ function initListeners(socket, fbServices) {
     socket.on('get-user', async (userId) => {
         let results = await fbServices.getUser(userId);
 
-        if (results && results.error) {
+        if (results.error) {
             console.log('Error retrieving user info: ' + results.error);
         } else {
             console.log('Retrieved account info for ' + userId);
@@ -243,7 +257,7 @@ function initListeners(socket, fbServices) {
     socket.on('create-game', async (userId, gameName) => {
         let results = await fbServices.addGame(userId, gameName);
 
-        if (results && results.error) {
+        if (results.error) {
             console.log('Error adding game: ' + results.error);
         } else {
             console.log('Game ' + gameName + ' added by ' + userId);
@@ -253,21 +267,21 @@ function initListeners(socket, fbServices) {
     socket.on('join-game', async (userId, gameId) => {
         let results = await fbServices.joinGame(userId, gameId);
 
-        if (results && results.error) {
+        if (results.error) {
             console.log('Error joining game: ' + results.error);
         } else {
             console.log(userId + ' joined ' + results.data.name);
             socket.emit('joined-game', results.data);
         }
     });
-    socket.on('get-game-list', async () => {
-        let results = await fbServices.getGameIdList();
+    socket.on('get-game-list', async (userId) => {
+        let results = await fbServices.getGameIdList(userId);
 
-        if (results && results.error) {
+        if (results.error) {
             console.log('Error retrieving game list: ' + results.error);
         } else {
             console.log('Game list retrieved');
-            socket.emit('game-list-sent', results.data);
+            socket.emit('game-list-retrieved', results.data);
         }
     });
     socket.on('player-login', async (userId) => {
