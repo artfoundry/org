@@ -2,7 +2,10 @@ class Player {
     constructor(userId, socket) {
         this.userId = userId;
         this.socket = socket;
-        this.userInfo = null;
+        this.userInfo = {
+            loggedIn: false,
+            gameIds: []
+        };
     }
 
     playerLogin(callback) {
@@ -29,7 +32,10 @@ class Player {
 
     getInfo(callback) {
         this.socket.on('userinfo', (data) => {
-            this.userInfo = data;
+            this.userInfo.loggedIn = data.loggedIn;
+            if (data.gameIds) {
+                this.userInfo.gameIds = data.gameIds;
+            }
             callback(this.userInfo);
         });
         this.socket.emit('get-user', this.userId);

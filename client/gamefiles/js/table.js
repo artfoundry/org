@@ -4,6 +4,23 @@ class Table {
         this.game = null;
     }
 
+    /*************************
+     * getFullGameList
+     * Calls server to get list of available games in database
+     *
+     * @param data: object: {userId: string, callback: func}
+     *************************/
+    getFullGameList(data) {
+        let userId = data.userId;
+        let callback = data.callback;
+
+        this.socket.on('game-list-retrieved', (gameList) => {
+            callback(gameList);
+        });
+
+        this.socket.emit('get-game-list', userId);
+    }
+
     /***********************
      * createGame
      * Sends game name and user ID to server and waits for signal game has been created and assigned

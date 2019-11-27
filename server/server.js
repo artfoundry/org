@@ -20,7 +20,7 @@ const serviceAccount = require("./org-board-25cea87fa1fa.json");
 // const fs = require('fs');
 // const { parse } = require('querystring');
 
-const MAX_PLAYER_COUNT = 4;
+const MAX_PLAYER_COUNT = 5;
 
 class FirebaseServices {
     constructor() {

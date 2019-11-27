@@ -1,13 +1,15 @@
 class UI {
-    constructor(socket, player, table, board, audio) {
-        this.socket = socket;
+    constructor(player, table, board, audio) {
+        // player object format:
+        // {userId: string,
+        //  userInfo: {gameIds: array, loggedIn: boolean}
+        // }
         this.player = player;
-        this.playerInfo = {};
+
         this.game = {
             name: '',
             gameId: ''
         };
-        this.mustRenderList = false;
         this.table = table;
         this.board = board;
         this.audio = audio;
@@ -20,16 +22,20 @@ class UI {
         this.$templates = {};
         this._loadTemplates();
 
+        // bindings for callbacks
         this._getPlayerInfo = this._getPlayerInfo.bind(this);
-        this._getGameList = this._getGameList.bind(this);
+        this._keystrokeListener = this._keystrokeListener.bind(this);
         this._processGameNameEntry = this._processGameNameEntry.bind(this);
         this._displayWarning = this._displayWarning.bind(this);
         this._hideWarning = this._hideWarning.bind(this);
         this._renderGameList = this._renderGameList.bind(this);
         this.updateGame = this.updateGame.bind(this);
+        this.table.joinGame = this.table.joinGame.bind(this.table);
+        this.table.createGame = this.table.createGame.bind(this.table);
+        this.table.getFullGameList = this.table.getFullGameList.bind(this.table);
 
+        // Initial setup functions
         this.player.playerLogin(this._postMessage);
-        this._initSocketListeners();
         this._initNav();
     }
 
@@ -48,26 +54,19 @@ class UI {
         $('#main-nav').click((evt)=> {
             let $button = $(evt.target);
             let dialogOptions = {};
-            // this should be generic class function
-            let typeListener = () => {
-                let $textField = $('#enter-game-name');
-                $textField.val('');
-                $textField.keydown(() => {
-                    this._hideWarning('#modal .warning');
-                });
-            };
 
             if ($button.hasClass('nav-view-info')) {
                 dialogOptions = {
                     template: this.$templates.userInfo,
                     processContent: this._getPlayerInfo,
-                    processContentCallback: this._renderGameList
+                    processContentParams: {callback: this._renderGameList}
                 };
 
             } else if ($button.hasClass('nav-create-game')) {
                 dialogOptions = {
                     template: this.$templates.createGame,
-                    processContent: typeListener,
+                    processContent: this._keystrokeListener,
+                    processContentParams: {formSelector: '#enter-game-name', warningSelector: '#modal .warning'},
                     processInput: this._processGameNameEntry,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
                     callback: this.table.createGame.bind(this.table)
@@ -76,24 +75,14 @@ class UI {
             } else if ($button.hasClass('nav-join-game')) {
                 dialogOptions = {
                     template: this.$templates.joinGame,
-                    processContent: this._getGameList,
-                    processContentCallback: () => { this.mustRenderList = true; },
+                    processContent: this.table.getFullGameList,
+                    processContentParams: {userId: this.player.userId, callback: this._renderGameList},
                     processInput: null,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'join-game'},
                     callback: this.table.joinGame.bind(this.table)
                 };
             }
             this._displayDialog(dialogOptions);
-        });
-    }
-
-    _initSocketListeners() {
-        this.socket.on('game-list-retrieved', async (gameList) => {
-            let list = await gameList;
-            if (this.mustRenderList) {
-                this._renderGameList(list);
-                this.mustRenderList = false;
-            }
         });
     }
 
@@ -108,6 +97,14 @@ class UI {
             }
         }
     }
+
+    _keystrokeListener(selectors) {
+        let $textField = $(selectors.formSelector);
+        $textField.val('');
+        $textField.keydown(() => {
+            this._hideWarning(selectors.warningSelector);
+        });
+    };
 
     /*************************
      * _processGameNameEntry
@@ -145,14 +142,14 @@ class UI {
 
     _isNameAvailable(nameToCheck) {
         return new Promise((resolve, reject) => {
-            this._getGameList((gameList) => {
+            this.table.getFullGameList({userId: this.player.userId, callback: (gameList) => {
                 for (let game in gameList) {
                     if (gameList.hasOwnProperty(game) && gameList[game].name === nameToCheck) {
                         resolve(false);
                     }
                 }
                 resolve(true);
-            });
+            }});
         });
     }
 
@@ -164,37 +161,24 @@ class UI {
         $(selector).hide();
     }
 
-    _getPlayerInfo(callback) {
+    _getPlayerInfo(params) {
         this.player.getInfo(async (results) => {
-            this.playerInfo = await results;
-            if (callback) {
-                callback();
+            this.player.userInfo = await results;
+            if (params.callback) {
+                params.callback();
             }
         });
     }
 
     /*************************
-     * _getGameList
-     * Calls server to get list of available games in database
-     *
-     * processInput function for _displayDialog
-     *************************/
-    _getGameList(callback) {
-        this.socket.emit('get-game-list', this.player.userId);
-        if (callback) {
-            callback();
-        }
-    }
-
-    /*************************
      * _renderGameList
-     * Inserts game list data into markup template for display in game list modal
+     * Inserts game list data into markup template for display in either game list modal or user account modal
      *
-     * processContentCallback function for _getPlayerInfo
+     * processContent callback for _getPlayerInfo
      *
-     * @param gameList
+     * @param gameList: array of objects: {creator: string, gameId: string, name: string, playerCount: int, playerIds: array of strings}
      *************************/
-    _renderGameList(gameList = this.playerInfo.gameIds || []) {
+    _renderGameList(gameList = this.player.userInfo.gameIds) {
         let $gameText = null;
         let ui = this;
         let $gameListMarkup = $('#modal .game-list');
@@ -256,7 +240,9 @@ class UI {
         if (gameData !== null) {
             this.board.updateBoard(gameData);
         }
-        this._postMessage({gameData, messageType});
+        if (messageType) {
+            this._postMessage({gameData, messageType});
+        }
     }
 
     /*************************
@@ -303,9 +289,9 @@ class UI {
         let $modalBackdrop = $('#modal-backdrop');
         let $cancelButton = $modal.find('#button-cancel');
         let processContent = dialogOptions.processContent;
-        let processContentCB = dialogOptions.processContentCallback;
+        let processContentParams = dialogOptions.processContentParams;
 
-        processContentCB ? await processContent(processContentCB) : await processContent();
+        await processContent(processContentParams);
 
         $modal.show();
         $modalBackdrop.show();
