@@ -4,6 +4,12 @@ body {
     background-color: black;
 }
 
+#page-header {
+    justify-content: space-between;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .title {
     display: inline-block;
     width: 150px;
@@ -119,11 +125,15 @@ header {
     width: 15%;
     height: 100%;
     margin: 0 5px 0 0;
-    padding: 5px;
+    overflow: auto;
     border-radius: 5px;
     background-color: gray;
     box-sizing: border-box;
     color: gainsboro;
+}
+
+.log-message {
+    margin: 10px;
 }
 
 #game-board-content {
@@ -131,6 +141,10 @@ header {
     height: 100%;
     padding: 10px;
     color: white;
+}
+
+#game-board-start-button {
+    display: none;
 }
 
 .board-game-title {
@@ -230,7 +244,12 @@ header {
 }
 
 .error-text {
+    display: none;
     color: red;
+}
+
+.wait-text {
+    display: none;
 }
 
 .modal-buttons {

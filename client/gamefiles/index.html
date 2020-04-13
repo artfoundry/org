@@ -7,12 +7,13 @@
         <link rel="stylesheet" type="text/css" href="css/main.css">
     </head>
     <body>
-        <section id="header">
+        <section id="page-header">
             <div class="title">Org</div>
             <nav id="main-nav">
-                <span class="button nav-button nav-view-info">View account</span>
                 <span class="button nav-button nav-create-game">Create game</span>
                 <span class="button nav-button nav-join-game">Join game</span>
+                <span class="button nav-button nav-black-market">Black Market</span>
+                <span class="button nav-button nav-view-info">View account</span>
             </nav>
         </section>
 
@@ -28,7 +29,10 @@
                 </section>
                 <section id="game-board">
                     <div id="messages"></div>
-                    <div id="game-board-content"></div>
+                    <div id="game-board-content">
+                        <div class="board-game-title"></div>
+                        <span id="game-board-start-button" class="button action-button">Start the game</span>
+                    </div>
                 </section>
             </div>
             <div id="modal"></div>

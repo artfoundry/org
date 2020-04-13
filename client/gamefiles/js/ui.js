@@ -1,5 +1,5 @@
 class UI {
-    constructor(player, table, board, audio) {
+    constructor(player, table, audio) {
         // player object format:
         // {userId: string,
         //  userInfo: {gameIds: array, loggedIn: boolean}
@@ -11,13 +11,14 @@ class UI {
             gameId: ''
         };
         this.table = table;
-        this.board = board;
+        this.board = null;
         this.audio = audio;
 
         this.tempPaths = {
             createGame: 'html/create_game_modal.html',
             joinGame: 'html/join_game_modal.html',
-            userInfo: 'html/user-info-modal.html'
+            userInfo: 'html/user-info-modal.html',
+            blackMarket: 'html/black-market-modal.html'
         };
         this.$templates = {};
         this._loadTemplates();
@@ -33,6 +34,7 @@ class UI {
         this.table.joinGame = this.table.joinGame.bind(this.table);
         this.table.createGame = this.table.createGame.bind(this.table);
         this.table.getFullGameList = this.table.getFullGameList.bind(this.table);
+        this.player.buyAddon = this.player.buyAddon.bind(this.player);
 
         // Initial setup functions
         this.player.playerLogin(this._postMessage);
@@ -59,19 +61,20 @@ class UI {
                 dialogOptions = {
                     template: this.$templates.userInfo,
                     processContent: this._getPlayerInfo,
-                    processContentParams: {callback: this._renderGameList}
+                    processContentParams: {callback: this._renderGameList},
+                    processInput: null,
+                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'load-game'},
+                    callback: this.table.joinGame
                 };
-
             } else if ($button.hasClass('nav-create-game')) {
                 dialogOptions = {
                     template: this.$templates.createGame,
                     processContent: this._keystrokeListener,
-                    processContentParams: {formSelector: '#enter-game-name', warningSelector: '#modal .warning'},
+                    processContentParams: {formSelector: '#enter-game-name', warningSelector: '#modal .error'},
                     processInput: this._processGameNameEntry,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
-                    callback: this.table.createGame.bind(this.table)
+                    callback: this.table.createGame
                 };
-
             } else if ($button.hasClass('nav-join-game')) {
                 dialogOptions = {
                     template: this.$templates.joinGame,
@@ -79,7 +82,16 @@ class UI {
                     processContentParams: {userId: this.player.userId, callback: this._renderGameList},
                     processInput: null,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'join-game'},
-                    callback: this.table.joinGame.bind(this.table)
+                    callback: this.table.joinGame
+                };
+            } else if ($button.hasClass('nav-black-market')) {
+                dialogOptions = {
+                    template: this.$templates.blackMarket,
+                    processContent: this.table.getAddons,
+                    processContentParams: {userId: this.player.userId, callback: this._renderGameList},
+                    processInput: null,
+                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'buy-addon'},
+                    callback: this.player.buyAddon
                 };
             }
             this._displayDialog(dialogOptions);
@@ -113,7 +125,9 @@ class UI {
      * then returns true above are true, which then allows _displayDialog to continue;
      * or returns false if either above is false, which then prevents _displayDialog from continuing.
      *
-     * @returns {boolean}
+     * @returns boolean
+     *
+     * @private
      *************************/
     async _processGameNameEntry() {
         let gameName = $('#enter-game-name').val();
@@ -132,7 +146,7 @@ class UI {
         }).catch((error) => {
             this._hideWarning('#modal .wait-text');
             this._postMessage({
-                messageType: 'error',
+                messageType: 'server-error',
                 messageDetails: error
             });
         });
@@ -177,6 +191,8 @@ class UI {
      * processContent callback for _getPlayerInfo
      *
      * @param gameList: array of objects: {creator: string, gameId: string, name: string, playerCount: int, playerIds: array of strings}
+     *
+     * @private
      *************************/
     _renderGameList(gameList = this.player.userInfo.gameIds) {
         let $gameText = null;
@@ -228,18 +244,27 @@ class UI {
      * updateGame
      * callbackParams callback function for _displayDialog
      *
-     * @param gameData: {
-     *      creator: string,
-     *      name: string,
-     *      playerCount: int,
-     *      playerIds: array of strings,
-     *      sets: array of strings
-     * }
+     * @param gameData.creator: string
+     * @param gameData.board: object (new Board)
+     * @param gameData.name: string
+     * @param gameData.playerCount: int
+     * @param gameData.playerIds: array of strings
+     * @param gameData.sets: array of strings
      *************************/
     updateGame(gameData, messageType) {
-        if (gameData !== null) {
-            this.board.updateBoard(gameData);
+        let boardAction = '';
+        let playerIsCreator = gameData.creator === this.player.userId;
+
+        if (gameData.board) {
+            this.board = gameData.board;
+            this.board.updateBoard = this.board.updateBoard.bind(this.board);
+            this.board.initBoardListeners(this._postMessage, playerIsCreator);
         }
+        if (messageType && (messageType === 'join-game' || messageType === 'create-game' || messageType === 'load-game')) {
+            boardAction = messageType;
+        }
+        this.board.updateBoard(gameData, boardAction);
+
         if (messageType) {
             this._postMessage({gameData, messageType});
         }
@@ -249,27 +274,31 @@ class UI {
      * _postMessage
      * Displays message in sidebar
      *
-     * @param payload: {
-     *     messageType: string,
-     *     messageDetails: string or null depending on server response,
-     *     gameData: {playerId}
-     * }
+     * @param payload.messageType: string
+     * @param payload.messageDetails: string or null depending on server response
+     * @param payload.gameData.playerId: string
+     *
+     * @private
      ************************/
     _postMessage(payload) {
         let messageKey = payload.messageType || null;
         let messageDetails = payload.messageDetails || null;
         let gameData = payload.gameData || null;
-        let message = '';
+        let $message = $(document.createElement('div'));
 
+        $message.addClass('log-message');
         switch(messageKey) {
-            case 'login': message = `${gameData.player} has logged in`; break;
-            case 'login-failed': message = 'Login failed due to: ' + messageDetails; break;
-            case 'create-game': message = `${gameData.name} started by ${gameData.creator}`; break;
-            case 'join-game': message = `${gameData.player} has joined ${gameData.name}`; break;
-            case 'already-in-game': message = 'You are already a player in that game!'; break;
-            case 'error': message = 'An error has occurred: ' + messageDetails; break;
+            case 'login': $message.text(`Login successful`); break;
+            case 'login-failed': $message.text(`Login failed due to: ${messageDetails}`); break;
+            case 'create-game': $message.text(`${gameData.name} created by ${gameData.creator}`); break;
+            case 'join-game': $message.text(`${gameData.player} has joined ${gameData.name}`); break;
+            case 'load-game': $message.text(`${gameData.name} loaded`); break;
+            case 'already-in-game': $message.text('You are already a player in that game!'); break;
+            case 'game-starting': $message.text('The game is starting!'); break;
+            case 'server-error': $message.text(`An error has occurred: ${messageDetails}`); break;
+            case 'game-message': $message.text(messageDetails); break;
         }
-        $('#messages').text(message);
+        $('#messages').append($message);
     }
 
     /*************************
@@ -277,12 +306,12 @@ class UI {
      * Accepts a set of options to determine modal content, user interaction processing,
      * and data and callback to send to destination
      *
-     * @param dialogOptions: {
-     *      template: string - path to template file
-     *      content: function
-     *      callbackParams: object
-     *      callback: function - action to take when non-cancel button is pressed
-     * }
+     * @param dialogOptions.template: string - path to template file
+     * @param dialogOptions.content: function
+     * @param dialogOptions.callbackParams: object
+     * @param dialogOptions.callback: function - action to take when non-cancel button is pressed
+     *
+     * @private
      *************************/
     async _displayDialog(dialogOptions) {
         let $modal = $('#modal').html(dialogOptions.template);
@@ -297,7 +326,7 @@ class UI {
         $modalBackdrop.show();
         if ($cancelButton) {
             $cancelButton.click(() => {
-                this._hideWarning('#modal .warning');
+                this._hideWarning('#modal .wait-text,.error-text');
                 $modal.hide();
                 $modalBackdrop.hide();
             });
@@ -308,7 +337,7 @@ class UI {
                 inputValid = await dialogOptions.processInput();
             }
             if (inputValid || inputValid === null) {
-                this._hideWarning('#modal .warning');
+                this._hideWarning('#modal .wait-text,.error-text');
                 $modal.hide();
                 $modalBackdrop.hide();
                 if (dialogOptions.callback) {

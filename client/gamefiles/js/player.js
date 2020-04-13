@@ -4,6 +4,7 @@ class Player {
         this.socket = socket;
         this.userInfo = {
             loggedIn: false,
+            inGame: false,
             gameIds: []
         };
     }
@@ -39,5 +40,9 @@ class Player {
             callback(this.userInfo);
         });
         this.socket.emit('get-user', this.userId);
+    }
+
+    buyAddon(callback) {
+
     }
 }
