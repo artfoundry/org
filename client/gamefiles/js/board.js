@@ -17,7 +17,6 @@ class Board {
                 break;
             case 'exit-game' : $players.html('');
                 break;
-
         }
     }
 

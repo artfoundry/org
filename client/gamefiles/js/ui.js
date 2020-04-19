@@ -56,10 +56,15 @@ class UI {
         $('#main-nav').click((evt)=> {
             let $button = $(evt.target);
             let dialogOptions = {};
+            let populateUserID = () => {
+                this.$templates.userInfo.find('#user-id').text(this.player.userId);
+                return this.$templates.userInfo;
+            };
 
             if ($button.hasClass('nav-view-info')) {
                 dialogOptions = {
-                    template: this.$templates.userInfo,
+                    template: populateUserID(),
+                    focus: null,
                     processContent: this._getPlayerInfo,
                     processContentParams: {callback: this._renderGameList},
                     processInput: null,
@@ -69,8 +74,9 @@ class UI {
             } else if ($button.hasClass('nav-create-game')) {
                 dialogOptions = {
                     template: this.$templates.createGame,
+                    focus: '#modal .text-line-entry',
                     processContent: this._keystrokeListener,
-                    processContentParams: {formSelector: '#enter-game-name', warningSelector: '#modal .error'},
+                    processContentParams: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'},
                     processInput: this._processGameNameEntry,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
                     callback: this.table.createGame
@@ -78,6 +84,7 @@ class UI {
             } else if ($button.hasClass('nav-join-game')) {
                 dialogOptions = {
                     template: this.$templates.joinGame,
+                    focus: null,
                     processContent: this.table.getFullGameList,
                     processContentParams: {userId: this.player.userId, callback: this._renderGameList},
                     processInput: null,
@@ -87,6 +94,7 @@ class UI {
             } else if ($button.hasClass('nav-black-market')) {
                 dialogOptions = {
                     template: this.$templates.blackMarket,
+                    focus: null,
                     processContent: this.table.getAddons,
                     processContentParams: {userId: this.player.userId, callback: this._renderGameList},
                     processInput: null,
@@ -130,7 +138,7 @@ class UI {
      * @private
      *************************/
     async _processGameNameEntry() {
-        let gameName = $('#enter-game-name').val();
+        let gameName = $('#create-modal-enter-game-name').val();
         let isValid = null;
 
         this._displayWarning('#modal .wait-text');
@@ -205,10 +213,11 @@ class UI {
                 <span class="game-list-text">No games available</span>
             `);
             $gameListMarkup.append($gameText);
+            $('#modal-button-primary').focus();
         } else {
             for (let game in gameList) {
                 if (gameList.hasOwnProperty(game)) {
-                    $gameText = $(document.createElement('div')).addClass('game-list-row').html(`
+                    $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
                         <span class="game-list-text game-list-text-name" data-game="${gameList[game].gameId}">${gameList[game].name}</span>
                         <span class="game-list-text">${gameList[game].creator}</span>
                         <span class="game-list-text">${gameList[game].playerCount}</span>
@@ -237,6 +246,7 @@ class UI {
                     $gameListMarkup.append($gameText);
                 }
             }
+            $gameListMarkup.children('.game-list-row').first().focus();
         }
     }
 
@@ -252,18 +262,16 @@ class UI {
      * @param gameData.sets: array of strings
      *************************/
     updateGame(gameData, messageType) {
-        let boardAction = '';
         let playerIsCreator = gameData.creator === this.player.userId;
 
         if (gameData.board) {
             this.board = gameData.board;
             this.board.updateBoard = this.board.updateBoard.bind(this.board);
             this.board.initBoardListeners(this._postMessage, playerIsCreator);
+            if (messageType && (messageType === 'join-game' || messageType === 'create-game' || messageType === 'load-game')) {
+                this.board.updateBoard(gameData, messageType);
+            }
         }
-        if (messageType && (messageType === 'join-game' || messageType === 'create-game' || messageType === 'load-game')) {
-            boardAction = messageType;
-        }
-        this.board.updateBoard(gameData, boardAction);
 
         if (messageType) {
             this._postMessage({gameData, messageType});
@@ -307,6 +315,7 @@ class UI {
      * and data and callback to send to destination
      *
      * @param dialogOptions.template: string - path to template file
+     * @param dialogOptions.focus: string - element focus should be applied to upon opening modal
      * @param dialogOptions.content: function
      * @param dialogOptions.callbackParams: object
      * @param dialogOptions.callback: function - action to take when non-cancel button is pressed
@@ -316,13 +325,16 @@ class UI {
     async _displayDialog(dialogOptions) {
         let $modal = $('#modal').html(dialogOptions.template);
         let $modalBackdrop = $('#modal-backdrop');
-        let $cancelButton = $modal.find('#button-cancel');
+        let $cancelButton = $modal.find('#modal-button-cancel');
         let processContent = dialogOptions.processContent;
         let processContentParams = dialogOptions.processContentParams;
 
         await processContent(processContentParams);
 
         $modal.show();
+        if (dialogOptions.focus) {
+            $(dialogOptions.focus).focus();
+        }
         $modalBackdrop.show();
         if ($cancelButton) {
             $cancelButton.click(() => {
@@ -331,7 +343,7 @@ class UI {
                 $modalBackdrop.hide();
             });
         }
-        $modal.find('#button-primary').click(async () => {
+        $modal.find('#modal-button-primary').click(async () => {
             let inputValid = null;
             if (dialogOptions.processInput) {
                 inputValid = await dialogOptions.processInput();

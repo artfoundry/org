@@ -23,7 +23,7 @@ body {
 
 .button {
     display: inline-block;
-    width: 120px;
+    min-width: 130px;
     line-height: 20px;
     margin: 0 3px;
     padding: 10px;

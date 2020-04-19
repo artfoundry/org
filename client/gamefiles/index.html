@@ -10,10 +10,10 @@
         <section id="page-header">
             <div class="title">Org</div>
             <nav id="main-nav">
-                <span class="button nav-button nav-create-game">Create game</span>
-                <span class="button nav-button nav-join-game">Join game</span>
-                <span class="button nav-button nav-black-market">Black Market</span>
-                <span class="button nav-button nav-view-info">View account</span>
+                <button class="button nav-button nav-create-game" tabindex="0">Create game</button>
+                <button class="button nav-button nav-join-game" tabindex="0">Join game</button>
+                <button class="button nav-button nav-black-market" tabindex="0">Black Market</button>
+                <button class="button nav-button nav-view-info" tabindex="0">View account</button>
             </nav>
         </section>
 
@@ -21,8 +21,8 @@
             <div id="game-container">
                 <section id="actions">
                     <header>Actions</header>
-                    <span class="button action-button">Play card</span>
-                    <span class="button action-button">Place marker</span>
+                    <button class="button action-button" tabindex="0">Play card</button>
+                    <button class="button action-button" tabindex="0">Place marker</button>
                 </section>
                 <section id="players">
                     <header>Players</header>
@@ -31,7 +31,7 @@
                     <div id="messages"></div>
                     <div id="game-board-content">
                         <div class="board-game-title"></div>
-                        <span id="game-board-start-button" class="button action-button">Start the game</span>
+                        <button id="game-board-start-button" class="button action-button" tabindex="0">Start the game</button>
                     </div>
                 </section>
             </div>
@@ -50,7 +50,6 @@
         <script type="text/javascript" src="js/table.js"></script>
         <script type="text/javascript" src="js/audio.js"></script>
         <script type="text/javascript" src="js/helpers.js"></script>
-        <script type="text/javascript" src="js/turn-controller.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
     </body>
 </html>

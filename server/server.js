@@ -92,10 +92,10 @@ class FirebaseServices {
         if (this.isOnline) {
             await this.fbDatabase.ref('/gameIdList/').once('value').then((snapshot) => {
                 let rawData = snapshot.val();
+                // Only send back list of games that still have openings and in which user is not already playing and that hasn't started yet
                 let filteredList = (game => {
                     return game.playerIds.length <= MAX_PLAYER_COUNT && !game.playerIds.includes(userId) && !game.isRunning;
                 });
-                // Only send back list of games that still have openings and in which user is not already playing
                 results.data = rawData ? Object.values(rawData).filter(filteredList) : [];
             }).catch((error) => {
                 results.error = error;
