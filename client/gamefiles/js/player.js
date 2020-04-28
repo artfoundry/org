@@ -5,7 +5,8 @@ class Player {
         this.userInfo = {
             loggedIn: false,
             inGame: false,
-            gameIds: []
+            gameIds: [],
+            games: []
         };
     }
 
@@ -13,7 +14,7 @@ class Player {
         let data = {
             messageType: '',
             messageDetails: null,
-            gameData: {
+            updateData: {
                 player: this.userId
             }
         };
@@ -32,12 +33,14 @@ class Player {
     }
 
     getInfo(callback) {
-        this.socket.on('userinfo', (data) => {
+        this.socket.on('user-info', (data) => {
             this.userInfo.loggedIn = data.loggedIn;
             if (data.gameIds) {
                 this.userInfo.gameIds = data.gameIds;
+                this.userInfo.games = data.games;
             }
-            callback(this.userInfo);
+            this.socket.off('user-info');
+            callback();
         });
         this.socket.emit('get-user', this.userId);
     }

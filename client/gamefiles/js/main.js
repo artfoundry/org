@@ -50,7 +50,7 @@ let Game = {
         this.socket.on('connect', () => {
             console.log('Connected to server');
         });
-        this.socket.on('connect_error', (error) => {
+        this.socket.on('connect-error', (error) => {
             console.log('Error connecting to server: ', error);
         });
         let player = new Player(this.userId, this.socket);

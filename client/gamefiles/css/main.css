@@ -136,18 +136,18 @@ header {
     margin: 10px;
 }
 
-#game-board-content {
+#board-content {
     width: 85%;
     height: 100%;
     padding: 10px;
     color: white;
 }
 
-#game-board-start-button {
+#board-start-button {
     display: none;
 }
 
-.board-game-title {
+#board-gametitle {
     position: relative;
     top: 0;
     font-size: 16px;

@@ -18,6 +18,7 @@ class FirebaseServices {
                 console.log(snapshot.val());
             });
         }
+        this.connectionErrorString = 'Error: Lost connection with database. Please try again.';
     }
 
     _initAuth() {
@@ -29,8 +30,8 @@ class FirebaseServices {
                 credential: this.admin.credential.cert(this.serviceAccount),
                 databaseURL: "https://org-board.firebaseio.com"
             });
-        } catch (e) {
-            alert('Unable to connect to the server. Reload the page to try again.');
+        } catch (error) {
+            alert(`Unable to connect to the server. Reload the page to try again.\n${error}`);
             initResult = false;
         }
 
@@ -40,134 +41,199 @@ class FirebaseServices {
     _monitorFbConnection(socket) {
         let connectedRef = this.fbDatabase.ref('.info/connected');
         connectedRef.on('value', (snap) => {
+            let logMessage = 'No connection with Firebase server. Will keep trying...';
+
             this.isOnline = snap.val();
             if (this.isOnline) {
                 console.log('Connection with Firebase server is good')
             } else {
-                console.log('No connection with Firebase server. Will keep trying...');
-                socket.emit('connect_error', 'No connection with Firebase server. Will keep trying...');
+                console.log(logMessage);
+                socket.emit('connect-error', logMessage);
             }
         });
     }
 
-    login(userId, status, callback) {
-        if (!this.isOnline) {
-            return false;
-        }
-        this.fbDatabase.ref(`/userIdList/${userId}/loggedIn`).set(status, callback);
+    login(userId, status) {
+        return new Promise((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
+
+            if (this.isOnline) {
+                this.fbDatabase.ref(`/userIdList/${userId}/loggedIn`).set(status).then(() => {
+                    resolve(); // no data needed to pass back
+                }).catch((error) => {
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
+                });
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
+            }
+        });
     }
 
-    async getUser(userId) {
-        let results = {
-            data: null,
-            error: null
-        };
+    getUser(userId) {
+        return new Promise((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
+            if (this.isOnline) {
+                this.fbDatabase.ref(`/userIdList/${userId}`).once('value').then((snapshot) => {
+                    let results = snapshot.val();
 
-        if (this.isOnline) {
-            await this.fbDatabase.ref(`/userIdList/${userId}`).once('value').then((snapshot) => {
-                results.data = snapshot.val();
-            }).catch((error) => {
-                results.error = error;
-            });
-        } else {
-            results.error = "Error: Lost connection with database. Please try again.";
-        }
-
-        return results;
+                    if (results.gameIds) {
+                        this.getGameList(userId, true).then((gameList) => {
+                            results.games = gameList;
+                            resolve(results);
+                        }).catch((error) => {
+                            errorObject.type = 'server-error';
+                            errorObject.message = error;
+                            reject(errorObject);
+                        });
+                    } else {
+                        resolve(results);
+                    }
+                }).catch((error) => {
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
+                });
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
+            }
+        });
     }
 
     /***************
-     * getGameIdList
+     * getGameList
      * Request list of games that are still available to join for user (still open and user isn't already in it)
      *
      * @param userId: string
-     * @returns {Promise<{data: object, error: string}>}
-     **************/
-    async getGameIdList(userId) {
-        let results = {
-            data: null,
-            error: null
-        };
+     * @param getPlayerGames: boolean
+     * @returns {Promise<array>}
+     */
+    getGameList(userId, getPlayerGames) {
+        return new Promise((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
 
-        if (this.isOnline) {
-            await this.fbDatabase.ref('/gameIdList/').once('value').then((snapshot) => {
-                let rawData = snapshot.val();
-                // Only send back list of games that still have openings and in which user is not already playing and that hasn't started yet
-                let filteredList = (game => {
-                    return game.playerIds.length <= MAX_PLAYER_COUNT && !game.playerIds.includes(userId) && !game.isRunning;
+            if (this.isOnline) {
+                this.fbDatabase.ref('/gameIdList/').once('value').then((snapshot) => {
+                    let rawData = snapshot.val();
+                    let filteredList;
+                    let results;
+
+                    if (getPlayerGames) {
+                        // Only send back list of user is playing
+                        filteredList = ((game) => {
+                            return game.playerIds.includes(userId);
+                        });
+                    } else {
+                        // Only send back list of games that still have openings and in which user is not already playing and that hasn't started yet
+                        filteredList = ((game) => {
+                            return game.playerIds.length <= MAX_PLAYER_COUNT && !game.playerIds.includes(userId) && !game.isRunning;
+                        });
+                    }
+                    results = rawData ? Object.values(rawData).filter(filteredList) : [];
+                    resolve(results);
+                }).catch((error) => {
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
                 });
-                results.data = rawData ? Object.values(rawData).filter(filteredList) : [];
-            }).catch((error) => {
-                results.error = error;
-            });
-        } else {
-            results.error = "Error: Lost connection with database. Please try again.";
-        }
-
-        return results;
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
+            }
+        });
     }
 
-    async getGameInfo(gameId) {
-        let results = {
-            data: null,
-            error: null
-        };
+    getGameInfo(gameId) {
+        return new Promise ((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
 
-        if (this.isOnline) {
-            await this.fbDatabase.ref(`/gameIdList/${gameId}`).once('value').then((snapshot) => {
-                results.data = snapshot.val();
-            }).catch((error) => {
-                results.error = error;
-            });
-        } else {
-            results.error = "Error: Lost connection with database. Please try again.";
-        }
-
-        return results;
+            if (this.isOnline) {
+                this.fbDatabase.ref(`/gameIdList/${gameId}`).once('value').then((snapshot) => {
+                    resolve(snapshot.val());
+                }).catch((error) => {
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
+                });
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
+            }
+        });
     }
 
     /***************
-     * addGame
+     * createGame
      * Game server requests FB server to add a new game with user as the creator.
      *
      * @param userId: string
      * @param gameName: string
-     * @returns {Promise<{data: object, error: string}>}
+     * @returns {Promise<object>}
      ****************/
-    async addGame(userId, gameName) {
-        let gameData = {
-            gameId: null,
-            creator: userId,
-            name: gameName,
-            playerCount: 1,
-            playerIds: [userId],
-            sets: [],
-            isRunning: false
-        };
-        let results = {
-            error: null,
-            data: null
-        };
+    createGame(userId, gameName) {
+        return new Promise ((resolve, reject) => {
+            let gameData = {
+                gameId: null,
+                creator: userId,
+                name: gameName,
+                playerCount: 1,
+                playerIds: [userId],
+                sets: [],
+                isRunning: false
+            };
+            let errorObject = {
+                type: '',
+                message: ''
+            };
 
-        if (this.isOnline) {
-            let gameId = this.fbDatabase.ref('/gameIdList/').push().key;
-            let updates = {};
+            if (this.isOnline) {
+                let userGameList;
+                let gameId;
+                let updates = {};
 
-            gameData.gameId = gameId;
-            updates[`/gameIdList/${gameId}`] = gameData;
-            updates[`/userIdList/${userId}/gameIds/${gameId}`] = gameData;
-            updates[`/userIdList/${userId}/inGame`] = gameId;
+                this.getUser(userId).then((userInfo) => {
+                    userGameList = userInfo.gameIds || [];
+                }).then(() => {
+                    gameId = this.fbDatabase.ref('/gameIdList/').push().key;
+                    gameData.gameId = gameId;
+                    userGameList.push(gameId);
+                    updates[`/gameIdList/${gameId}`] = gameData;
+                    updates[`/userIdList/${userId}/gameIds`] = userGameList;
+                    updates[`/userIdList/${userId}/inGame`] = gameId;
 
-            await this.fbDatabase.ref().update(updates).then(() => {
-                results.data = gameData;
-            }).catch((error) => {
-                results.error = error;
-            });
-        } else {
-            results.error = "Error: Lost connection with database. Please try again.";
-        }
-
-        return results;
+                    this.fbDatabase.ref().update(updates).then(() => {
+                        resolve(gameData);
+                    }).catch((error) => {
+                        errorObject.type = 'server-error';
+                        errorObject.message = error;
+                        reject(errorObject);
+                    });
+                });
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
+            }
+        });
     }
 
     /****************
@@ -187,51 +253,65 @@ class FirebaseServices {
      * @param gameId: FB key (string)
      * @returns {Promise<{data: object, error: string}>}
      ******************/
-    async joinGame(userId, gameId) {
-        let gameData = {
-            gameId,
-            creator: null,
-            name: null,
-            playerCount: null,
-            playerIds: [],
-            sets: [],
-            currentPlayerTurn: ''
-        };
-        let results = {
-            error: null,
-            data: {}
-        };
+    joinGame(userId, gameId) {
+        return new Promise ((resolve, reject) => {
+            let gameData = {
+                gameId,
+                creator: null,
+                name: null,
+                playerCount: null,
+                playerIds: [],
+                sets: [],
+                currentPlayerTurn: ''
+            };
+            let errorObject = {
+                type: '',
+                message: ''
+            };
 
-        if (this.isOnline) {
-            let gameInfo = await this.getGameInfo(gameId);
-            let updates = {};
+            if (this.isOnline) {
+                let userGameIDList;
+                let updates = {};
+                this.getUser(userId).then((userData) => {
+                    userGameIDList = userData.gameIds || [];
+                    userGameIDList.push(gameId);
+                }).then(() => {
+                    this.getGameInfo(gameId).then((retrievedGameInfo) => {
+                        retrievedGameInfo.playerIds.push(userId);
+                        gameData.name = retrievedGameInfo.name;
+                        gameData.playerIds = retrievedGameInfo.playerIds;
+                        gameData.playerCount = retrievedGameInfo.playerCount + 1;
+                        gameData.creator = retrievedGameInfo.creator;
+                        gameData.sets = retrievedGameInfo.sets || gameData.sets;
 
-            if (gameInfo.error) {
-                results.error = gameInfo.error;
-            } else {
-                gameData.name = gameInfo.data.name;
-                gameInfo.data.playerIds.push(userId);
-                gameData.playerIds = gameInfo.data.playerIds;
-                gameData.playerCount = gameInfo.data.playerCount + 1;
-                gameData.creator = gameInfo.data.creator;
-                gameData.sets = gameInfo.data.sets || gameData.sets;
+                        updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
+                        updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                        updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
+                        updates[`/userIdList/${userId}/inGame`] = gameId;
 
-                updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
-                updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
-                updates[`/userIdList/${userId}/gameIds/${gameId}`] = gameData;
-                updates[`/userIdList/${userId}/inGame`] = gameId;
-
-                await this.fbDatabase.ref().update(updates).then(() => {
-                    results.data = gameData;
+                        this.fbDatabase.ref().update(updates).then(() => {
+                            resolve(gameData);
+                        }).catch((error) => {
+                            errorObject.type = 'server-error';
+                            errorObject.message = error;
+                            reject(errorObject);
+                        });
+                    }).catch((error) => {
+                        errorObject.type = 'server-error';
+                        errorObject.message = error;
+                        reject(errorObject);
+                    });
                 }).catch((error) => {
-                    results.error = error;
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
                 });
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
             }
-        } else {
-            results.error = "Error: Lost connection with database. Please try again.";
-        }
-
-        return results;
+        });
     }
 
     /*********************
@@ -240,28 +320,42 @@ class FirebaseServices {
      * @param gameId: string
      * @param gameData: object of whatever data needs to be updated
      * @param playerId: string
-     * @returns {Promise<void>}
+     * @returns {Promise<object>}
      *********************/
-    async updateGame(gameId, gameData, playerId = null) {
-        let updates = {};
+    updateGame(gameId, gameData, playerId = null) {
+        return new Promise ((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
 
-        // gameData contains keys (dataType) that are the same keys used in the DB
-        for (let dataType in gameData) {
-            if (gameData.hasOwnProperty(dataType)) {
-                if (playerId) {
-                    updates[`/gameIdList/${gameId}/gameData/${dataType}/${playerId}`] = gameData[dataType];
-                } else if (dataType === 'isRunning') {
-                    updates[`/gameIdList/${gameId}/isRunning`] = gameData[dataType];
-                } else {
-                    updates[`/gameIdList/${gameId}/gameData/${dataType}`] = gameData[dataType];
+            if (this.isOnline) {
+                let updates = {};
+
+                // gameData contains keys (dataType) that are the same keys used in the DB
+                for (let dataType in gameData) {
+                    if (gameData.hasOwnProperty(dataType)) {
+                        if (playerId) {
+                            updates[`/gameIdList/${gameId}/gameData/${dataType}/${playerId}`] = gameData[dataType];
+                        } else if (dataType === 'isRunning') {
+                            updates[`/gameIdList/${gameId}/isRunning`] = gameData[dataType];
+                        } else {
+                            updates[`/gameIdList/${gameId}/gameData/${dataType}`] = gameData[dataType];
+                        }
+                    }
                 }
+                this.fbDatabase.ref().update(updates).then(() => {
+                    resolve(); //no data to return
+                }).catch((error) => {
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
+                });
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
             }
-        }
-
-        await this.fbDatabase.ref().update(updates).then((results) => {
-            return results;
-        }).catch((error) => {
-            return error;
         });
     }
 
@@ -269,25 +363,33 @@ class FirebaseServices {
      * updateUser
      *
      * @param playerId: string
-     * @param gameId: string
+     * @param params: object {string, any}
      * @returns {Promise<void>}
      *********************/
 // need to make this more general instead of just updating 'inGame'
-    async updateUser(playerId, gameId) {
-        let results = {
-            error: "Error: Lost connection with database. Please try again."
-        };
+    updateUser(playerId, params) {
+        return new Promise ((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
+            let key = params.key;
+            let value = params.value;
 
-        if (this.isOnline) {
-            await this.fbDatabase.ref(`/userIdList/${playerId}/inGame`).set(gameId).then(() => {
-                // success, no need to return anything`
-                results = null;
-            }).catch((error) => {
-                results.error = error;
-            });
-        }
-
-        return results;
+            if (this.isOnline) {
+                this.fbDatabase.ref(`/userIdList/${playerId}/${key}`).set(value).then(() => {
+                    resolve(); // success, no need to return anything
+                }).catch((error) => {
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
+                });
+            } else {
+                errorObject.type = 'login-failed';
+                errorObject.message = this.connectionErrorString;
+                reject(errorObject);
+            }
+        });
     }
 }
 
@@ -301,8 +403,6 @@ class GameServer {
         this.socket = null;
         this.port = 4000;
         this.gameTurns = 10;
-        this.disconnectMessage = "Error: Lost connection with database. Please try again.";
-        this.logDisconnectMessage = `Error communicating with DB: ${this.disconnectMessage}`;
     }
 
     /*************
@@ -334,83 +434,84 @@ class GameServer {
         console.log('listeners setup');
 
         // lobby listeners
-        this.socket.on('player-login', async (userId) => {
-            let errorType = 'login-failed';
-            let successLog = `${userId} logged in`;
-            let successType = 'login-successful';
-            let resultsCallback = (error) => {
-                error ? this.emitResponse(errorType, errorMessage, errorLog) : this.emitResponse(successType, null, successLog);
-            };
+        this.socket.on('player-login', (userId) => {
+            let logMessage = '';
 
-            let results = await this.fbServices.login(userId, true, resultsCallback);
-
-            // if isOnline is false
-            if (results === false) {
-                this.emitResponse(errorType, this.disconnectMessage, this.logDisconnectMessage);
-            }
+            this.fbServices.login(userId, true).then(() => {
+                logMessage = `${userId} logged in`;
+                this.emitResponse('login-successful', null, logMessage);
+            }).catch((error) => {
+                logMessage = `${userId} login failed. Error: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
         });
-        this.socket.on('get-user', async (userId) => {
-            let results = await this.fbServices.getUser(userId);
-
-            if (results.error) {
-                console.log(`Error retrieving user info: ${results.error}`);
-            } else {
-                console.log(`Retrieved account info for ${userId}`);
-                this.socket.emit('userinfo', results.data);
-            }
+        this.socket.on('get-user', (userId) => {
+            let logMessage = '';
+            this.fbServices.getUser(userId).then((results) => {
+                logMessage = `Retrieved account info for ${userId}`;
+                this.emitResponse('user-info', results, logMessage);
+            }).catch((error) => {
+                logMessage = `Error retrieving user info: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
         });
-        this.socket.on('create-game', async (userId, gameName) => {
-            let results = await this.fbServices.addGame(userId, gameName);
-
-            if (results.error) {
-                console.log(`Error adding game: ${results.error}`);
-            } else {
-                console.log(`Game ${gameName} added by ${userId}`);
-                this.socket.emit('assigned-game', results.data);
-            }
+        this.socket.on('create-game', (userId, gameName) => {
+            let logMessage = '';
+            this.fbServices.createGame(userId, gameName).then((results) => {
+                logMessage = `Game ${gameName} created by ${userId}`;
+                this.emitResponse('created-game', results, logMessage);
+            }).catch((error) => {
+                logMessage = `Error creating game: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
         });
-        this.socket.on('join-game', async (userId, gameId) => {
-            let results = await this.fbServices.joinGame(userId, gameId);
-
-            if (results.error) {
-                console.log(`Error joining game: ${results.error}`);
-            } else {
-                console.log(userId + ' joined ' + results.data.name);
-                this.socket.emit('joined-game', results.data);
-            }
-        });
-        this.socket.on('load-game', async (userId, gameId) => {
-            let results = {
-                userInfo: await this.fbServices.updateUser(userId, gameId),
-                gameInfo: await this.fbServices.getGameInfo(gameId)
-            };
-
-            if (results.userInfo && results.userInfo.error) {
-                console.log(`Error rejoining game: ${results.userInfo.error}`);
-            } else if (results.gameInfo.error) {
-                console.log(`Error retrieving game info: ${results.gameInfo.error}`);
-            } else {
-                console.log(userId + ' has rejoined ' + results.gameInfo.data.name);
+        this.socket.on('join-game', (userId, gameId) => {
+            let logMessage = '';
+            this.fbServices.joinGame(userId, gameId).then((results) => {
                 let updateData = {
                     userId: userId,
-                    update: {
-                        gameId,
-                        inGame: true
-                    }
+                    gameId,
+                    name: results.name
                 };
-                this.socket.emit('joined-game', results.gameInfo.data);
-                this.socket.emit('other-player-joined', updateData);
-            }
+                logMessage = userId + ' joined ' + results.name;
+                this.emitResponse('joined-game', results, logMessage);
+                logMessage = 'Message broadcasted to other players';
+                this.emitResponse('other-joined-game', updateData, logMessage);
+            }).catch((error) => {
+                logMessage = `Error joining game: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
         });
-        this.socket.on('get-game-list', async (userId) => {
-            let results = await this.fbServices.getGameIdList(userId);
+        this.socket.on('load-game', (userId, gameId) => {
+            let gameInfo;
+            let logMessage = '';
 
-            if (results.error) {
-                console.log(`Error retrieving game list: ${results.error}`);
-            } else {
-                console.log('Game list retrieved');
-                this.socket.emit('game-list-retrieved', results.data);
-            }
+            this.fbServices.getGameInfo(gameId).then((gameData) => {
+                gameInfo = gameData;
+            }).then(() => {
+                let params = {key: 'inGame', value: gameId};
+
+                this.fbServices.updateUser(userId, params).catch((error) => {
+                    logMessage = `Error updating user info: ${error.message}`;
+                    this.emitResponse(error.type, error.message, logMessage);
+                });
+            }).then(() => {
+                logMessage = `${userId} has rejoined ${gameInfo.name}`;
+                this.emitResponse('joined-game', gameInfo, logMessage);
+            }).catch((error) => {
+                logMessage = `Error retrieving game info: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
+        });
+        this.socket.on('get-game-list', (userId) => {
+            let logMessage = '';
+            this.fbServices.getGameList(userId, false).then((results) => {
+                logMessage = 'Game list retrieved';
+                this.emitResponse('game-list-retrieved', results, logMessage);
+            }).catch((error) => {
+                logMessage = `Error retrieving game list: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
         });
 
         // game listeners
@@ -420,17 +521,29 @@ class GameServer {
     }
 
     emitResponse(type, message, logMessage) {
-        console.log(logMessage);
-        message ? this.socket.emit(type, message) : this.socket.emit(type);
+        console.log(new Date() + ': ' + (logMessage || message));
+        this.socket.emit(type, message);
     }
 
-    async startGame(gameId) {
-        let gameInfo = await this.fbServices.getGameInfo(gameId);
+    startGame(gameId) {
+        let logMessage = '';
+        let gameInfo;
 
-        await this.fbServices.updateGame(gameId, {isRunning: true});
-        this.gameSetup(gameId, gameInfo.data);
-        this.startTurnController(gameId, gameInfo.data);
-        this.socket.emit('game-starting');
+        this.fbServices.getGameInfo(gameId).then((gameData) => {
+            gameInfo = gameData;
+            this.fbServices.updateGame(gameId, {isRunning: true}).catch((error) => {
+                logMessage = `Error updating game info while trying to start game: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
+        }).then(() => {
+            this.gameSetup(gameId, gameInfo);
+            this.startTurnController(gameId, gameInfo);
+            logMessage = `${gameId} is starting`;
+            this.emitResponse('game-starting', null, logMessage);
+        }).catch((error) => {
+            logMessage = `Error retrieving game info while trying to start game: ${error.message}`;
+            this.emitResponse(error.type, error.message, logMessage);
+        });
     }
 
     startTurnController(gameId, gameInfo) {
@@ -447,32 +560,27 @@ class GameServer {
         let playersIdList = gameInfo.playerIds;
         let startingInfluenceTokens = 3;
 
-        playersIdList.forEach(async (playerId) => {
-            await this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens).then(() => {
-                this.socket.emit('game-message', `${playerId} has received ${startingInfluenceTokens} Influence Tokens`);
-            }).catch((error) => {
-                this.socket.emit('server-error', error);
-                console.log(`Error communicating with DB: ${error}`);
-            });
+        playersIdList.forEach((playerId) => {
+            this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens);
         });
     }
 
-    async giveInfluenceTokens(gameId, playerId, influenceTokens) {
+    giveInfluenceTokens(gameId, playerId, influenceTokens) {
         let gameData = {influenceTokens};
+        let message = '';
 
-        if (this.fbServices.isOnline) {
-            await this.fbServices.updateGame(gameId, gameData, playerId).then((results) => {
-                return results;
-            });
-        } else {
-            this.emitResponse('server-error', this.disconnectMessage, this.logDisconnectMessage);
-        }
+        this.fbServices.updateGame(gameId, gameData, playerId).then(() => {
+            message = `${playerId} has received ${influenceTokens} Influence Tokens`;
+            this.emitResponse('game-message', message);
+        }).catch((error) => {
+            message = `Error updating game info while trying to give out tokens: ${error.message}`;
+            this.emitResponse(error.type, error.message, message);
+        });
     }
 
 
 
 }
-
 
 (function() {
     const fbServices = new FirebaseServices();

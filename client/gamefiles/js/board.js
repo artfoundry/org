@@ -4,16 +4,16 @@ class Board {
     }
 
     updateBoard(gameData, boardAction) {
-        let $boardContent = $('#game-board-content');
+        let $boardContent = $('#board-content');
         let $players = $('#players');
 
-        switch(boardAction) {
-            case 'join-game' || 'create-game' :
+        switch (boardAction) {
+            case 'load-game' :
                 $players.html('');
                 gameData.playerIds.forEach((name) => {
                     $players.append(`<span class="player-box">${name}</span>`);
                 });
-                $boardContent.find("board-game-title").text(`Game: ${gameData.name}`);
+                $boardContent.find("#board-gametitle").text(`Game: ${gameData.name}`);
                 break;
             case 'exit-game' : $players.html('');
                 break;
@@ -24,10 +24,10 @@ class Board {
 
     }
 
-    initBoardListeners(uiMessageCallback, playerIsCreator) {
-        let $startButton = $('#game-board-start-button');
+    initBoardListeners(uiMessageCallback, playerIsCreator, isRunning) {
+        let $startButton = $('#board-start-button');
 
-        if (playerIsCreator) {
+        if (playerIsCreator && !isRunning) {
             $startButton.show().click(() => {
                 this.table.startGame(uiMessageCallback);
                 $startButton.hide();

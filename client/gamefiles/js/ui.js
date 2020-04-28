@@ -30,6 +30,7 @@ class UI {
         this._displayWarning = this._displayWarning.bind(this);
         this._hideWarning = this._hideWarning.bind(this);
         this._renderGameList = this._renderGameList.bind(this);
+        this._openModal = this._openModal.bind(this);
         this.updateGame = this.updateGame.bind(this);
         this.table.joinGame = this.table.joinGame.bind(this.table);
         this.table.createGame = this.table.createGame.bind(this.table);
@@ -184,10 +185,9 @@ class UI {
     }
 
     _getPlayerInfo(params) {
-        this.player.getInfo(async (results) => {
-            this.player.userInfo = await results;
-            if (params.callback) {
-                params.callback();
+        this.player.getInfo(() => {
+            if (this.player.userInfo) {
+                params.callback(this.player.userInfo.games);
             }
         });
     }
@@ -198,11 +198,9 @@ class UI {
      *
      * processContent callback for _getPlayerInfo
      *
-     * @param gameList: array of objects: {creator: string, gameId: string, name: string, playerCount: int, playerIds: array of strings}
-     *
      * @private
      *************************/
-    _renderGameList(gameList = this.player.userInfo.gameIds) {
+    _renderGameList(gameList) {
         let $gameText = null;
         let ui = this;
         let $gameListMarkup = $('#modal .game-list');
@@ -215,37 +213,35 @@ class UI {
             $gameListMarkup.append($gameText);
             $('#modal-button-primary').focus();
         } else {
-            for (let game in gameList) {
-                if (gameList.hasOwnProperty(game)) {
-                    $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
-                        <span class="game-list-text game-list-text-name" data-game="${gameList[game].gameId}">${gameList[game].name}</span>
-                        <span class="game-list-text">${gameList[game].creator}</span>
-                        <span class="game-list-text">${gameList[game].playerCount}</span>
-                    `);
-                    $gameText.click(function() {
-                        let $prevSelected = $('.game-list-row-selected');
-                        let $gameName = $(this).find('.game-list-text-name');
+            gameList.forEach((game) => {
+                $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
+                    <span class="game-list-text game-list-text-name" data-game="${game.gameId}">${game.name}</span>
+                    <span class="game-list-text">${game.creator}</span>
+                    <span class="game-list-text">${game.playerCount}</span>
+                `);
+                $gameText.click(function() {
+                    let $prevSelected = $('.game-list-row-selected');
+                    let $gameName = $(this).find('.game-list-text-name');
 
-                        if ($(this).hasClass('game-list-row-selected')) {
-                            $(this).removeClass('game-list-row-selected');
-                            ui.game = {
-                                name: '',
-                                gameId: ''
-                            };
-                        } else {
-                            if ($prevSelected.length > 0) {
-                                $prevSelected.removeClass('game-list-row-selected');
-                            }
-                            $(this).addClass('game-list-row-selected');
-                            ui.game = {
-                                name: $gameName.innerText,
-                                gameId: $gameName.data('game')
-                            };
+                    if ($(this).hasClass('game-list-row-selected')) {
+                        $(this).removeClass('game-list-row-selected');
+                        ui.game = {
+                            name: '',
+                            gameId: ''
+                        };
+                    } else {
+                        if ($prevSelected.length > 0) {
+                            $prevSelected.removeClass('game-list-row-selected');
                         }
-                    });
-                    $gameListMarkup.append($gameText);
-                }
-            }
+                        $(this).addClass('game-list-row-selected');
+                        ui.game = {
+                            name: $gameName.innerText,
+                            gameId: $gameName.data('game')
+                        };
+                    }
+                });
+                $gameListMarkup.append($gameText);
+            });
             $gameListMarkup.children('.game-list-row').first().focus();
         }
     }
@@ -254,28 +250,33 @@ class UI {
      * updateGame
      * callbackParams callback function for _displayDialog
      *
-     * @param gameData.creator: string
-     * @param gameData.board: object (new Board)
-     * @param gameData.name: string
-     * @param gameData.playerCount: int
-     * @param gameData.playerIds: array of strings
-     * @param gameData.sets: array of strings
+     * @param updateData.gameId: string
+     * @param updateData.creator: string
+     * @param updateData.name: string
+     * @param updateData.playerCount: int
+     * @param updateData.playerIds: array of strings
+     * @param updateData.sets: array of strings
+     * @param updateData.isRunning: boolean
      *************************/
-    updateGame(gameData, messageType) {
-        let playerIsCreator = gameData.creator === this.player.userId;
+    updateGame(updateData, messageType) {
+        let playerIsCreator = updateData.creator === this.player.userId;
+        let isRunning = updateData.isRunning;
 
-        if (gameData.board) {
-            this.board = gameData.board;
-            this.board.updateBoard = this.board.updateBoard.bind(this.board);
-            this.board.initBoardListeners(this._postMessage, playerIsCreator);
-            if (messageType && (messageType === 'join-game' || messageType === 'create-game' || messageType === 'load-game')) {
-                this.board.updateBoard(gameData, messageType);
-            }
+        if (!this.board) {
+            this.createBoard();
+            this.board.initBoardListeners(this._postMessage, playerIsCreator, isRunning);
         }
 
         if (messageType) {
-            this._postMessage({gameData, messageType});
+            this._postMessage({updateData, messageType});
+            if (messageType === 'join-game' || messageType === 'create-game' || messageType === 'load-game') {
+                this.board.updateBoard(updateData, 'load-game');
+            }
         }
+    }
+
+    createBoard() {
+        this.board = new Board(this.table);
     }
 
     /*************************
@@ -284,23 +285,28 @@ class UI {
      *
      * @param payload.messageType: string
      * @param payload.messageDetails: string or null depending on server response
-     * @param payload.gameData.playerId: string
+     * @param payload.updateData: object
+     * @param payload.
      *
      * @private
      ************************/
     _postMessage(payload) {
-        let messageKey = payload.messageType || null;
-        let messageDetails = payload.messageDetails || null;
-        let gameData = payload.gameData || null;
+        let messageKey = payload.messageType;
+        let messageDetails = payload.messageDetails;
+        let gameData = payload.updateData;
+        let gameName = gameData && gameData.name;
+        let creator = gameData && gameData.creator;
+        let otherPlayer = gameData && gameData.userId;
         let $message = $(document.createElement('div'));
 
         $message.addClass('log-message');
         switch(messageKey) {
             case 'login': $message.text(`Login successful`); break;
-            case 'login-failed': $message.text(`Login failed due to: ${messageDetails}`); break;
-            case 'create-game': $message.text(`${gameData.name} created by ${gameData.creator}`); break;
-            case 'join-game': $message.text(`${gameData.player} has joined ${gameData.name}`); break;
-            case 'load-game': $message.text(`${gameData.name} loaded`); break;
+            case 'login-failed': $message.text(messageDetails); break;
+            case 'create-game': $message.text(`${gameName} created by ${creator}`); break;
+            case 'join-game': $message.text(`You joined ${gameName}`); break;
+            case 'other-joined-game': $message.text(`${otherPlayer} joined ${gameName}`); break;
+            case 'load-game': $message.text(`${gameName} loaded`); break;
             case 'already-in-game': $message.text('You are already a player in that game!'); break;
             case 'game-starting': $message.text('The game is starting!'); break;
             case 'server-error': $message.text(`An error has occurred: ${messageDetails}`); break;
@@ -316,20 +322,35 @@ class UI {
      *
      * @param dialogOptions.template: string - path to template file
      * @param dialogOptions.focus: string - element focus should be applied to upon opening modal
-     * @param dialogOptions.content: function
-     * @param dialogOptions.callbackParams: object
+     * @param dialogOptions.processContent: function
+     * @param dialogOptions.processContentParams: object
+     * @param dialogOptions.processInput: function
      * @param dialogOptions.callback: function - action to take when non-cancel button is pressed
+     * @param dialogOptions.callbackParams: object
      *
      * @private
      *************************/
-    async _displayDialog(dialogOptions) {
-        let $modal = $('#modal').html(dialogOptions.template);
-        let $modalBackdrop = $('#modal-backdrop');
-        let $cancelButton = $modal.find('#modal-button-cancel');
+    _displayDialog(dialogOptions) {
         let processContent = dialogOptions.processContent;
         let processContentParams = dialogOptions.processContentParams;
+        let processContentCallback = processContentParams.callback || null;
+        let $modal = $('#modal').html(dialogOptions.template);
 
-        await processContent(processContentParams);
+        if (processContentParams.callback) {
+            processContentParams.callback = (data) => {
+                processContentCallback(data);
+                this._openModal($modal, dialogOptions);
+            };
+            processContent(processContentParams);
+        } else {
+            processContent(processContentParams);
+            this._openModal($modal, dialogOptions);
+        }
+    }
+
+    _openModal($modal, dialogOptions) {
+        let $modalBackdrop = $('#modal-backdrop');
+        let $cancelButton = $modal.find('#modal-button-cancel');
 
         $modal.show();
         if (dialogOptions.focus) {
