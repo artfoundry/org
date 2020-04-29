@@ -60,20 +60,26 @@ class FirebaseServices {
                 message: ''
             };
 
-            if (this.isOnline) {
-                this.fbDatabase.ref(`/userIdList/${userId}/loggedIn`).set(status).then(() => {
-                    resolve(); // no data needed to pass back
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
+            this.checkOnlineStatus(reject);
+
+            this.fbDatabase.ref(`/userIdList/${userId}/loggedIn`).set(status).then(() => {
+                resolve(); // no data needed to pass back
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
                 reject(errorObject);
-            }
+            });
         });
+    }
+
+    checkOnlineStatus(reject) {
+        if (!this.isOnline) {
+            let options = {
+                type: 'login-failed',
+                message: this.connectionErrorString
+            };
+            reject(options);
+        }
     }
 
     getUser(userId) {
@@ -82,32 +88,29 @@ class FirebaseServices {
                 type: '',
                 message: ''
             };
-            if (this.isOnline) {
-                this.fbDatabase.ref(`/userIdList/${userId}`).once('value').then((snapshot) => {
-                    let results = snapshot.val();
 
-                    if (results.gameIds) {
-                        this.getGameList(userId, true).then((gameList) => {
-                            results.games = gameList;
-                            resolve(results);
-                        }).catch((error) => {
-                            errorObject.type = 'server-error';
-                            errorObject.message = error;
-                            reject(errorObject);
-                        });
-                    } else {
+            this.checkOnlineStatus(reject);
+
+            this.fbDatabase.ref(`/userIdList/${userId}`).once('value').then((snapshot) => {
+                let results = snapshot.val();
+
+                if (results.gameIds) {
+                    this.getGameList(userId, true).then((gameList) => {
+                        results.games = gameList;
                         resolve(results);
-                    }
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
+                    }).catch((error) => {
+                        errorObject.type = 'server-error';
+                        errorObject.message = error;
+                        reject(errorObject);
+                    });
+                } else {
+                    resolve(results);
+                }
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
                 reject(errorObject);
-            }
+            });
         });
     }
 
@@ -126,35 +129,31 @@ class FirebaseServices {
                 message: ''
             };
 
-            if (this.isOnline) {
-                this.fbDatabase.ref('/gameIdList/').once('value').then((snapshot) => {
-                    let rawData = snapshot.val();
-                    let filteredList;
-                    let results;
+            this.checkOnlineStatus(reject);
 
-                    if (getPlayerGames) {
-                        // Only send back list of user is playing
-                        filteredList = ((game) => {
-                            return game.playerIds.includes(userId);
-                        });
-                    } else {
-                        // Only send back list of games that still have openings and in which user is not already playing and that hasn't started yet
-                        filteredList = ((game) => {
-                            return game.playerIds.length <= MAX_PLAYER_COUNT && !game.playerIds.includes(userId) && !game.isRunning;
-                        });
-                    }
-                    results = rawData ? Object.values(rawData).filter(filteredList) : [];
-                    resolve(results);
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
+            this.fbDatabase.ref('/gameIdList/').once('value').then((snapshot) => {
+                let rawData = snapshot.val();
+                let filteredList;
+                let results;
+
+                if (getPlayerGames) {
+                    // Only send back list of user is playing
+                    filteredList = ((game) => {
+                        return game.playerIds.includes(userId);
+                    });
+                } else {
+                    // Only send back list of games that still have openings and in which user is not already playing and that hasn't started yet
+                    filteredList = ((game) => {
+                        return game.playerIds.length <= MAX_PLAYER_COUNT && !game.playerIds.includes(userId) && !game.isRunning;
+                    });
+                }
+                results = rawData ? Object.values(rawData).filter(filteredList) : [];
+                resolve(results);
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
                 reject(errorObject);
-            }
+            });
         });
     }
 
@@ -165,19 +164,15 @@ class FirebaseServices {
                 message: ''
             };
 
-            if (this.isOnline) {
-                this.fbDatabase.ref(`/gameIdList/${gameId}`).once('value').then((snapshot) => {
-                    resolve(snapshot.val());
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
+            this.checkOnlineStatus(reject);
+
+            this.fbDatabase.ref(`/gameIdList/${gameId}`).once('value').then((snapshot) => {
+                resolve(snapshot.val());
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
                 reject(errorObject);
-            }
+            });
         });
     }
 
@@ -204,35 +199,30 @@ class FirebaseServices {
                 type: '',
                 message: ''
             };
+            let userGameList;
+            let gameId;
+            let updates = {};
 
-            if (this.isOnline) {
-                let userGameList;
-                let gameId;
-                let updates = {};
+            this.checkOnlineStatus(reject);
 
-                this.getUser(userId).then((userInfo) => {
-                    userGameList = userInfo.gameIds || [];
-                }).then(() => {
-                    gameId = this.fbDatabase.ref('/gameIdList/').push().key;
-                    gameData.gameId = gameId;
-                    userGameList.push(gameId);
-                    updates[`/gameIdList/${gameId}`] = gameData;
-                    updates[`/userIdList/${userId}/gameIds`] = userGameList;
-                    updates[`/userIdList/${userId}/inGame`] = gameId;
+            this.getUser(userId).then((userInfo) => {
+                userGameList = userInfo.gameIds || [];
+            }).then(() => {
+                gameId = this.fbDatabase.ref('/gameIdList/').push().key;
+                gameData.gameId = gameId;
+                userGameList.push(gameId);
+                updates[`/gameIdList/${gameId}`] = gameData;
+                updates[`/userIdList/${userId}/gameIds`] = userGameList;
+                updates[`/userIdList/${userId}/inGame`] = gameId;
 
-                    this.fbDatabase.ref().update(updates).then(() => {
-                        resolve(gameData);
-                    }).catch((error) => {
-                        errorObject.type = 'server-error';
-                        errorObject.message = error;
-                        reject(errorObject);
-                    });
+                this.fbDatabase.ref().update(updates).then(() => {
+                    resolve(gameData);
+                }).catch((error) => {
+                    errorObject.type = 'server-error';
+                    errorObject.message = error;
+                    reject(errorObject);
                 });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
-                reject(errorObject);
-            }
+            });
         });
     }
 
@@ -268,34 +258,30 @@ class FirebaseServices {
                 type: '',
                 message: ''
             };
+            let userGameIDList;
+            let updates = {};
 
-            if (this.isOnline) {
-                let userGameIDList;
-                let updates = {};
-                this.getUser(userId).then((userData) => {
-                    userGameIDList = userData.gameIds || [];
-                    userGameIDList.push(gameId);
-                }).then(() => {
-                    this.getGameInfo(gameId).then((retrievedGameInfo) => {
-                        retrievedGameInfo.playerIds.push(userId);
-                        gameData.name = retrievedGameInfo.name;
-                        gameData.playerIds = retrievedGameInfo.playerIds;
-                        gameData.playerCount = retrievedGameInfo.playerCount + 1;
-                        gameData.creator = retrievedGameInfo.creator;
-                        gameData.sets = retrievedGameInfo.sets || gameData.sets;
+            this.checkOnlineStatus(reject);
 
-                        updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
-                        updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
-                        updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
-                        updates[`/userIdList/${userId}/inGame`] = gameId;
+            this.getUser(userId).then((userData) => {
+                userGameIDList = userData.gameIds || [];
+                userGameIDList.push(gameId);
+            }).then(() => {
+                this.getGameInfo(gameId).then((retrievedGameInfo) => {
+                    retrievedGameInfo.playerIds.push(userId);
+                    gameData.name = retrievedGameInfo.name;
+                    gameData.playerIds = retrievedGameInfo.playerIds;
+                    gameData.playerCount = retrievedGameInfo.playerCount + 1;
+                    gameData.creator = retrievedGameInfo.creator;
+                    gameData.sets = retrievedGameInfo.sets || gameData.sets;
 
-                        this.fbDatabase.ref().update(updates).then(() => {
-                            resolve(gameData);
-                        }).catch((error) => {
-                            errorObject.type = 'server-error';
-                            errorObject.message = error;
-                            reject(errorObject);
-                        });
+                    updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
+                    updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                    updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
+                    updates[`/userIdList/${userId}/inGame`] = gameId;
+
+                    this.fbDatabase.ref().update(updates).then(() => {
+                        resolve(gameData);
                     }).catch((error) => {
                         errorObject.type = 'server-error';
                         errorObject.message = error;
@@ -306,11 +292,11 @@ class FirebaseServices {
                     errorObject.message = error;
                     reject(errorObject);
                 });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
                 reject(errorObject);
-            }
+            });
         });
     }
 
@@ -328,34 +314,29 @@ class FirebaseServices {
                 type: '',
                 message: ''
             };
+            let updates = {};
 
-            if (this.isOnline) {
-                let updates = {};
+            this.checkOnlineStatus(reject);
 
-                // gameData contains keys (dataType) that are the same keys used in the DB
-                for (let dataType in gameData) {
-                    if (gameData.hasOwnProperty(dataType)) {
-                        if (playerId) {
-                            updates[`/gameIdList/${gameId}/gameData/${dataType}/${playerId}`] = gameData[dataType];
-                        } else if (dataType === 'isRunning') {
-                            updates[`/gameIdList/${gameId}/isRunning`] = gameData[dataType];
-                        } else {
-                            updates[`/gameIdList/${gameId}/gameData/${dataType}`] = gameData[dataType];
-                        }
+            // gameData contains keys (dataType) that are the same keys used in the DB
+            for (let dataType in gameData) {
+                if (gameData.hasOwnProperty(dataType)) {
+                    if (playerId) {
+                        updates[`/gameIdList/${gameId}/gameData/${dataType}/${playerId}`] = gameData[dataType];
+                    } else if (dataType === 'isRunning') {
+                        updates[`/gameIdList/${gameId}/isRunning`] = gameData[dataType];
+                    } else {
+                        updates[`/gameIdList/${gameId}/gameData/${dataType}`] = gameData[dataType];
                     }
                 }
-                this.fbDatabase.ref().update(updates).then(() => {
-                    resolve(); //no data to return
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
-                reject(errorObject);
             }
+            this.fbDatabase.ref().update(updates).then(() => {
+                resolve(); //no data to return
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
+                reject(errorObject);
+            });
         });
     }
 
@@ -366,7 +347,6 @@ class FirebaseServices {
      * @param params: object {string, any}
      * @returns {Promise<void>}
      *********************/
-// need to make this more general instead of just updating 'inGame'
     updateUser(playerId, params) {
         return new Promise ((resolve, reject) => {
             let errorObject = {
@@ -376,19 +356,15 @@ class FirebaseServices {
             let key = params.key;
             let value = params.value;
 
-            if (this.isOnline) {
-                this.fbDatabase.ref(`/userIdList/${playerId}/${key}`).set(value).then(() => {
-                    resolve(); // success, no need to return anything
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
-            } else {
-                errorObject.type = 'login-failed';
-                errorObject.message = this.connectionErrorString;
+            this.checkOnlineStatus(reject);
+
+            this.fbDatabase.ref(`/userIdList/${playerId}/${key}`).set(value).then(() => {
+                resolve(); // success, no need to return anything
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
                 reject(errorObject);
-            }
+            });
         });
     }
 }
