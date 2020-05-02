@@ -144,7 +144,7 @@ class FirebaseServices {
                 } else {
                     // Only send back list of games that still have openings and in which user is not already playing and that hasn't started yet
                     filteredList = ((game) => {
-                        return game.playerIds.length <= MAX_PLAYER_COUNT && !game.playerIds.includes(userId) && !game.isRunning;
+                        return game.playerIds.length < MAX_PLAYER_COUNT && !game.playerIds.includes(userId) && !game.isRunning;
                     });
                 }
                 results = rawData ? Object.values(rawData).filter(filteredList) : [];
