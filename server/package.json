@@ -15,7 +15,6 @@
   "dependencies": {
     "express": "^4.17.1",
     "firebase-admin": "^8.11.0",
-    "jqueryui": "^1.11.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {

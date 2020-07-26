@@ -12,13 +12,6 @@
     "url": "https://www.github.com/artfoundry/org"
   },
   "main": "tools",
-  "dependencies": {
-    "firebase": "^7.16.1",
-    "firebaseui": "^4.6.0",
-    "jquery": "^3.4.1",
-    "jqueryui": "^1.11.1"
-  },
-  "devDependencies": {
-    "lodash": "^4.17.19"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

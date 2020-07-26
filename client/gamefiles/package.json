@@ -13,11 +13,11 @@
   },
   "main": "gamefiles",
   "dependencies": {
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.1",
     "jqueryui": "^1.11.1",
     "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.19"
   }
 }
