@@ -3,7 +3,23 @@ Online version of the Jubal game
 
 **Setup**
 
-*Backend server Express setup (for game, not tools):*
+*Tools setup*
+
+- Go to /client/tools and run
+
+```npm i```
+
+- Run this to start local Firebase server:
+
+```firebase serve```
+
+- In the event of an auth error after running this, run `$firebase login --reauth` and then run `$firebase serve` again
+
+- Server runs on localhost:5000/ and both serves client files and connects to Firebase
+
+---
+
+*Game backend Express server setup (for game, not tools):*
 
 - Go to /server and run 
 
@@ -15,40 +31,30 @@ Online version of the Jubal game
 
 - Run this to start the Express server:
 
-```DEBUG=org:* npm start```
+```npm start```
 
-- Alternatively, backend server can be run with node:
+or
 
 ```node server```
 
-- Server runs on localhost:4000 and connects to Firebase and client
+- Server runs on localhost:4000/ and connects to Firebase and client
 
-*Tools setup*
+---
 
-- Go to /client/tools and run
-
-```npm i```
-
-- Run this to start Firebase server:
-
-```firebase serve```
-
-- In the event of an auth error after running this, run `$firebase login --reauth` and then run `$firebase serve` again
-
-- Server runs on localhost:5000 and both serves client files and connects to Firebase
-
-*Game setup*
+*Game client setup*
 
 - After starting Express backend server (above), go to /client/gamefiles and run:
 
 ```npm i```
 
 - Run to start apache server (may need to set up apache user conf file, set DocumentRoot and Directory paths to /client/gamefiles in apache httpd.conf, 
-and set User to [username] also in apache httpd.conf):
+and set User to [username] also in apache httpd.conf) - this should only need to be done once unless you have apache set to quit upon restarting the computer:
 
 ```sudo apachectl start```
 
-- Server runs on localhost and connects to Express backend server.  Reloading server is unnecessary when making changes to src files.
+- Server runs on localhost/ and connects to Express backend server.  Reloading server is unnecessary when making changes to src files.
+
+---
 
 *Apache Info*
 
