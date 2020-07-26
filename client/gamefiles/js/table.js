@@ -4,6 +4,7 @@ class Table {
         this.playerId = null;
         this.game = null;
         this.gameId = '';
+        this.gameBoardNames = null;
         this.isBroadcasting = false;
     }
 
@@ -36,6 +37,7 @@ class Table {
      ***********************/
     createGame(data) {
         let gameName = data.gameData.name;
+        let gamePackage = data.gameData.gamePackage;
         let callback = data.callback;
         let messageType = data.messageType;
 
@@ -43,6 +45,7 @@ class Table {
         this.socket.on('created-game', (gameData) => {
             this.game = gameData;
             this.gameId = gameData.gameId;
+            this.gameBoardNames = gameData.set;
             if (!this.isBroadcasting) {
                 this.setUpGameBroadcaster('other-joined-game', callback);
                 this.isBroadcasting = true;
@@ -51,7 +54,7 @@ class Table {
             callback(gameData, messageType);
         });
 
-        this.socket.emit(messageType, this.playerId, gameName);
+        this.socket.emit(messageType, this.playerId, gameName, gamePackage);
     }
 
     /************************
@@ -94,7 +97,7 @@ class Table {
 
     startGame(uiMessageCallback) {
         this.initGameListeners(uiMessageCallback);
-        this.socket.emit('start-game', this.gameId);
+        this.socket.emit('start-game', this.gameId, this.gameBoardNames);
     }
 
     initGameListeners(uiMessageCallback) {

@@ -1,3 +1,5 @@
+import {Board} from './board.js';
+
 class UI {
     constructor(player, table, audio) {
         // player object format:
@@ -15,8 +17,8 @@ class UI {
         this.audio = audio;
 
         this.tempPaths = {
-            createGame: 'html/create_game_modal.html',
-            joinGame: 'html/join_game_modal.html',
+            createGame: 'html/create-game-modal.html',
+            joinGame: 'html/join-game-modal.html',
             userInfo: 'html/user-info-modal.html',
             blackMarket: 'html/black-market-modal.html'
         };
@@ -26,7 +28,7 @@ class UI {
         // bindings for callbacks
         this._getPlayerInfo = this._getPlayerInfo.bind(this);
         this._keystrokeListener = this._keystrokeListener.bind(this);
-        this._processGameNameEntry = this._processGameNameEntry.bind(this);
+        this._processCreateGameForm = this._processCreateGameForm.bind(this);
         this._displayWarning = this._displayWarning.bind(this);
         this._hideWarning = this._hideWarning.bind(this);
         this._renderGameList = this._renderGameList.bind(this);
@@ -78,7 +80,7 @@ class UI {
                     focus: '#modal .text-line-entry',
                     processContent: this._keystrokeListener,
                     processContentParams: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'},
-                    processInput: this._processGameNameEntry,
+                    processInput: this._processCreateGameForm,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
                     callback: this.table.createGame
                 };
@@ -127,6 +129,10 @@ class UI {
         });
     };
 
+    _processCreateForm() {
+
+    }
+
     /*************************
      * _processGameNameEntry
      * processInput function for _displayDialog
@@ -138,7 +144,7 @@ class UI {
      *
      * @private
      *************************/
-    async _processGameNameEntry() {
+    async _processCreateGameForm() {
         let gameName = $('#create-modal-enter-game-name').val();
         let isValid = null;
 
@@ -217,6 +223,7 @@ class UI {
                 $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
                     <span class="game-list-text game-list-text-name" data-game="${game.gameId}">${game.name}</span>
                     <span class="game-list-text">${game.creator}</span>
+                    <span class="game-list-text">${game.region}</span>
                     <span class="game-list-text">${game.playerCount}</span>
                 `);
                 $gameText.click(function() {
@@ -322,9 +329,9 @@ class UI {
      *
      * @param dialogOptions.template: string - path to template file
      * @param dialogOptions.focus: string - element focus should be applied to upon opening modal
-     * @param dialogOptions.processContent: function
+     * @param dialogOptions.processContent: function - for displaying content in modal
      * @param dialogOptions.processContentParams: object
-     * @param dialogOptions.processInput: function
+     * @param dialogOptions.processInput: function - for determining user input in modal
      * @param dialogOptions.callback: function - action to take when non-cancel button is pressed
      * @param dialogOptions.callbackParams: object
      *
@@ -381,3 +388,5 @@ class UI {
         });
     }
 }
+
+export { UI };

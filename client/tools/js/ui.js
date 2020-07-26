@@ -14,7 +14,7 @@ class UI {
     }
 
     navbar() {
-        $('#navbar .nav-link').click(() => {
+        $('#navbar .nav-link').click((event) => {
             if (!$(`#${event.target.id}`).hasClass('active')) {
                 let newTargetId = event.target.id.substring(8);
                 let oldTargetId = $('#navbar .active').attr('id').substring(8);

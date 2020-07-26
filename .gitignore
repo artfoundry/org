@@ -3,6 +3,7 @@
 /client/gamefiles/npm-debug.log
 
 /client/tools/node_modules/
+/client/tools/.firebase/
 /client/tools/firebaseServices-debug.log
 /client/tools/database-debug.log
 /client/tools/npm-debug.log
@@ -10,7 +11,7 @@
 /server/node_modules/
 /server/firebaseServices-debug.log
 /server/database-debug.log
-/server/org-board-25cea87fa1fa.json
+/server/org-board-eff5da155b1b.json
 /server/npm-debug.log
 
 /references

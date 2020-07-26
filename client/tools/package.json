@@ -13,13 +13,12 @@
   },
   "main": "tools",
   "dependencies": {
-    "firebase": "^6.5.0",
-    "firebaseui": "^4.1.0",
+    "firebase": "^7.16.1",
+    "firebaseui": "^4.6.0",
     "jquery": "^3.4.1",
-    "jqueryui": "^1.11.1",
-    "socket.io-client": "^2.2.0"
+    "jqueryui": "^1.11.1"
   },
   "devDependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.19"
   }
 }

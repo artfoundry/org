@@ -30,8 +30,12 @@
                 <section id="game-board">
                     <div id="messages"></div>
                     <div id="board-content">
-                        <div id="board-gametitle"></div>
-                        <button id="board-start-button" class="button action-button" tabindex="0">Start the game</button>
+                        <div id="board-content-header">
+                            <div id="board-gametitle"></div>
+                            <div id="board-collected-influence"></div>
+                            <button id="board-start-button" class="button action-button" tabindex="0">Start the game</button>
+                        </div>
+                        <div id="board-worlds"></div>
                     </div>
                 </section>
             </div>
@@ -44,12 +48,10 @@
         <script type="text/javascript" src="node_modules/jqueryui/jquery-ui.js"></script>
         <script type="text/javascript" src="node_modules/socket.io-client/dist/socket.io.js"></script>
         <script type="text/javascript" src="js/events-controller.js"></script>
-        <script type="text/javascript" src="js/ui.js"></script>
         <script type="text/javascript" src="js/player.js"></script>
-        <script type="text/javascript" src="js/board.js"></script>
         <script type="text/javascript" src="js/table.js"></script>
         <script type="text/javascript" src="js/audio.js"></script>
         <script type="text/javascript" src="js/helpers.js"></script>
-        <script type="text/javascript" src="js/main.js"></script>
+        <script type="module" src="js/main.js"></script>
     </body>
 </html>

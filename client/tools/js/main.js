@@ -7,7 +7,7 @@
 
 let Tools = {
     'initialize' : function() {
-        this.objectTypes = ['card', 'board'];
+        this.objectTypes = ['card', 'board', 'set'];
         this.allItems = new ItemStorage();
         this.ui = new UI(this.objectTypes[0]);
         this.fbServices = new FirebaseServices();

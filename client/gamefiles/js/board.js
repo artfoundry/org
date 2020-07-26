@@ -1,6 +1,22 @@
 class Board {
     constructor(table) {
         this.table = table;
+
+        this.setupBoard();
+    }
+
+    setupBoard() {
+        this.table.gameBoardNames.forEach((world) => {
+            this.placeWorld(world);
+        });
+    }
+
+    placeWorld(world) {
+        let $worldsContainer = $('#board-worlds');
+        let $newWorld = $(document.createElement('div'));
+
+        $newWorld.text(world).addClass('world').attr('id', `world-${world.toLowerCase()}`);
+        $worldsContainer.append($newWorld);
     }
 
     updateBoard(gameData, boardAction) {
@@ -35,3 +51,5 @@ class Board {
         }
     }
 }
+
+export { Board };

@@ -7,6 +7,8 @@
  * Instantiates global objects and starts the app
  */
 
+import {UI} from './ui.js';
+
 const ORG_SERVER = 'http://localhost:4000';
 
 let Game = {
@@ -58,8 +60,6 @@ let Game = {
         let table = new Table(this.socket);
         let ui = new UI(player, table, audio);
         // let eventsController = new EventsController(ui);
-        // let players = {};
-        // let turnController = new TurnController(ui, players, eventsController, table);
 
     }
 };

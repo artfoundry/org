@@ -3,7 +3,7 @@ Online version of the Jubal game
 
 **Setup**
 
-*Backend server Express setup:*
+*Backend server Express setup (for game, not tools):*
 
 - Go to /server and run 
 
@@ -33,6 +33,8 @@ Online version of the Jubal game
 
 ```firebase serve```
 
+- In the event of an auth error after running this, run `$firebase login --reauth` and then run `$firebase serve` again
+
 - Server runs on localhost:5000 and both serves client files and connects to Firebase
 
 *Game setup*
@@ -47,3 +49,9 @@ and set User to [username] also in apache httpd.conf):
 ```sudo apachectl start```
 
 - Server runs on localhost and connects to Express backend server.  Reloading server is unnecessary when making changes to src files.
+
+*Apache Info*
+
+Tutorial for setting up apache: https://medium.com/@JohnFoderaro/how-to-set-up-apache-in-macos-sierra-10-12-bca5a5dfffba
+
+OSX Catalina security change needed: https://stackoverflow.com/questions/58455332/apache-gives-access-denied-on-macos-catalina

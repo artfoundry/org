@@ -8,6 +8,7 @@ class FirebaseServices {
     constructor() {
         this.isOnline = this._initialize();
         if (this.isOnline) {
+            console.log('Init successful')
             this._initAuth();
             this._monitorAuth();
             this.fbDatabase = firebase.database();
@@ -20,24 +21,25 @@ class FirebaseServices {
     }
 
     _initialize() {
+        // from https://console.firebase.google.com/u/0/project/org-board/settings/general
         let config = {
                 apiKey: "AIzaSyBFc_HcCL84XhFoYr6rwRDrWddnUinsWtQ",
                 authDomain: "org-board.firebaseapp.com",
                 databaseURL: "https://org-board.firebaseio.com",
                 projectId: "org-board",
                 storageBucket: "org-board.appspot.com",
-                messagingSenderId: "905919970459"
-            },
-            initResult = true;
+                messagingSenderId: "905919970459",
+                appId: "1:905919970459:web:de9a4fad93011122675a3e"
+            };
 
         try {
+            console.log('Trying to initialize')
             firebase.initializeApp(config);
+            return true;
         } catch (e) {
             alert('Unable to connect to the server. Reload the page to try again.');
-            initResult = false;
+            return false;
         }
-
-        return initResult;
     }
 
     _initAuth() {
@@ -92,13 +94,15 @@ class FirebaseServices {
             if (user) {
                 // User is signed in.
                 $("#sign-out").click(() => {
-                    firebase.auth().signOut();
+                    firebase.auth().signOut().then(() => {
+                        // User is signed out.
+                        if (window.location.pathname !== "/org/client/tools/index.html")
+                            window.location.pathname = "/org/client/tools/index.html";
+                        $("#sign-out").off("click");
+                    }).catch((error) => {
+                        console.log(error);
+                    });
                 });
-            } else {
-                // User is signed out.
-                if (window.location.pathname !== "/tools/index.html")
-                    window.location.pathname = "/tools/index.html";
-                $("#sign-out").off("click");
             }
         }, (error) => {
             console.log(error);
@@ -154,7 +158,9 @@ class FirebaseServices {
             this.fbDatabase.ref('/' + type + '/').orderByKey().on('value', (snapshot) => {
                 let items = snapshot.val();
                 for (let item in items) {
-                    Tools.allItems.setItem(type, item, items[item]);
+                    if (items.hasOwnProperty(item)) {
+                        Tools.allItems.setItem(type, item, items[item]);
+                    }
                 }
                 Tools.ui.updateList(type);
             });
