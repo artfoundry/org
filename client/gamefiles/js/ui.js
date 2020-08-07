@@ -212,7 +212,7 @@ class UI {
                 if (setList.hasOwnProperty(set)) {
                     $setText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
                         <span class="game-list-text set-list-set-name" data-set="${set}">${set}</span>
-                        <span class="game-list-text">${setList[set].region}</span>
+                        <span class="game-list-text">${setList[set].regions}</span>
                         <span class="game-list-text">${setList[set].description}</span>
                     `);
                     $setText.click(function() {
