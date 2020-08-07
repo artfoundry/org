@@ -9,6 +9,25 @@ class Table {
     }
 
     /*************************
+     * getSetList
+     * Calls server to get list of game sets in database
+     *
+     * @param data.selector: string
+     * @param data.callback: function
+     *************************/
+    getSetList(data) {
+        let selector = data.selector;
+        let callback = data.callback;
+
+        this.socket.on('set-list-retrieved', (setList) => {
+            this.socket.off('set-list-retrieved');
+            callback(selector, setList);
+        });
+
+        this.socket.emit('get-set-list');
+    }
+
+    /*************************
      * getFullGameList
      * Calls server to get list of available games in database
      *

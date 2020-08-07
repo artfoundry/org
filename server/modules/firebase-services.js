@@ -109,6 +109,33 @@ class FirebaseServices {
     }
 
     /***************
+     * getSetList
+     * Request list of sets
+     *
+     * @returns {Promise<array>}
+     */
+    getSetList() {
+        return new Promise((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
+
+            this.checkOnlineStatus(reject);
+
+            this.fbDatabase.ref('/set/').once('value').then((snapshot) => {
+                let results = snapshot.val();
+
+                resolve(results);
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = error;
+                reject(errorObject);
+            });
+        });
+    }
+
+    /***************
      * getGameList
      * Request list of games that are still available to join for user (still open and user isn't already in it)
      *

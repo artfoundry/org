@@ -10,7 +10,8 @@ class UI {
 
         this.game = {
             name: '',
-            gameId: ''
+            gameId: '',
+            set: ''
         };
         this.table = table;
         this.board = null;
@@ -27,11 +28,12 @@ class UI {
 
         // bindings for callbacks
         this._getPlayerInfo = this._getPlayerInfo.bind(this);
-        this._keystrokeListener = this._keystrokeListener.bind(this);
+        this._renderCreateGameForm = this._renderCreateGameForm.bind(this);
         this._processCreateGameForm = this._processCreateGameForm.bind(this);
         this._displayWarning = this._displayWarning.bind(this);
         this._hideWarning = this._hideWarning.bind(this);
         this._renderGameList = this._renderGameList.bind(this);
+        this._renderSetList = this._renderSetList.bind(this);
         this._openModal = this._openModal.bind(this);
         this.updateGame = this.updateGame.bind(this);
         this.table.joinGame = this.table.joinGame.bind(this.table);
@@ -78,8 +80,8 @@ class UI {
                 dialogOptions = {
                     template: this.$templates.createGame,
                     focus: '#modal .text-line-entry',
-                    processContent: this._keystrokeListener,
-                    processContentParams: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'},
+                    processContent: this._renderCreateGameForm,
+                    processContentParams: {setSelector: '#create-game-sets', keyListenerSelectors: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'}},
                     processInput: this._processCreateGameForm,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
                     callback: this.table.createGame
@@ -129,8 +131,9 @@ class UI {
         });
     };
 
-    _processCreateForm() {
-
+    _renderCreateGameForm(selectors) {
+        this.table.getSetList({selector: selectors.setSelector, callback: this._renderSetList});
+        this._keystrokeListener(selectors.keyListenerSelectors);
     }
 
     /*************************
@@ -198,6 +201,46 @@ class UI {
         });
     }
 
+    _renderSetList(listSelector, setList) {
+        let $setText;
+        let ui = this;
+        let $setListMarkup = $(listSelector);
+
+        $setListMarkup.html('');
+        if (setList) {
+            for (let set in setList) {
+                if (setList.hasOwnProperty(set)) {
+                    $setText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
+                        <span class="game-list-text set-list-set-name" data-set="${set}">${set}</span>
+                        <span class="game-list-text">${setList[set].region}</span>
+                        <span class="game-list-text">${setList[set].description}</span>
+                    `);
+                    $setText.click(function() {
+                        let $prevSelected = $('.game-list-row-selected');
+                        let $setName = $(this).find('[data-set]');
+
+                        if ($(this).hasClass('game-list-row-selected')) {
+                            $(this).removeClass('game-list-row-selected');
+                            ui.game = {
+                                set: ''
+                            };
+                        } else {
+                            if ($prevSelected.length > 0) {
+                                $prevSelected.removeClass('game-list-row-selected');
+                            }
+                            $(this).addClass('game-list-row-selected');
+                            ui.game = {
+                                set: $setName
+                            };
+                        }
+                    });
+                    $setListMarkup.append($setText);
+                }
+            }
+            $setListMarkup.children('.game-list-row').first().focus();
+        }
+    }
+
     /*************************
      * _renderGameList
      * Inserts game list data into markup template for display in either game list modal or user account modal
@@ -207,7 +250,7 @@ class UI {
      * @private
      *************************/
     _renderGameList(gameList) {
-        let $gameText = null;
+        let $gameText;
         let ui = this;
         let $gameListMarkup = $('#modal .game-list');
 
@@ -223,7 +266,7 @@ class UI {
                 $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
                     <span class="game-list-text game-list-text-name" data-game="${game.gameId}">${game.name}</span>
                     <span class="game-list-text">${game.creator}</span>
-                    <span class="game-list-text">${game.region}</span>
+                    <span class="game-list-text">${game.set}</span>
                     <span class="game-list-text">${game.playerCount}</span>
                 `);
                 $gameText.click(function() {

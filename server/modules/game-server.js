@@ -117,6 +117,16 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
+        this.socket.on('get-set-list', () => {
+            let logMessage = '';
+            this.fbServices.getSetList().then((results) => {
+                logMessage = 'Set list retrieved';
+                this.emitResponse('set-list-retrieved', results, logMessage);
+            }).catch((error) => {
+                logMessage = `Error retrieving set list: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
+        });
 
         // game listeners
         this.socket.on('start-game', (gameId) => {
