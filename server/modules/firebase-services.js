@@ -60,7 +60,7 @@ class FirebaseServices {
                 resolve(); // no data needed to pass back
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.login(): ' + error;
                 reject(errorObject);
             });
         });
@@ -92,17 +92,13 @@ class FirebaseServices {
                     this.getGameList(userId, true).then((gameList) => {
                         results.games = gameList;
                         resolve(results);
-                    }).catch((error) => {
-                        errorObject.type = 'server-error';
-                        errorObject.message = error;
-                        reject(errorObject);
                     });
                 } else {
                     resolve(results);
                 }
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.getUser(): ' + error;
                 reject(errorObject);
             });
         });
@@ -129,7 +125,7 @@ class FirebaseServices {
                 resolve(results);
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.getSetList(): ' + error;
                 reject(errorObject);
             });
         });
@@ -172,7 +168,7 @@ class FirebaseServices {
                 resolve(results);
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.getGameList(): ' + error;
                 reject(errorObject);
             });
         });
@@ -191,7 +187,7 @@ class FirebaseServices {
                 resolve(snapshot.val());
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.getGameInfo(): ' + error;
                 reject(errorObject);
             });
         });
@@ -227,17 +223,19 @@ class FirebaseServices {
             let gameId;
             let updates = {};
 
-            this.getBoardData(gameSet).then((boardData) => {
-                console.log('retrieved board data');
-                gameData.set = boardData;
-                this.getUser(userId).then((userInfo) => {
-                    userGameList = userInfo.gameIds || [];
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
+            this.getSetList().then((setList) => {
+                return setList;
+            }).then((setList) => {
+                return this.getBoardData(setList[gameSet].regions);
+            }).then((regions) => {
+                gameData.set = {
+                    name: gameSet,
+                    regions: regions
+                };
             }).then(() => {
+                return this.getUser(userId);
+            }).then((userInfo) => {
+                userGameList = userInfo.gameIds || [];
                 gameId = this.fbDatabase.ref('/gameIdList/').push().key;
                 gameData.gameId = gameId;
                 userGameList.push(gameId);
@@ -245,16 +243,12 @@ class FirebaseServices {
                 updates[`/userIdList/${userId}/gameIds`] = userGameList;
                 updates[`/userIdList/${userId}/inGame`] = gameId;
 
-                this.fbDatabase.ref().update(updates).then(() => {
-                    resolve(gameData);
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
+                return this.fbDatabase.ref().update(updates);
+            }).then(() => {
+                resolve(gameData);
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.createGame(): ' + error;
                 reject(errorObject);
             });
         });
@@ -270,7 +264,7 @@ class FirebaseServices {
      *      name (string)
      *      playerCount (int)
      *      playerIds (array)
-     *      sets (array)
+     *      set (array)
      *      colors (object)
      *
      * @param userId: string
@@ -285,7 +279,7 @@ class FirebaseServices {
                 name: null,
                 playerCount: null,
                 playerIds: [],
-                sets: [],
+                set: [],
                 currentPlayerTurn: ''
             };
             let errorObject = {
@@ -301,34 +295,27 @@ class FirebaseServices {
                 userGameIDList = userData.gameIds || [];
                 userGameIDList.push(gameId);
             }).then(() => {
-                this.getGameInfo(gameId).then((retrievedGameInfo) => {
-                    retrievedGameInfo.playerIds.push(userId);
-                    gameData.name = retrievedGameInfo.name;
-                    gameData.playerIds = retrievedGameInfo.playerIds;
-                    gameData.playerCount = retrievedGameInfo.playerCount + 1;
-                    gameData.creator = retrievedGameInfo.creator;
-                    gameData.sets = retrievedGameInfo.sets || gameData.sets;
+                return this.getGameInfo(gameId);
+            }).then((retrievedGameInfo) => {
+                retrievedGameInfo.playerIds.push(userId);
+                gameData.name = retrievedGameInfo.name;
+                gameData.playerIds = retrievedGameInfo.playerIds;
+                gameData.playerCount = retrievedGameInfo.playerCount + 1;
+                gameData.creator = retrievedGameInfo.creator;
+                gameData.sets = retrievedGameInfo.sets || gameData.sets;
 
-                    updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
-                    updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
-                    updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
-                    updates[`/userIdList/${userId}/inGame`] = gameId;
-
-                    this.fbDatabase.ref().update(updates).then(() => {
-                        resolve(gameData);
-                    }).catch((error) => {
-                        errorObject.type = 'server-error';
-                        errorObject.message = error;
-                        reject(errorObject);
-                    });
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
+                updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
+                updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
+                updates[`/userIdList/${userId}/inGame`] = gameId;
+                return updates;
+            }).then((updates) => {
+                this.fbDatabase.ref().update(updates).then(() => {
+                    resolve(gameData);
                 });
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.joinGame(): ' + error;
                 reject(errorObject);
             });
         });
@@ -368,7 +355,7 @@ class FirebaseServices {
                 resolve(); //no data to return
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.updateGame(): ' + error;
                 reject(errorObject);
             });
         });
@@ -396,14 +383,31 @@ class FirebaseServices {
                 resolve(); // success, no need to return anything
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = error;
+                errorObject.message = 'FirebaseServices.updateUser(): ' + error;
                 reject(errorObject);
             });
         });
     }
 
     getCardData() {
+        return new Promise((resolve, reject) => {
+            let errorObject = {
+                type: '',
+                message: ''
+            };
 
+            this.checkOnlineStatus(reject);
+
+            this.fbDatabase.ref('/card/').once('value').then((snapshot) => {
+                let results = snapshot.val();
+
+                resolve(results);
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = 'FirebaseServices.getCardData(): ' + error;
+                reject(errorObject);
+            });
+        });
     }
 
     getBoardData(boardNames) {
@@ -416,15 +420,17 @@ class FirebaseServices {
 
             this.checkOnlineStatus(reject);
 
-            boardNames.forEach((name) => {
-                this.fbDatabase.ref(`/board/${name}`).once('value').then((snapshot) => {
-                    boardData[name] = snapshot.val();
-                }).catch((error) => {
-                    errorObject.type = 'server-error';
-                    errorObject.message = error;
-                    reject(errorObject);
-                });
-            });
+            for (let name in boardNames) {
+                if (boardNames.hasOwnProperty(name)) {
+                    this.fbDatabase.ref(`/board/${name}`).once('value').then((snapshot) => {
+                        boardData[name] = snapshot.val();
+                    }).catch((error) => {
+                        errorObject.type = 'server-error';
+                        errorObject.message = 'FirebaseServices.getBoardData(): ' + error;
+                        reject(errorObject);
+                    });
+                }
+            }
             resolve(boardData);
         });
     }

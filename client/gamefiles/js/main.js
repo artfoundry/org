@@ -11,7 +11,7 @@ import {UI} from './ui.js';
 
 const ORG_SERVER = 'http://localhost:4000';
 
-let Game = {
+let Org = {
     'gameSettings' : {
         audioOptions : {
             musicOn : true,
@@ -56,12 +56,12 @@ let Game = {
             console.log('Error connecting to server: ', error);
         });
         let player = new Player(this.userId, this.socket);
-        let audio = new Audio();
+        // let audio = new Audio();
         let table = new Table(this.socket);
-        let ui = new UI(player, table, audio);
+        let ui = new UI(player, table, this.helpers);
         // let eventsController = new EventsController(ui);
 
     }
 };
 
-$(Game.initialize());
+$(Org.initialize());

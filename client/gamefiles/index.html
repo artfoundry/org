@@ -10,35 +10,26 @@
         <section id="page-header">
             <div class="title">Org</div>
             <nav id="main-nav">
-                <button class="button nav-button nav-create-game" tabindex="0">Create game</button>
-                <button class="button nav-button nav-join-game" tabindex="0">Join game</button>
-                <button class="button nav-button nav-black-market" tabindex="0">Black Market</button>
-                <button class="button nav-button nav-view-info" tabindex="0">View account</button>
+                <button class="button nav-create-game" tabindex="0">Create game</button>
+                <button class="button nav-join-game" tabindex="0">Join game</button>
+                <button class="button nav-black-market" tabindex="0">Black Market</button>
+                <button class="button nav-view-info" tabindex="0">Account</button>
             </nav>
         </section>
 
         <main>
-            <div id="game-container">
-                <section id="actions">
-                    <header>Actions</header>
-                    <button class="button action-button" tabindex="0">Play card</button>
-                    <button class="button action-button" tabindex="0">Place marker</button>
-                </section>
-                <section id="players">
-                    <header>Players</header>
-                </section>
-                <section id="game-board">
-                    <div id="messages"></div>
-                    <div id="board-content">
-                        <div id="board-content-header">
-                            <div id="board-gametitle"></div>
-                            <div id="board-collected-influence"></div>
-                            <button id="board-start-button" class="button action-button" tabindex="0">Start the game</button>
-                        </div>
-                        <div id="board-worlds"></div>
+            <section id="game-container">
+                <div id="messages"></div>
+                <div id="game-content">
+                    <div id="game-content-header">
+                        <div id="game-title"></div>
+                        <div id="players"></div>
+                        <div id="game-collected-influence"></div>
+                        <button id="game-start-button" class="button" tabindex="0">Start the game</button>
                     </div>
-                </section>
-            </div>
+                    <div id="game-boards"></div>
+                </div>
+            </section>
             <div id="modal"></div>
             <div id="modal-backdrop"></div>
             <div id="tempContainer"></div>

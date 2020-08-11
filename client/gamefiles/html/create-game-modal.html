@@ -2,12 +2,14 @@
 <label for="create-modal-enter-game-name">Enter game name:</label>
 <input id="create-modal-enter-game-name" class="text-line-entry" name="game-name" required minlength="3" maxlength="30" size="30">
 
-<div class="game-list-header">Select Set:</div>
-<div id="create-game-sets" class="game-list"></div>
+<div class="game-list set-list">
+    <div class="set-list-header">Select Set</div>
+    <div id="create-game-sets"></div>
+</div>
 
 <div class="error-text">Invalid name</div>
 <div class="wait-text">Please wait...</div>
 <div class="modal-buttons">
     <button id="modal-button-cancel" class="button action-button" tabindex="0">Cancel</button>
-    <button id="modal-button-primary" class="button action-button" tabindex="0">Create</button>
+    <button id="modal-button-primary" class="button action-button disabled" tabindex="0">Create</button>
 </div>

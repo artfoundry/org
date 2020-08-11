@@ -59,9 +59,9 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
-        this.socket.on('create-game', (userId, gameName, gamePackage) => {
+        this.socket.on('create-game', (userId, gameName, gameSet) => {
             let logMessage = '';
-            this.fbServices.createGame(userId, gameName, gamePackage).then((results) => {
+            this.fbServices.createGame(userId, gameName, gameSet).then((results) => {
                 logMessage = `Game ${gameName} created by ${userId}`;
                 this.emitResponse('created-game', results, logMessage);
             }).catch((error) => {
@@ -188,6 +188,7 @@ class GameServer {
             });
             this.waitForAllPlayersToPlay();
         }
+        this.reportScore();
     }
 
     gameSetup(gameId, gameInfo) {
@@ -232,6 +233,10 @@ class GameServer {
 
     }
 
+    reportScore() {
+        let message = `Game is over`;
+        this.emitResponse('game-message', message);
+    }
 }
 
 export { GameServer };

@@ -1,21 +1,21 @@
-import {Board} from './board.js';
+import {Game} from './game.js';
 
 class UI {
-    constructor(player, table, audio) {
+    constructor(player, table, helpers) {
         // player object format:
         // {userId: string,
         //  userInfo: {gameIds: array, loggedIn: boolean}
         // }
         this.player = player;
 
-        this.game = {
+        this.gameData = {
             name: '',
             gameId: '',
             set: ''
         };
         this.table = table;
-        this.board = null;
-        this.audio = audio;
+        this.game = null;
+        this.helpers = helpers;
 
         this.tempPaths = {
             createGame: 'html/create-game-modal.html',
@@ -58,13 +58,16 @@ class UI {
      * @private
      */
     _initNav() {
-        $('#main-nav').click((evt)=> {
+        let $mainNav = $('#main-nav');
+        $mainNav.click((evt)=> {
             let $button = $(evt.target);
             let dialogOptions = {};
             let populateUserID = () => {
                 this.$templates.userInfo.find('#user-id').text(this.player.userId);
                 return this.$templates.userInfo;
             };
+
+            this._navButtonToggle($button);
 
             if ($button.hasClass('nav-view-info')) {
                 dialogOptions = {
@@ -111,6 +114,17 @@ class UI {
         });
     }
 
+    _navButtonToggle($button = null) {
+        let $previousButton = $('#main-nav').find('.button-selected');
+
+        if ($previousButton) {
+            $previousButton.removeClass('button-selected');
+        }
+        if ($button) {
+            $button.addClass('button-selected');
+        }
+    }
+
     _loadTemplates() {
         let $tempContainer = $('#tempContainer');
 
@@ -155,7 +169,7 @@ class UI {
         await this._isNameAvailable(gameName).then((nameIsAvailable) => {
             this._hideWarning('#modal .wait-text');
             if (gameName && gameName.length >= 3 && nameIsAvailable) {
-                this.game.name = gameName;
+                this.gameData.name = gameName;
                 isValid = true;
             } else {
                 this._displayWarning('#modal .error-text');
@@ -210,18 +224,27 @@ class UI {
         if (setList) {
             for (let set in setList) {
                 if (setList.hasOwnProperty(set)) {
-                    $setText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
-                        <span class="game-list-text set-list-set-name" data-set="${set}">${set}</span>
-                        <span class="game-list-text">${setList[set].regions}</span>
-                        <span class="game-list-text">${setList[set].description}</span>
+                    let regionList = this.helpers.capitalize(setList[set].regions);
+
+                    regionList = regionList.map((name) => {return ' ' + name;});
+                    if (regionList.length > 1) {
+                        regionList[regionList.length-1] = ' and' + regionList[regionList.length-1];
+                    }
+                    $setText = $(document.createElement('div')).addClass('set-list-row').attr('tabindex', '0').html(`
+                        <span class="no-pointer-events set-list-set-name" data-set="${set}">${set}</span>
+                        <div class="no-pointer-events">
+                            <div class="set-list-regions">${regionList}</div>
+                            <div>${setList[set].description}</div>
+                        </div>
                     `);
                     $setText.click(function() {
                         let $prevSelected = $('.game-list-row-selected');
-                        let $setName = $(this).find('[data-set]');
+                        let gameSetEl = $(this).children()[0];
 
                         if ($(this).hasClass('game-list-row-selected')) {
                             $(this).removeClass('game-list-row-selected');
-                            ui.game = {
+                            $('#modal-button-primary').addClass('disabled');
+                            ui.gameData = {
                                 set: ''
                             };
                         } else {
@@ -229,8 +252,9 @@ class UI {
                                 $prevSelected.removeClass('game-list-row-selected');
                             }
                             $(this).addClass('game-list-row-selected');
-                            ui.game = {
-                                set: $setName
+                            $('#modal-button-primary').removeClass('disabled');
+                            ui.gameData = {
+                                set: gameSetEl.getAttribute('data-set')
                             };
                         }
                     });
@@ -266,16 +290,17 @@ class UI {
                 $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
                     <span class="game-list-text game-list-text-name" data-game="${game.gameId}">${game.name}</span>
                     <span class="game-list-text">${game.creator}</span>
-                    <span class="game-list-text">${game.set}</span>
+                    <span class="game-list-text">${game.set.name}</span>
                     <span class="game-list-text">${game.playerCount}</span>
                 `);
                 $gameText.click(function() {
                     let $prevSelected = $('.game-list-row-selected');
-                    let $gameName = $(this).find('.game-list-text-name');
+                    let gameNameEl = $(this).children()[0];
 
                     if ($(this).hasClass('game-list-row-selected')) {
                         $(this).removeClass('game-list-row-selected');
-                        ui.game = {
+                        $('#modal-button-primary').addClass('disabled');
+                        ui.gameData = {
                             name: '',
                             gameId: ''
                         };
@@ -284,9 +309,10 @@ class UI {
                             $prevSelected.removeClass('game-list-row-selected');
                         }
                         $(this).addClass('game-list-row-selected');
-                        ui.game = {
-                            name: $gameName.innerText,
-                            gameId: $gameName.data('game')
+                        $('#modal-button-primary').removeClass('disabled');
+                        ui.gameData = {
+                            name: gameNameEl.innerText,
+                            gameId: gameNameEl.getAttribute('data-game')
                         };
                     }
                 });
@@ -312,21 +338,22 @@ class UI {
         let playerIsCreator = updateData.creator === this.player.userId;
         let isRunning = updateData.isRunning;
 
-        if (!this.board) {
-            this.createBoard();
-            this.board.initBoardListeners(this._postMessage, playerIsCreator, isRunning);
+        if (!this.game || this.table.gameId !== updateData.gameId) {
+            this.createGame();
+            this.game.initGameListeners(this._postMessage, playerIsCreator, isRunning);
         }
 
         if (messageType) {
             this._postMessage({updateData, messageType});
             if (messageType === 'join-game' || messageType === 'create-game' || messageType === 'load-game') {
-                this.board.updateBoard(updateData, 'load-game');
+                this.game.updateGame(updateData, 'load-game');
             }
         }
     }
 
-    createBoard() {
-        this.board = new Board(this.table);
+    createGame() {
+        this.game = new Game(this.table);
+        this.game.setupGame();
     }
 
     /*************************
@@ -401,6 +428,7 @@ class UI {
     _openModal($modal, dialogOptions) {
         let $modalBackdrop = $('#modal-backdrop');
         let $cancelButton = $modal.find('#modal-button-cancel');
+        let $primaryButton = $modal.find('#modal-button-primary');
 
         $modal.show();
         if (dialogOptions.focus) {
@@ -412,9 +440,10 @@ class UI {
                 this._hideWarning('#modal .wait-text,.error-text');
                 $modal.hide();
                 $modalBackdrop.hide();
+                this._navButtonToggle();
             });
         }
-        $modal.find('#modal-button-primary').click(async () => {
+        $primaryButton.click(async () => {
             let inputValid = null;
             if (dialogOptions.processInput) {
                 inputValid = await dialogOptions.processInput();
@@ -423,8 +452,10 @@ class UI {
                 this._hideWarning('#modal .wait-text,.error-text');
                 $modal.hide();
                 $modalBackdrop.hide();
+                $primaryButton.addClass('disabled');
+                this._navButtonToggle();
                 if (dialogOptions.callback) {
-                    dialogOptions.callbackParams.gameData = this.game;
+                    dialogOptions.callbackParams.gameData = this.gameData;
                     dialogOptions.callback(dialogOptions.callbackParams);
                 }
             }

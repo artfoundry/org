@@ -123,14 +123,16 @@ class UI {
             let faction = item.type;
 
             for (let attr in item) {
-                let value = item[attr];
+                if (item.hasOwnProperty(attr)) {
+                    let value = item[attr];
 
-                if (attr === 'text') {
-                    $form.find(`[name="${attr}"]`)[0].innerText = value;
-                } else if (attr.indexOf('polities') === 0) {
-                    $form.find(`[name="${attr}"]`)[0].checked = true;
-                } else {
-                    $($form.find(`[name="${attr}"]`)[0]).val(value);
+                    if (attr === 'text') {
+                        $form.find(`[name="${attr}"]`)[0].innerText = value;
+                    } else if (attr.indexOf('polities') === 0) {
+                        $form.find(`[name="${attr}"]`)[0].checked = true;
+                    } else {
+                        $($form.find(`[name="${attr}"]`)[0]).val(value);
+                    }
                 }
             }
             this._setItemPreview(faction, item);
@@ -138,17 +140,20 @@ class UI {
     }
 
     updateList(type) {
-        for (let item in Tools.allItems.getAllItems(type)) {
-            let $itemID = $(`#${item}`);
+        let items = Tools.allItems.getAllItems(type);
+        for (let item in items) {
+            if (items.hasOwnProperty(item)) {
+                let $itemID = $(`#${item}`);
 
-            if ($itemID.length === 0) {
-                $(`#list-${type} > .list`).append(`<div id="${item}" class="list-item-row"></div>`);
-                $itemID = $(`#${item}`);
-            } else {
-                $itemID.html('');
+                if ($itemID.length === 0) {
+                    $(`#list-${type} > .list`).append(`<div id="${item}" class="list-item-row"></div>`);
+                    $itemID = $(`#${item}`);
+                } else {
+                    $itemID.html('');
+                }
+                $itemID.append(`<span class="list-item-name">${item}</span>`);
+                this._listWatch(item);
             }
-            $itemID.append(`<span class="list-item-name">${item}</span>`);
-            this._listWatch(item);
         }
     }
 
