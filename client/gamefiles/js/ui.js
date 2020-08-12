@@ -69,7 +69,7 @@ class UI {
 
             this._navButtonToggle($button);
 
-            if ($button.hasClass('nav-view-info')) {
+            if ($button.hasClass('nav-view-account')) {
                 dialogOptions = {
                     template: populateUserID(),
                     focus: null,

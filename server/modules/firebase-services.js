@@ -302,7 +302,7 @@ class FirebaseServices {
                 gameData.playerIds = retrievedGameInfo.playerIds;
                 gameData.playerCount = retrievedGameInfo.playerCount + 1;
                 gameData.creator = retrievedGameInfo.creator;
-                gameData.sets = retrievedGameInfo.sets || gameData.sets;
+                gameData.set = retrievedGameInfo.set || gameData.set;
 
                 updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
                 updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;

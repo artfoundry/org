@@ -1,3 +1,6 @@
+const HTTP_PORT = 4000;
+const NUM_GAME_TURNS = 10;
+
 class GameServer {
     constructor(fbServices) {
         this.fbServices = fbServices;
@@ -5,8 +8,6 @@ class GameServer {
         this.http = require('http').createServer(this.app);
         this.io = require('socket.io')(this.http);
         this.socket = null;
-        this.port = 4000;
-        this.gameTurns = 10;
     }
 
     /*************
@@ -18,7 +19,7 @@ class GameServer {
             res.send('Org backend server started');
         });
 
-        this.http.listen(this.port, () => console.log(`Org server listening on port ${this.port}!`));
+        this.http.listen(HTTP_PORT, () => console.log(`Org server listening on port ${HTTP_PORT}!`));
 
         this.io.on('connection', (socket) => {
             console.log('connected to client');
@@ -35,8 +36,6 @@ class GameServer {
     }
 
     initListeners() {
-        console.log('listeners setup');
-
         // lobby listeners
         this.socket.on('player-login', (userId) => {
             let logMessage = '';
@@ -132,6 +131,8 @@ class GameServer {
         this.socket.on('start-game', (gameId) => {
             this.startGame(gameId);
         });
+
+        console.log('listeners setup');
     }
 
     /*************
@@ -176,10 +177,19 @@ class GameServer {
         });
     }
 
+    gameSetup(gameId, gameInfo) {
+        let playersIdList = gameInfo.playerIds;
+        let startingInfluenceTokens = 3;
+
+        playersIdList.forEach((playerId) => {
+            this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens);
+        });
+    }
+
     startTurnController(gameId, gameInfo) {
         let playersIdList = gameInfo.playerIds;
 
-        for (let turn = 1; turn <= 10; turn++) {
+        for (let turn = 1; turn <= NUM_GAME_TURNS; turn++) {
             playersIdList.forEach((playerId) => {
                 this.playExpansionPhase(gameId, playerId);
                 this.playDrawPhase();
@@ -189,15 +199,6 @@ class GameServer {
             this.waitForAllPlayersToPlay();
         }
         this.reportScore();
-    }
-
-    gameSetup(gameId, gameInfo) {
-        let playersIdList = gameInfo.playerIds;
-        let startingInfluenceTokens = 3;
-
-        playersIdList.forEach((playerId) => {
-            this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens);
-        });
     }
 
     giveInfluenceTokens(gameId, playerId, influenceTokens) {
