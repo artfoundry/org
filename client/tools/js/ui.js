@@ -79,33 +79,21 @@ class UI {
             $(`#${this.currentType}-thumb .${this.currentType}-container`).hide();
             $(`#${this.currentType}-thumb`).off('click');
         });
-        $(`#draw-action-${this.currentType}`).on('change', (el) => {
-            if ($(el.currentTarget).val() === 'move') {
-                $(`#draw-destination-${this.currentType}`).prop('disabled', false);
-            } else {
-                $(`#draw-destination-${this.currentType}`).prop('disabled', true);
-            }
+        $('#draw-action-rule1-card').on('change', (el) => {
+            let propBool = $(el.currentTarget).val() === 'move';
+            $('#draw-destination-rule1-card').prop('disabled', !propBool);
         });
-        $(`#draw-action2-${this.currentType}`).on('change', (el) => {
-            if ($(el.currentTarget).val() === 'move') {
-                $(`#draw-destination2-${this.currentType}`).prop('disabled', false);
-            } else {
-                $(`#draw-destination2-${this.currentType}`).prop('disabled', true);
-            }
+        $('#draw-action-rule2-card').on('change', (el) => {
+            let propBool = $(el.currentTarget).val() === 'move';
+            $('#draw-destination-rule2-card').prop('disabled', !propBool);
         });
-        $(`#draw-cond-comp-${this.currentType}`).on('change', (el) => {
-            if ($(el.currentTarget).val() === 'value') {
-                $(`#draw-cond-comp-value-${this.currentType}`).prop('disabled', false);
-            } else {
-                $(`#draw-cond-comp-value-${this.currentType}`).prop('disabled', true);
-            }
+        $('#draw-cond-comp-rule1-card').on('change', (el) => {
+            let propBool = $(el.currentTarget).val() === 'value';
+            $('#draw-cond-comp-value-rule1-card').prop('disabled', !propBool);
         });
-        $(`#draw-cond2-comp-${this.currentType}`).on('change', (el) => {
-            if ($(el.currentTarget).val() === 'value') {
-                $(`#draw-cond2-comp-value-${this.currentType}`).prop('disabled', false);
-            } else {
-                $(`#draw-cond2-comp-value-${this.currentType}`).prop('disabled', true);
-            }
+        $('#draw-cond-comp-rule2-card').on('change', (el) => {
+            let propBool = $(el.currentTarget).val() === 'value';
+            $('#draw-cond-comp-value-rule2-card').prop('disabled', !propBool);
         });
         $(`#type-${this.currentType}`).on('change', (el) => {
             let faction = $(el.currentTarget).val();

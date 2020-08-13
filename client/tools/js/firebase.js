@@ -142,6 +142,16 @@ class FirebaseServices {
         if (this.isOnline) {
             this.fbDatabase.ref(type + '/' + name + '/').set(item);
             console.log('submitted ' + name);
+
+            if (type === 'card') {
+                let regionName = '';
+                for (let subitem in item) {
+                    if (item.hasOwnProperty(subitem) && subitem.includes('count')) {
+                        regionName = subitem.slice(6);
+                        this.fbDatabase.ref(`region/${regionName}/${name}`).set(item[subitem]);
+                    }
+                }
+            }
         }
     }
 
