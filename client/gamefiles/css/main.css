@@ -1,0 +1,338 @@
+body {
+    margin: 0;
+    font-family: "Century Gothic", "Arial", "sans-serif";
+    font-weight: 300;
+    background-color: black;
+    color: white;
+}
+
+#page-header {
+    justify-content: space-between;
+    padding-left: 0;
+    padding-right: 0;
+    border-bottom: 2px solid darkred;
+}
+
+.title {
+    display: inline-block;
+    width: 150px;
+    font-size: 40px;
+    color: gainsboro;
+}
+
+#main-nav {
+    display: flex;
+}
+
+.button {
+    display: inline-block;
+    min-width: 100px;
+    line-height: 20px;
+    margin: 0 3px;
+    padding: 4px 7px;
+    border: 2px solid darkred;
+    border-radius: 3px;
+    font-size: 14px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    background-color: darkred;
+    color: white;
+}
+
+.button:focus {
+    outline: none;
+    border: 2px solid white;
+}
+
+.button-selected {
+    background-color: lightcoral;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#game-container {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 1fr 1fr auto;
+}
+
+section {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 3px;
+    padding: 8px;
+}
+
+header {
+    display: inline-block;
+    width: 150px;
+    opacity: 0.2;
+    color: cornflowerblue;
+    font-size: 40px;
+    font-weight: 500;
+}
+
+.subheader {
+    margin: 10px 0 20px;
+    font-size: 18px;
+}
+
+
+/* Game Board */
+
+#game-container {
+    display: flex;
+    grid-column: 1 / 3;
+    grid-row: 3 / 3;
+    height: 600px;
+}
+
+#messages {
+    position: absolute;
+    width: 200px;
+    height: 100px;
+    bottom: 0;
+    left: 0;
+    margin: 0 5px 0 0;
+    font-size: 12px;
+    overflow: scroll;
+    border: 2px solid darkred;
+    border-radius: 3px;
+    z-index: 10;
+}
+
+.log-message {
+    margin: 10px;
+}
+
+#game-content {
+    width: 85%;
+    height: 100%;
+    padding: 10px;
+    color: white;
+}
+
+#game-content-header {
+    width: 100%;
+    height: 100px;
+    padding: 10px 0;
+}
+
+#game-start-button {
+    display: none;
+}
+
+#game-title {
+    position: relative;
+    top: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Board images */
+#game-boards {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.world {
+    width: 135px;
+    height: 160px;
+    background-size: 135px 135px;
+    background-repeat: no-repeat;
+    text-align: center;
+}
+
+#world-earth {
+    background-image: url('../images/worlds/temp.png');
+}
+
+#world-luna {
+    background-image: url('../images/worlds/temp.png');
+}
+
+#world-mars {
+    background-image: url('../images/worlds/temp.png');
+}
+
+#world-venus {
+    background-image: url('../images/worlds/temp.png');
+}
+
+#world-mercury {
+    background-image: url('../images/worlds/temp.png');
+}
+
+/* Modals */
+
+#modal {
+    display: none;
+    position: absolute;
+    width: 100%;
+    top: 75px;
+    text-align: center;
+    background-color: black;
+    z-index: 3;
+    color: white;
+}
+
+#modal-backdrop {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 75px;
+    z-index: 2;
+    background-color: black;
+}
+
+.modal-title {
+    padding-bottom: 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.text-line-entry {
+    margin: 10px;
+    font-size: 16px;
+    border: 3px solid white;
+    border-radius: 3px;
+}
+
+.text-line-entry:focus {
+    outline: none;
+    border: 3px solid darkred;
+}
+
+.game-list {
+    max-height: 400px;
+    overflow: scroll;
+}
+
+.set-list {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    margin-top: 10px;
+}
+
+.game-list-header-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 0 20px;
+}
+
+.game-list-header {
+    place-self: center;
+    font-weight: 600;
+    padding-bottom: 10px;
+}
+
+.game-list-header:first-child {
+    text-align: left;
+}
+
+.set-list-header {
+    padding-top: 5px;
+    font-weight: 600;
+}
+
+.game-list-row, .game-list-row-nogames {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    line-height: 1.2em;
+    margin: 3px;
+    padding: 0 20px;
+    border: 2px solid black;
+    border-radius: 3px;
+}
+
+.game-list-row:focus, .game-list-row-nogames:focus, .set-list-row:focus {
+    outline: none;
+    border: 2px solid darkred;
+}
+
+.set-list-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    line-height: 1.2em;
+    margin: 3px;
+    padding: 5px 20px;
+    text-align: left;
+    border: 2px solid black;
+    border-radius: 3px;
+}
+
+.set-list-regions {
+    padding: 0 0 5px;
+    font-weight: 600;
+}
+
+.game-list-row:hover, .set-list-row:hover {
+    background-color: red;
+    opacity: 0.5;
+    color: black;
+    cursor: pointer;
+}
+
+.game-list-row.game-list-row-selected, .set-list-row.game-list-row-selected {
+    background-color: lightcoral;
+    opacity: 0.8;
+    color: black;
+}
+
+.game-list-text {
+    place-self: center;
+}
+
+.game-list-text-name, .set-list-set-name {
+    text-align: left;
+}
+
+.no-pointer-events {
+    pointer-events: none;
+}
+
+.warning {
+    display: none;
+}
+
+.error-text {
+    display: none;
+    color: red;
+}
+
+.wait-text {
+    display: none;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+}
+
+#tempContainer {
+    display: none;
+}
+
+@media (min-width: 1000px) {
+    #game-container {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr auto;
+    }
+
+    #players {
+        grid-column: 2 / 2;
+        grid-row: 1 / 1;
+    }
+
+    #actions {
+        grid-column: 1 / 1;
+        grid-row: 1 / 1;
+        flex-flow: wrap;
+    }
+}

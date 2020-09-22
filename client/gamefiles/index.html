@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <title>Org: The Game</title>
+        <link rel="stylesheet" type="text/css" href="css/main.css">
+    </head>
+    <body>
+        <section id="page-header">
+            <div class="title">Org</div>
+            <nav id="main-nav">
+                <button class="button nav-create-game" tabindex="0">Create game</button>
+                <button class="button nav-join-game" tabindex="0">Join game</button>
+                <button class="button nav-black-market" tabindex="0">Black Market</button>
+                <button class="button nav-view-info" tabindex="0">Account</button>
+            </nav>
+        </section>
+
+        <main>
+            <section id="game-container">
+                <div id="messages"></div>
+                <div id="game-content">
+                    <div id="game-content-header">
+                        <div id="game-title"></div>
+                        <div id="players"></div>
+                        <div id="game-collected-influence"></div>
+                        <button id="game-start-button" class="button" tabindex="0">Start the game</button>
+                    </div>
+                    <div id="game-boards"></div>
+                </div>
+            </section>
+            <div id="modal"></div>
+            <div id="modal-backdrop"></div>
+            <div id="tempContainer"></div>
+        </main>
+
+        <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="node_modules/jqueryui/jquery-ui.js"></script>
+        <script type="text/javascript" src="node_modules/socket.io-client/dist/socket.io.js"></script>
+        <script type="text/javascript" src="js/events-controller.js"></script>
+        <script type="text/javascript" src="js/player.js"></script>
+        <script type="text/javascript" src="js/table.js"></script>
+        <script type="text/javascript" src="js/audio.js"></script>
+        <script type="text/javascript" src="js/helpers.js"></script>
+        <script type="module" src="js/main.js"></script>
+    </body>
+</html>

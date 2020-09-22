@@ -1,0 +1,25 @@
+{
+  "name": "org-server",
+  "version": "0.1.0",
+  "description": "Node server for online version of Org card game",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artfoundry/org.git"
+  },
+  "author": {
+    "name": "David Markowitz",
+    "email": "dave@artfoundry.com",
+    "url": "https://www.github.com/artfoundry/org"
+  },
+  "main": "public",
+  "dependencies": {
+    "express": "^4.17.1",
+    "firebase-admin": "^8.11.0",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "lodash": "^4.17.19"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "orgtools",
+  "version": "0.2.0",
+  "description": "Tools for online version of Org card game",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artfoundry/org.git"
+  },
+  "author": {
+    "name": "David Markowitz",
+    "email": "dave@artfoundry.com",
+    "url": "https://www.github.com/artfoundry/org"
+  },
+  "main": "tools",
+  "dependencies": {},
+  "devDependencies": {}
+}
