@@ -45,6 +45,10 @@ body {
     border: 2px solid white;
 }
 
+.button:hover {
+    background-color: #550000;
+}
+
 .button-selected {
     background-color: lightcoral;
 }
@@ -223,7 +227,7 @@ header {
 
 .game-list-header-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr repeat(6, 1fr);
     padding: 0 20px;
 }
 
@@ -244,15 +248,13 @@ header {
 
 .game-list-row, .game-list-row-nogames {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr repeat(6, 1fr);
     line-height: 1.2em;
-    margin: 3px;
+    margin: 5px;
     padding: 0 20px;
-    border: 2px solid black;
-    border-radius: 3px;
 }
 
-.game-list-row:focus, .game-list-row-nogames:focus, .set-list-row:focus {
+.set-list-row:focus {
     outline: none;
     border: 2px solid darkred;
 }
@@ -273,17 +275,11 @@ header {
     font-weight: 600;
 }
 
-.game-list-row:hover, .set-list-row:hover {
+.set-list-row:hover {
     background-color: red;
     opacity: 0.5;
     color: black;
     cursor: pointer;
-}
-
-.game-list-row.game-list-row-selected, .set-list-row.game-list-row-selected {
-    background-color: lightcoral;
-    opacity: 0.8;
-    color: black;
 }
 
 .game-list-text {

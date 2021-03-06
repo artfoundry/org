@@ -20,6 +20,7 @@ class UI {
         this.tempPaths = {
             createGame: 'html/create-game-modal.html',
             joinGame: 'html/join-game-modal.html',
+            userGames: 'html/user-games-modal.html',
             userInfo: 'html/user-info-modal.html',
             blackMarket: 'html/black-market-modal.html'
         };
@@ -62,8 +63,8 @@ class UI {
         $mainNav.click((evt)=> {
             let $button = $(evt.target);
             let dialogOptions = {};
-            let populateUserID = () => {
-                this.$templates.userInfo.find('#user-id').text(this.player.userId);
+            let populateUserID = (templateName) => {
+                $(this.$templates[templateName]).find('.user-id').text(this.player.userId);
                 return this.$templates.userInfo;
             };
 
@@ -71,20 +72,20 @@ class UI {
 
             if ($button.hasClass('nav-view-account')) {
                 dialogOptions = {
-                    template: populateUserID(),
+                    template: populateUserID('userInfo'),
                     focus: null,
                     processContent: this._getPlayerInfo,
-                    processContentParams: {callback: this._renderGameList},
+                    processContentParams: {userId: this.player.userId},
                     processInput: null,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'load-game'},
-                    callback: this.table.joinGame
+                    callbackParams: {player: this.player, gameData: null, callback: null, messageType: null},
+                    callback: null
                 };
             } else if ($button.hasClass('nav-create-game')) {
                 dialogOptions = {
                     template: this.$templates.createGame,
                     focus: '#modal .text-line-entry',
                     processContent: this._renderCreateGameForm,
-                    processContentParams: {setSelector: '#create-game-sets', keyListenerSelectors: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'}},
+                    processContentParams: {setSelector: '.create-game-sets', keyListenerSelectors: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'}},
                     processInput: this._processCreateGameForm,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
                     callback: this.table.createGame
@@ -97,6 +98,16 @@ class UI {
                     processContentParams: {userId: this.player.userId, callback: this._renderGameList},
                     processInput: null,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'join-game'},
+                    callback: this.table.joinGame
+                };
+            } else if ($button.hasClass('nav-user-games')) {
+                dialogOptions = {
+                    template: populateUserID('userGames'),
+                    focus: null,
+                    processContent: this._getPlayerGames,
+                    processContentParams: {callback: this._renderGameList},
+                    processInput: null,
+                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'load-game'},
                     callback: this.table.joinGame
                 };
             } else if ($button.hasClass('nav-black-market')) {
@@ -215,6 +226,21 @@ class UI {
         });
     }
 
+    _getPlayerGames(params) {
+
+    }
+
+    /*************************
+     * _renderSetList
+     * Inserts planet set list data into markup for display in Create New Game screen
+     *
+     * this.table.getSetList callback in this._renderCreateGameForm
+     *
+     * @param: listSelector: $ selector for list of sets
+     * @param: setList: Object retrieved from server containing everything in "/set/" (sets of planets)
+     *
+     * @private
+     *************************/
     _renderSetList(listSelector, setList) {
         let $setText;
         let ui = this;
@@ -243,7 +269,7 @@ class UI {
 
                         if ($(this).hasClass('game-list-row-selected')) {
                             $(this).removeClass('game-list-row-selected');
-                            $('#modal-button-primary').addClass('disabled');
+                            $('.modal-button-primary').addClass('disabled');
                             ui.gameData = {
                                 set: ''
                             };
@@ -252,7 +278,7 @@ class UI {
                                 $prevSelected.removeClass('game-list-row-selected');
                             }
                             $(this).addClass('game-list-row-selected');
-                            $('#modal-button-primary').removeClass('disabled');
+                            $('.modal-button-primary').removeClass('disabled');
                             ui.gameData = {
                                 set: gameSetEl.getAttribute('data-set')
                             };
@@ -267,9 +293,11 @@ class UI {
 
     /*************************
      * _renderGameList
-     * Inserts game list data into markup template for display in either game list modal or user account modal
+     * Inserts game list data into markup template for display in either game list screen or user account screen
      *
-     * processContent callback for _getPlayerInfo
+     * processContent callback for this._getPlayerInfo
+     *
+     * @param: gameList: Object from server containing all games currently running
      *
      * @private
      *************************/
@@ -284,41 +312,38 @@ class UI {
                 <span class="game-list-text">No games available</span>
             `);
             $gameListMarkup.append($gameText);
-            $('#modal-button-primary').focus();
+            $('.modal-button-cancel').focus();
         } else {
             gameList.forEach((game) => {
                 $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
-                    <span class="game-list-text game-list-text-name" data-game="${game.gameId}">${game.name}</span>
+                    <span class="game-list-text game-list-text-name">${game.name}</span>
                     <span class="game-list-text">${game.creator}</span>
                     <span class="game-list-text">${game.set.name}</span>
                     <span class="game-list-text">${game.playerCount}</span>
+                    <button class="button game-join-button" data-gameid="${game.gameId}" data-gamename="${game.name}">Join</button>
                 `);
-                $gameText.click(function() {
-                    let $prevSelected = $('.game-list-row-selected');
-                    let gameNameEl = $(this).children()[0];
-
-                    if ($(this).hasClass('game-list-row-selected')) {
-                        $(this).removeClass('game-list-row-selected');
-                        $('#modal-button-primary').addClass('disabled');
-                        ui.gameData = {
-                            name: '',
-                            gameId: ''
-                        };
-                    } else {
-                        if ($prevSelected.length > 0) {
-                            $prevSelected.removeClass('game-list-row-selected');
-                        }
-                        $(this).addClass('game-list-row-selected');
-                        $('#modal-button-primary').removeClass('disabled');
-                        ui.gameData = {
-                            name: gameNameEl.innerText,
-                            gameId: gameNameEl.getAttribute('data-game')
-                        };
-                    }
-                });
                 $gameListMarkup.append($gameText);
             });
-            $gameListMarkup.children('.game-list-row').first().focus();
+
+            $('.game-join-button').click(function() {
+                ui.gameData = {
+                    name: $(this).data('gamename'),
+                    gameId: $(this).data('gameid')
+                };
+                let gameData = {
+                    player: ui.player,
+                    gameData: ui.gameData,
+                    callback: ui.updateGame,
+                    messageType: 'join-game'
+                };
+
+                $('.game-join-button').off('click');
+                ui._hideWarning('#modal .wait-text,.error-text');
+                $('#modal').hide();
+                $('#modal-backdrop').hide();
+                ui._navButtonToggle();
+                ui.table.joinGame(gameData);
+            });
         }
     }
 
@@ -335,25 +360,15 @@ class UI {
      * @param updateData.isRunning: boolean
      *************************/
     updateGame(updateData, messageType) {
-        let playerIsCreator = updateData.creator === this.player.userId;
-        let isRunning = updateData.isRunning;
-
-        if (!this.game || this.table.gameId !== updateData.gameId) {
-            this.createGame();
-            this.game.initGameListeners(this._postMessage, playerIsCreator, isRunning);
-        }
-
-        if (messageType) {
+        if (!this.game || this.game.gameData.gameId !== updateData.gameId) {
+            this.createGame(updateData); // this will cause 'load-game' message to fire from this.game
+        } else if (messageType) {
             this._postMessage({updateData, messageType});
-            if (messageType === 'join-game' || messageType === 'create-game' || messageType === 'load-game') {
-                this.game.updateGame(updateData, 'load-game');
-            }
         }
     }
 
-    createGame() {
-        this.game = new Game(this.table);
-        this.game.setupGame();
+    createGame(gameData) {
+        this.game = new Game(this.table, this.player, this._postMessage, gameData);
     }
 
     /*************************
@@ -427,8 +442,8 @@ class UI {
 
     _openModal($modal, dialogOptions) {
         let $modalBackdrop = $('#modal-backdrop');
-        let $cancelButton = $modal.find('#modal-button-cancel');
-        let $primaryButton = $modal.find('#modal-button-primary');
+        let $cancelButton = $modal.find('.modal-button-cancel');
+        let $primaryButton = $modal.find('.modal-button-primary');
 
         $modal.show();
         if (dialogOptions.focus) {

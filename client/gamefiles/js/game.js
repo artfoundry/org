@@ -1,12 +1,36 @@
 class Game {
-    constructor(table) {
+    constructor(table, player, uiMessager, gameData) {
         this.table = table;
-        this.cards = null;
+        this.player = player;
+        this.uiMessager = uiMessager.bind(this);
+        this.gameData = gameData;
+        this.cards = {
+            cardTypes: {},
+            cardsByRegion: {}
+        };
+        this.gameRegions = [];
+
+        this._initGameListeners();
+        this.updateGame(this.gameData, 'load-game');
+    }
+
+    _initGameListeners() {
+        let $startButton = $('#game-start-button');
+        let playerIsCreator = this.gameData.creator === this.player.userId;
+        let isRunning = this.gameData.isRunning;
+
+        if (playerIsCreator && !isRunning) {
+            $startButton.show().click(() => {
+                this.table.startGame(this, this.uiMessager);
+                $startButton.hide();
+            });
+        }
     }
 
     setupGame() {
         for (let world in this.table.gameBoards) {
             if (this.table.gameBoards.hasOwnProperty(world)) {
+                this.gameRegions.push(world);
                 this.placeWorld(world, this.table.gameBoards[world]);
             }
         }
@@ -28,7 +52,8 @@ class Game {
     }
 
     storeCards(cardData) {
-        this.cards = cardData;
+        this.cards.cardTypes = cardData.cards;
+        this.cards.cardsByRegion = cardData.regions;
     }
 
     updateGame(gameData, boardAction) {
@@ -51,17 +76,6 @@ class Game {
 
     updateOtherPlayer(userId, inGame) {
 
-    }
-
-    initGameListeners(uiMessageCallback, playerIsCreator, isRunning) {
-        let $startButton = $('#game-start-button');
-
-        if (playerIsCreator && !isRunning) {
-            $startButton.show().click(() => {
-                this.table.startGame(this, uiMessageCallback);
-                $startButton.hide();
-            });
-        }
     }
 }
 

@@ -395,13 +395,20 @@ class FirebaseServices {
                 type: '',
                 message: ''
             };
+            let cardData = {
+                cards: {},
+                regions: {}
+            }
 
             this.checkOnlineStatus(reject);
 
             this.fbDatabase.ref('/card/').once('value').then((snapshot) => {
-                let results = snapshot.val();
-
-                resolve(results);
+                cardData.cards = snapshot.val();
+            }).then(() => {
+                return this.fbDatabase.ref('/region/').once('value');
+            }).then((regions) => {
+                cardData.regions = regions;
+                resolve(cardData);
             }).catch((error) => {
                 errorObject.type = 'server-error';
                 errorObject.message = 'FirebaseServices.getCardData(): ' + error;

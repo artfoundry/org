@@ -150,7 +150,6 @@ class GameServer {
 
     startGame(gameId) {
         let logMessage = '';
-        let gameInfo;
 
         this.fbServices.getCardData().then((cardData) => {
             logMessage = 'retrieved card data';
@@ -161,14 +160,14 @@ class GameServer {
         });
 
         this.fbServices.getGameInfo(gameId).then((gameData) => {
-            gameInfo = gameData;
             this.fbServices.updateGame(gameId, {isRunning: true}).catch((error) => {
                 logMessage = `Error updating game info while trying to start game: ${error.message}`;
                 this.emitResponse(error.type, error.message, logMessage);
             });
-        }).then(() => {
-            this.gameSetup(gameId, gameInfo);
-            this.startTurnController(gameId, gameInfo);
+            return gameData;
+        }).then((gameData) => {
+            this.gameSetup(gameId, gameData);
+            this.startTurnController(gameId, gameData);
             logMessage = `${gameId} is starting`;
             this.emitResponse('game-starting', null, logMessage);
         }).catch((error) => {
@@ -180,10 +179,23 @@ class GameServer {
     gameSetup(gameId, gameInfo) {
         let playersIdList = gameInfo.playerIds;
         let startingInfluenceTokens = 3;
+        let regions = gameInfo.set.regions;
 
-        playersIdList.forEach((playerId) => {
-            this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens);
-        });
+        for (let playerId in playersIdList) {
+            if (playersIdList.hasOwnProperty(playerId)) {
+                this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens);
+            }
+        }
+
+        for (let region in regions) {
+            if (regions.hasOwnProperty(region)) {
+                this.dealRegionCards(gameInfo, region);
+            }
+        }
+    }
+
+    dealRegionCards(gameInfo, region) {
+        
     }
 
     startTurnController(gameId, gameInfo) {

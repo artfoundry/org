@@ -89,9 +89,6 @@ class Table {
         this.socket.on('joined-game', (gameData) => {
             this.initGame(gameData, callback);
             this.socket.off('joined-game');
-            if (this.gameData.isRunning) {
-                this.game.updateGame(this.gameData, 'load-game');
-            }
             callback(gameData, messageType);
         });
 
