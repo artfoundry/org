@@ -1,9 +1,10 @@
 class Player {
-    constructor(userId, socket) {
+    constructor(userId, accountInfo, socket) {
         this.userId = userId;
         this.socket = socket;
         this.userInfo = {
             loggedIn: false,
+            account: accountInfo,
             inGame: false,
             gameIds: [],
             games: []

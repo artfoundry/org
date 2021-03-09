@@ -29,6 +29,7 @@ class UI {
 
         // bindings for callbacks
         this._getPlayerInfo = this._getPlayerInfo.bind(this);
+        this._renderPlayerInfo = this._renderPlayerInfo.bind(this);
         this._renderCreateGameForm = this._renderCreateGameForm.bind(this);
         this._processCreateGameForm = this._processCreateGameForm.bind(this);
         this._displayWarning = this._displayWarning.bind(this);
@@ -41,6 +42,7 @@ class UI {
         this.table.createGame = this.table.createGame.bind(this.table);
         this.table.getFullGameList = this.table.getFullGameList.bind(this.table);
         this.player.buyAddon = this.player.buyAddon.bind(this.player);
+        this.player.getInfo = this.player.getInfo.bind(this.player);
 
         // Initial setup functions
         this.player.playerLogin(this._postMessage);
@@ -53,9 +55,10 @@ class UI {
      * dialogOptions needs to have:
      * - template for modal
      * - processContent function for processing modal content to display
+     * - processContentParams object with different params depending on the processContent function
      * - processInput function to process data to send to server (that needs to be checked, and if error, error displayed on modal
      * - callbackParams object with player name, game id or name, display callback, and action type message to send to server
-     * - callback function to call once game data is retrieved from server
+     * - callback function for user action, such as joining or creating a game
      * @private
      */
     _initNav() {
@@ -64,8 +67,9 @@ class UI {
             let $button = $(evt.target);
             let dialogOptions = {};
             let populateUserID = (templateName) => {
-                $(this.$templates[templateName]).find('.user-id').text(this.player.userId);
-                return this.$templates.userInfo;
+                let $templateToPopulate = $(this.$templates[templateName]);
+                $templateToPopulate.find('.user-id').text(this.player.userId);
+                return $templateToPopulate;
             };
 
             this._navButtonToggle($button);
@@ -75,10 +79,10 @@ class UI {
                     template: populateUserID('userInfo'),
                     focus: null,
                     processContent: this._getPlayerInfo,
-                    processContentParams: {userId: this.player.userId},
+                    processContentParams: {userId: this.player.userId, data: this.player.userInfo.account, callback: this._renderPlayerInfo},
                     processInput: null,
-                    callbackParams: {player: this.player, gameData: null, callback: null, messageType: null},
-                    callback: null
+                    callback: null,
+                    callbackParams: {player: this.player, gameData: null, callback: null, messageType: null}
                 };
             } else if ($button.hasClass('nav-create-game')) {
                 dialogOptions = {
@@ -87,8 +91,8 @@ class UI {
                     processContent: this._renderCreateGameForm,
                     processContentParams: {setSelector: '.create-game-sets', keyListenerSelectors: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'}},
                     processInput: this._processCreateGameForm,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'},
-                    callback: this.table.createGame
+                    callback: this.table.createGame,
+                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'}
                 };
             } else if ($button.hasClass('nav-join-game')) {
                 dialogOptions = {
@@ -97,18 +101,18 @@ class UI {
                     processContent: this.table.getFullGameList,
                     processContentParams: {userId: this.player.userId, callback: this._renderGameList},
                     processInput: null,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'join-game'},
-                    callback: this.table.joinGame
+                    callback: this.table.joinGame,
+                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'join-game'}
                 };
             } else if ($button.hasClass('nav-user-games')) {
                 dialogOptions = {
                     template: populateUserID('userGames'),
                     focus: null,
-                    processContent: this._getPlayerGames,
-                    processContentParams: {callback: this._renderGameList},
+                    processContent: this._getPlayerInfo,
+                    processContentParams: {data: this.player.userInfo.games, callback: this._renderGameList},
                     processInput: null,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'load-game'},
-                    callback: this.table.joinGame
+                    callback: this.table.joinGame,
+                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'load-game'}
                 };
             } else if ($button.hasClass('nav-black-market')) {
                 dialogOptions = {
@@ -117,8 +121,8 @@ class UI {
                     processContent: this.table.getAddons,
                     processContentParams: {userId: this.player.userId, callback: this._renderGameList},
                     processInput: null,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'buy-addon'},
-                    callback: this.player.buyAddon
+                    callback: this.player.buyAddon,
+                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'buy-addon'}
                 };
             }
             this._displayDialog(dialogOptions);
@@ -221,13 +225,20 @@ class UI {
     _getPlayerInfo(params) {
         this.player.getInfo(() => {
             if (this.player.userInfo) {
-                params.callback(this.player.userInfo.games);
+                params.callback(params.data);
             }
         });
     }
 
-    _getPlayerGames(params) {
+    _renderPlayerInfo(userInfo) {
+        let $userInfo = $('.user-info');
 
+        $userInfo.html('');
+        for (let info in userInfo) {
+            if (userInfo.hasOwnProperty(info)) {
+                $userInfo.append(`<div>${info}: ${userInfo[info]}</div>`);
+            }
+        }
     }
 
     /*************************
