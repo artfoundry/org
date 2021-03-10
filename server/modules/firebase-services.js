@@ -217,7 +217,8 @@ class FirebaseServices {
                 playerCount: 1,
                 playerIds: [userId],
                 set: null,
-                isRunning: false
+                isRunning: false,
+                currentTurn: 0
             };
             let userGameList;
             let gameId;
@@ -256,9 +257,9 @@ class FirebaseServices {
 
     /****************
      * joinGame
-     * Game server gets game info from FB server, then sends FB server request to add user to game.
+     * Gets user info, then gets game info, then updates game info with user info, and finally returns updated game info.
      *
-     * gameData object:
+     * returns gameData object:
      *      gameId (FB key)
      *      creator (string)
      *      name (string)
@@ -308,6 +309,71 @@ class FirebaseServices {
                 updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
                 updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
                 updates[`/userIdList/${userId}/inGame`] = gameId;
+                return updates;
+            }).then((updates) => {
+                this.fbDatabase.ref().update(updates).then(() => {
+                    resolve(gameData);
+                });
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = 'FirebaseServices.joinGame(): ' + error;
+                reject(errorObject);
+            });
+        });
+    }
+
+    /****************
+     * resignGame
+     * Gets user info, then gets game info, then updates game info by removing user info and
+     * updates user info by removing game info, and finally returns updated game info.
+     *
+     * returns gameData object:
+     *      gameId (FB key)
+     *      creator (string)
+     *      name (string)
+     *      playerCount (int)
+     *      playerIds (array)
+     *      set (array)
+     *      colors (object)
+     *
+     * @param userId: string
+     * @param gameId: FB key (string)
+     * @returns {Promise<{data: object, error: string}>}
+     ******************/
+    resignGame(userId, gameId) {
+        return new Promise ((resolve, reject) => {
+            let gameData = {
+                gameId,
+                creator: null,
+                name: null,
+                playerCount: null,
+                playerIds: [],
+                set: [],
+                currentPlayerTurn: ''
+            };
+            let errorObject = {
+                type: '',
+                message: ''
+            };
+            let userGameIDList;
+            let updates = {};
+
+            this.checkOnlineStatus(reject);
+
+            this.getUser(userId).then((userData) => {
+                userGameIDList = userData.gameIds || [];
+                // userGameIDList.push(gameId); - need to remove gameId from array
+            }).then(() => {
+                return this.getGameInfo(gameId);
+            }).then((retrievedGameInfo) => {
+                // retrievedGameInfo.playerIds.push(userId); - need to remove userId from array
+                gameData.playerIds = retrievedGameInfo.playerIds;
+                gameData.playerCount = retrievedGameInfo.playerCount - 1;
+
+                updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
+                updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
+                updates[`/userIdList/${userId}/inGame`] = null;
                 return updates;
             }).then((updates) => {
                 this.fbDatabase.ref().update(updates).then(() => {

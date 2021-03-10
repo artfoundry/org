@@ -1,12 +1,20 @@
 import {Game} from './game.js';
 
 class UI {
-    constructor(player, table, helpers) {
+    constructor(player, table, helpers, socket) {
         // player object format:
-        // {userId: string,
-        //  userInfo: {gameIds: array, loggedIn: boolean}
+        // {
+        //      userId: string,
+        //      userInfo: {
+        //          loggedIn: false,
+        //          account: accountInfo,
+        //          inGame: false,
+        //          gameIds: [],
+        //          games: []
+        //      }
         // }
         this.player = player;
+        this.socket = socket;
 
         this.gameData = {
             name: '',
@@ -79,7 +87,7 @@ class UI {
                     template: populateUserID('userInfo'),
                     focus: null,
                     processContent: this._getPlayerInfo,
-                    processContentParams: {userId: this.player.userId, data: this.player.userInfo.account, callback: this._renderPlayerInfo},
+                    processContentParams: {userId: this.player.userId, callback: this._renderPlayerInfo},
                     processInput: null,
                     callback: null,
                     callbackParams: {player: this.player, gameData: null, callback: null, messageType: null}
@@ -109,7 +117,7 @@ class UI {
                     template: populateUserID('userGames'),
                     focus: null,
                     processContent: this._getPlayerInfo,
-                    processContentParams: {data: this.player.userInfo.games, callback: this._renderGameList},
+                    processContentParams: {joined: true, callback: this._renderGameList},
                     processInput: null,
                     callback: this.table.joinGame,
                     callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'load-game'}
@@ -222,21 +230,21 @@ class UI {
         $(selector).hide();
     }
 
-    _getPlayerInfo(params) {
-        this.player.getInfo(() => {
-            if (this.player.userInfo) {
-                params.callback(params.data);
-            }
-        });
+    async _getPlayerInfo(params) {
+        let playerData = await this.player.getInfo();
+
+        if (params.joined)
+            playerData['joined'] = params.joined;
+        params.callback(playerData);
     }
 
     _renderPlayerInfo(userInfo) {
         let $userInfo = $('.user-info');
 
         $userInfo.html('');
-        for (let info in userInfo) {
-            if (userInfo.hasOwnProperty(info)) {
-                $userInfo.append(`<div>${info}: ${userInfo[info]}</div>`);
+        for (let info in userInfo.account) {
+            if (userInfo.account.hasOwnProperty(info)) {
+                $userInfo.append(`<div>${info}: ${userInfo.account[info]}</div>`);
             }
         }
     }
@@ -304,7 +312,7 @@ class UI {
 
     /*************************
      * _renderGameList
-     * Inserts game list data into markup template for display in either game list screen or user account screen
+     * Inserts game list data into markup template for display in either avail games screen or user games screen
      *
      * processContent callback for this._getPlayerInfo
      *
@@ -312,7 +320,10 @@ class UI {
      *
      * @private
      *************************/
-    _renderGameList(gameList) {
+    _renderGameList(data) {
+        let gameList = data.games;
+        let joinedGame = data.joined;
+        let joinResumeButtonLabel = joinedGame ? 'Resume' : 'Join';
         let $gameText;
         let ui = this;
         let $gameListMarkup = $('#modal .game-list');
@@ -326,17 +337,23 @@ class UI {
             $('.modal-button-cancel').focus();
         } else {
             gameList.forEach((game) => {
+                let resignButton = joinedGame ? `<button class="button game-resign-button" data-gameid="${game.gameId}" data-gamename="${game.name}">Resign</button>\n` : '';
+                let turnDisplay = game.currentTurn === 0 ? 'Not started yet' : game.currentTurn;
+                let gameTurn = joinedGame ? `<span class="game-list-text">${turnDisplay}</span>` : '';
+
                 $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
                     <span class="game-list-text game-list-text-name">${game.name}</span>
                     <span class="game-list-text">${game.creator}</span>
                     <span class="game-list-text">${game.set.name}</span>
                     <span class="game-list-text">${game.playerCount}</span>
-                    <button class="button game-join-button" data-gameid="${game.gameId}" data-gamename="${game.name}">Join</button>
+                    ${gameTurn}
+                    <button class="button game-join-button" data-gameid="${game.gameId}" data-gamename="${game.name}">${joinResumeButtonLabel}</button>
+                    ${resignButton}
                 `);
                 $gameListMarkup.append($gameText);
             });
 
-            $('.game-join-button').click(function() {
+            $('.game-join-button, .game-resign-button').click(function() {
                 ui.gameData = {
                     name: $(this).data('gamename'),
                     gameId: $(this).data('gameid')
@@ -345,15 +362,15 @@ class UI {
                     player: ui.player,
                     gameData: ui.gameData,
                     callback: ui.updateGame,
-                    messageType: 'join-game'
+                    messageType: joinedGame ? 'load-game' : 'join-game'
                 };
 
-                $('.game-join-button').off('click');
+                $('.game-join-button, .game-resign-button').off('click');
                 ui._hideWarning('#modal .wait-text,.error-text');
                 $('#modal').hide();
                 $('#modal-backdrop').hide();
                 ui._navButtonToggle();
-                ui.table.joinGame(gameData);
+                joinedGame ? ui.table.joinGame(gameData) : ui.table.resignGame(gameData);
             });
         }
     }

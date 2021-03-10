@@ -63,9 +63,7 @@ let Org = {
         let player = new Player(this.userId, this.account, this.socket);
         // let audio = new Audio();
         let table = new Table(this.socket);
-        let ui = new UI(player, table, this.helpers);
-        // let eventsController = new EventsController(ui);
-
+        new UI(player, table, this.helpers, this.socket);
     }
 };
 

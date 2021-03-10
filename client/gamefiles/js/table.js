@@ -42,7 +42,8 @@ class Table {
 
         this.socket.on('game-list-retrieved', (gameList) => {
             this.socket.off('game-list-retrieved');
-            callback(gameList);
+            let gameData = {games: gameList, joined: false};
+            callback(gameData);
         });
 
         this.socket.emit('get-game-list', userId);
@@ -89,6 +90,28 @@ class Table {
         this.socket.on('joined-game', (gameData) => {
             this.initGame(gameData, callback);
             this.socket.off('joined-game');
+            callback(gameData, messageType);
+        });
+
+        this.socket.emit(messageType, this.playerId, this.gameId);
+    }
+
+    /************************
+     * resignGame
+     * Sends gameId and player ID to server and waits for signal player has resigned
+     * @param data.player: object
+     * @param data.gameData: object
+     * @param data.callback: function
+     * @param data.messageType: string
+     ************************/
+    resignGame(data) {
+        let callback = data.callback;
+        let messageType = data.messageType;
+
+        this.playerId = data.player.userId;
+        this.gameId = data.gameData.gameId;
+        this.socket.on('resigned-game', (gameData) => {
+            this.socket.off('resigned-game');
             callback(gameData, messageType);
         });
 

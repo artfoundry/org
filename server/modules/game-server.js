@@ -48,6 +48,7 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
+        // Gets user account info, including games user is in
         this.socket.on('get-user', (userId) => {
             let logMessage = '';
             this.fbServices.getUser(userId).then((results) => {
@@ -58,6 +59,7 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
+        // Adds a new game to the DB and sends game info to the client
         this.socket.on('create-game', (userId, gameName, gameSet) => {
             let logMessage = '';
             this.fbServices.createGame(userId, gameName, gameSet).then((results) => {
@@ -68,6 +70,7 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
+        // Adds user to game and gets game info, then notifies all players in game that the user joined
         this.socket.on('join-game', (userId, gameId) => {
             let logMessage = '';
             this.fbServices.joinGame(userId, gameId).then((results) => {
@@ -85,6 +88,7 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
+        // Gets game info for a game a user has already joined and is now resuming
         this.socket.on('load-game', (userId, gameId) => {
             let gameInfo;
             let logMessage = '';
@@ -106,6 +110,7 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
+        // Gets list of all games a user is not in
         this.socket.on('get-game-list', (userId) => {
             let logMessage = '';
             this.fbServices.getGameList(userId, false).then((results) => {
@@ -116,6 +121,7 @@ class GameServer {
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
+        // Gets list of planet card/board sets
         this.socket.on('get-set-list', () => {
             let logMessage = '';
             this.fbServices.getSetList().then((results) => {
@@ -123,6 +129,24 @@ class GameServer {
                 this.emitResponse('set-list-retrieved', results, logMessage);
             }).catch((error) => {
                 logMessage = `Error retrieving set list: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
+        });
+        // Removes user from game, then notifies all players in game that the user resigned
+        this.socket.on('resign-game', (userId, gameId) => {
+            let logMessage = '';
+            this.fbServices.resignGame(userId, gameId).then((results) => {
+                let updateData = {
+                    userId: userId,
+                    gameId,
+                    name: results.name
+                };
+                logMessage = userId + ' resigned ' + results.name;
+                this.emitResponse('resigned-game', results, logMessage);
+                logMessage = 'Message broadcasted to other players';
+                this.emitResponse('other-resigned-game', updateData, logMessage);
+            }).catch((error) => {
+                logMessage = `Error resigning game: ${error.message}`;
                 this.emitResponse(error.type, error.message, logMessage);
             });
         });
@@ -201,7 +225,9 @@ class GameServer {
     startTurnController(gameId, gameInfo) {
         let playersIdList = gameInfo.playerIds;
 
-        for (let turn = 1; turn <= NUM_GAME_TURNS; turn++) {
+        for (let turn = gameInfo.currentTurn; turn <= NUM_GAME_TURNS; turn++) {
+            gameInfo.currentTurn++;
+            this.increaseTurnNumber(gameId, gameInfo, playersIdList);
             playersIdList.forEach((playerId) => {
                 this.playExpansionPhase(gameId, playerId);
                 this.playDrawPhase();
@@ -211,6 +237,22 @@ class GameServer {
             this.waitForAllPlayersToPlay();
         }
         this.reportScore();
+    }
+
+    increaseTurnNumber(gameId, gameInfo, playersIdList) {
+        let message = '';
+
+        // This really needs to be written out as a promise chain to avoid continuing to update if error occurs
+        playersIdList.forEach((playerId) => {
+            this.fbServices.updateGame(gameId, gameInfo, playerId).then(() => {
+                // go to next Id
+            }).catch((error) => {
+                message = `Error updating game turn value: ${error.message}`;
+                this.emitResponse(error.type, error.message, message);
+            });
+            message = `Turn ${gameInfo.currentTurn} is starting`;
+            this.emitResponse('game-message', message);
+        });
     }
 
     giveInfluenceTokens(gameId, playerId, influenceTokens) {

@@ -33,17 +33,23 @@ class Player {
         this.socket.emit('player-login', this.userId);
     }
 
-    getInfo(callback) {
-        this.socket.on('user-info', (data) => {
-            this.userInfo.loggedIn = data.loggedIn;
-            if (data.gameIds) {
-                this.userInfo.gameIds = data.gameIds;
-                this.userInfo.games = data.games;
-            }
-            this.socket.off('user-info');
-            callback();
+    getInfo() {
+        return new Promise((resolve, reject) => {
+            this.socket.on('user-info', (data) => {
+                if (data) {
+                    this.userInfo.loggedIn = data.loggedIn;
+                    if (data.gameIds) {
+                        this.userInfo.gameIds = data.gameIds;
+                        this.userInfo.games = data.games;
+                    }
+                    this.socket.off('user-info');
+                    resolve(this.userInfo);
+                } else {
+                    reject();
+                }
+            });
+            this.socket.emit('get-user', this.userId);
         });
-        this.socket.emit('get-user', this.userId);
     }
 
     buyAddon(callback) {
