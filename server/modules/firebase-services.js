@@ -309,8 +309,6 @@ class FirebaseServices {
                 updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
                 updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
                 updates[`/userIdList/${userId}/inGame`] = gameId;
-                return updates;
-            }).then((updates) => {
                 this.fbDatabase.ref().update(updates).then(() => {
                     resolve(gameData);
                 });
@@ -362,20 +360,20 @@ class FirebaseServices {
 
             this.getUser(userId).then((userData) => {
                 userGameIDList = userData.gameIds || [];
-                // userGameIDList.push(gameId); - need to remove gameId from array
+                let i = userGameIDList.indexOf(gameId);
+                userGameIDList.splice(i, 1);
             }).then(() => {
                 return this.getGameInfo(gameId);
             }).then((retrievedGameInfo) => {
-                // retrievedGameInfo.playerIds.push(userId); - need to remove userId from array
-                gameData.playerIds = retrievedGameInfo.playerIds;
-                gameData.playerCount = retrievedGameInfo.playerCount - 1;
+                gameData = retrievedGameInfo;
+                let i = gameData.playerIds.indexOf(userId);
+                gameData.playerIds.splice(i, 1);
+                gameData.playerCount--;
 
                 updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
                 updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
                 updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
                 updates[`/userIdList/${userId}/inGame`] = null;
-                return updates;
-            }).then((updates) => {
                 this.fbDatabase.ref().update(updates).then(() => {
                     resolve(gameData);
                 });

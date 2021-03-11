@@ -353,7 +353,9 @@ class UI {
                 $gameListMarkup.append($gameText);
             });
 
-            $('.game-join-button, .game-resign-button').click(function() {
+            $('.game-join-button, .game-resign-button').click(function(e) {
+                let button = e.currentTarget.textContent;
+
                 ui.gameData = {
                     name: $(this).data('gamename'),
                     gameId: $(this).data('gameid')
@@ -362,7 +364,7 @@ class UI {
                     player: ui.player,
                     gameData: ui.gameData,
                     callback: ui.updateGame,
-                    messageType: joinedGame ? 'load-game' : 'join-game'
+                    messageType: button === 'Resign' ? 'resign-game' : joinedGame ? 'load-game' : 'join-game'
                 };
 
                 $('.game-join-button, .game-resign-button').off('click');
@@ -370,7 +372,9 @@ class UI {
                 $('#modal').hide();
                 $('#modal-backdrop').hide();
                 ui._navButtonToggle();
-                joinedGame ? ui.table.joinGame(gameData) : ui.table.resignGame(gameData);
+                if (button === 'Resign')
+                    $('#game-content').html('');
+                button === 'Resign' ? ui.table.resignGame(gameData) : ui.table.joinGame(gameData);
             });
         }
     }
@@ -426,6 +430,8 @@ class UI {
             case 'create-game': $message.text(`${gameName} created by ${creator}`); break;
             case 'join-game': $message.text(`You joined ${gameName}`); break;
             case 'other-joined-game': $message.text(`${otherPlayer} joined ${gameName}`); break;
+            case 'resign-game': $message.text(`You have resigned ${gameName}`); break;
+            case 'other-resigned-game': $message.text(`${otherPlayer} has resigned ${gameName}`); break;
             case 'load-game': $message.text(`${gameName} loaded`); break;
             case 'already-in-game': $message.text('You are already a player in that game!'); break;
             case 'game-starting': $message.text('The game is starting!'); break;

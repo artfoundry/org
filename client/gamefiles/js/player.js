@@ -41,6 +41,9 @@ class Player {
                     if (data.gameIds) {
                         this.userInfo.gameIds = data.gameIds;
                         this.userInfo.games = data.games;
+                    } else {
+                        this.userInfo.gameIds = [];
+                        this.userInfo.games = [];
                     }
                     this.socket.off('user-info');
                     resolve(this.userInfo);
