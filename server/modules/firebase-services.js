@@ -8,9 +8,9 @@ class FirebaseServices {
         if (this.isOnline) {
             // As an admin, the app has access to read and write all data, regardless of Security Rules
             this.fbDatabase = this.admin.database();
-            this.ref = this.fbDatabase.ref("restricted_access/secret_document");
 
             // is this necessary?
+            // this.ref = this.fbDatabase.ref("restricted_access/secret_document");
             // this.ref.once("value", function(snapshot) {
             //     console.log(snapshot.val());
             // });
@@ -311,7 +311,7 @@ class FirebaseServices {
                 updates[`/userIdList/${userId}/inGame`] = gameId;
                 this.fbDatabase.ref().update(updates).then(() => {
                     resolve(gameData);
-                });
+                }).catch((error)=>{reject(error)});
             }).catch((error) => {
                 errorObject.type = 'server-error';
                 errorObject.message = 'FirebaseServices.joinGame(): ' + error;
@@ -369,17 +369,20 @@ class FirebaseServices {
                 let i = gameData.playerIds.indexOf(userId);
                 gameData.playerIds.splice(i, 1);
                 gameData.playerCount--;
-
-                updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
-                updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                if (gameData.playerCount === 0) {
+                    this.fbDatabase.ref(`/gameIdList/${gameId}/`).remove().catch((error)=>{reject(error)});
+                } else {
+                    updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
+                    updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                }
                 updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
                 updates[`/userIdList/${userId}/inGame`] = null;
                 this.fbDatabase.ref().update(updates).then(() => {
                     resolve(gameData);
-                });
+                }).catch((error)=>{reject(error)});
             }).catch((error) => {
                 errorObject.type = 'server-error';
-                errorObject.message = 'FirebaseServices.joinGame(): ' + error;
+                errorObject.message = 'FirebaseServices.resignGame(): ' + error;
                 reject(errorObject);
             });
         });

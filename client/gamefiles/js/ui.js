@@ -231,11 +231,12 @@ class UI {
     }
 
     async _getPlayerInfo(params) {
-        let playerData = await this.player.getInfo();
-
-        if (params.joined)
-            playerData['joined'] = params.joined;
-        params.callback(playerData);
+        this.player.getInfo().then((playerData) => {
+            if (params.joined)
+                playerData['joined'] = params.joined;
+            if (params.callback)
+                params.callback(playerData);
+        });
     }
 
     _renderPlayerInfo(userInfo) {
@@ -360,21 +361,26 @@ class UI {
                     name: $(this).data('gamename'),
                     gameId: $(this).data('gameid')
                 };
-                let gameData = {
+                let redrawUserGames = ()=> {
+                    ui._getPlayerInfo({joined: true, callback: ui._renderGameList});
+                };
+                let userActionData = {
                     player: ui.player,
                     gameData: ui.gameData,
-                    callback: ui.updateGame,
+                    callback: button === 'Resign' ? redrawUserGames : ui.updateGame,
                     messageType: button === 'Resign' ? 'resign-game' : joinedGame ? 'load-game' : 'join-game'
                 };
 
                 $('.game-join-button, .game-resign-button').off('click');
                 ui._hideWarning('#modal .wait-text,.error-text');
-                $('#modal').hide();
-                $('#modal-backdrop').hide();
-                ui._navButtonToggle();
-                if (button === 'Resign')
-                    $('#game-content').html('');
-                button === 'Resign' ? ui.table.resignGame(gameData) : ui.table.joinGame(gameData);
+                if (button === 'Resign') {
+                    ui.table.resignGame(userActionData);
+                } else {
+                    $('#modal').hide();
+                    $('#modal-backdrop').hide();
+                    ui._navButtonToggle();
+                    ui.table.joinGame(userActionData);
+                }
             });
         }
     }
@@ -393,10 +399,10 @@ class UI {
      *************************/
     updateGame(updateData, messageType) {
         if (!this.game || this.game.gameData.gameId !== updateData.gameId) {
-            this.createGame(updateData); // this will cause 'load-game' message to fire from this.game
-        } else if (messageType) {
-            this._postMessage({updateData, messageType});
+            this.createGame(updateData);
         }
+        this.game.updateBoard(messageType, updateData);
+        this._postMessage({updateData, messageType});
     }
 
     createGame(gameData) {

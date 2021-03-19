@@ -1,3 +1,4 @@
+// Sends/receives and stores game/player data with server
 class Table {
     constructor(socket) {
         this.socket = socket;
@@ -6,7 +7,7 @@ class Table {
         this.gameData = null;
         this.gameId = '';
         this.gameSet = '';
-        this.gameBoards = null;
+        this.gameRegions = null;
         this.isBroadcasting = false;
     }
 
@@ -112,6 +113,9 @@ class Table {
         this.gameId = data.gameData.gameId;
         this.socket.on('resigned-game', (gameData) => {
             this.socket.off('resigned-game');
+            this.turnOffGameBroadcaster('other-joined-game');
+            this.turnOffGameBroadcaster('other-resigned-game');
+            this.isBroadcasting = false;
             callback(gameData, messageType);
         });
 
@@ -122,27 +126,30 @@ class Table {
         this.gameData = gameData;
         this.gameId = gameData.gameId;
         this.gameSet = gameData.set.name;
-        this.gameBoards = gameData.set.regions;
+        this.gameRegions = gameData.set.regions;
         if (!this.isBroadcasting) {
             this.setUpGameBroadcaster('other-joined-game', callback);
+            this.setUpGameBroadcaster('other-resigned-game', callback);
             this.isBroadcasting = true;
         }
     }
 
     setUpGameBroadcaster(messageType, messageCallback) {
-        if (messageType === 'other-joined-game') {
-            this.socket.on(messageType, (updateData) => {
-                if (updateData.gameId === this.gameId && updateData.userId !== this.playerId) {
-                    messageCallback(updateData, messageType);
-                }
-            });
-        }
+        this.socket.on(messageType, (updateData) => {
+            if (updateData.gameId === this.gameId && updateData.userId !== this.playerId) {
+                messageCallback(updateData, messageType);
+            }
+        });
+    }
+
+    turnOffGameBroadcaster(messageType) {
+        this.socket.off(messageType);
     }
 
     startGame(game, uiMessageCallback) {
         this.game = game;
         this.initTableListeners(uiMessageCallback);
-        this.socket.emit('start-game', this.gameId, this.gameBoards);
+        this.socket.emit('start-game', this.gameId, this.gameRegions);
     }
 
     initTableListeners(uiMessageCallback) {
@@ -151,7 +158,7 @@ class Table {
         };
 
         this.socket.on('card-data', (data) => {
-            this.game.storeCards(data);
+            this.game.updateBoard('store-cards', data);
         });
 
         this.socket.on('game-message', (message) => {
