@@ -1,29 +1,9 @@
-import {Game} from './game.js';
+import {Helpers} from './helpers.js';
 
 class UI {
-    constructor(player, table, helpers, socket) {
-        // player object format:
-        // {
-        //      userId: string,
-        //      userInfo: {
-        //          loggedIn: false,
-        //          account: accountInfo,
-        //          inGame: false,
-        //          gameIds: [],
-        //          games: []
-        //      }
-        // }
-        this.player = player;
-        this.socket = socket;
-
-        this.gameData = {
-            name: '',
-            gameId: '',
-            set: ''
-        };
-        this.table = table;
-        this.game = null;
-        this.helpers = helpers;
+    constructor(controller) {
+        this.controller = controller;
+        this.helpers = new Helpers();
 
         this.tempPaths = {
             createGame: 'html/create-game-modal.html',
@@ -36,24 +16,22 @@ class UI {
         this._loadTemplates();
 
         // bindings for callbacks
-        this._getPlayerInfo = this._getPlayerInfo.bind(this);
         this._renderPlayerInfo = this._renderPlayerInfo.bind(this);
-        this._renderCreateGameForm = this._renderCreateGameForm.bind(this);
-        this._processCreateGameForm = this._processCreateGameForm.bind(this);
         this._displayWarning = this._displayWarning.bind(this);
         this._hideWarning = this._hideWarning.bind(this);
         this._renderGameList = this._renderGameList.bind(this);
         this._renderSetList = this._renderSetList.bind(this);
         this._openModal = this._openModal.bind(this);
-        this.updateGame = this.updateGame.bind(this);
-        this.table.joinGame = this.table.joinGame.bind(this.table);
-        this.table.createGame = this.table.createGame.bind(this.table);
-        this.table.getFullGameList = this.table.getFullGameList.bind(this.table);
-        this.player.buyAddon = this.player.buyAddon.bind(this.player);
-        this.player.getInfo = this.player.getInfo.bind(this.player);
+        this.controllerReqPlayerData = this.controller.getPlayerFromServer.bind(this.controller);
+        this.controllerPlayerStoredData = this.controller.getStoredPlayerData.bind(this.controller);
+        this.controllerSetupForm = this.controller.setupCreateGameForm.bind(this.controller);
+        this.controllerProcessForm = this.controller.processCreateGameForm.bind(this.controller);
+        this.controllerGetCallback = this.controller.getCallbackFunction.bind(this.controller);
+        this.controllerUpdateGameData = this.controller.updateGameData.bind(this.controller);
+        this.controllerUpdateBoard = this.controller.updateGameBoard.bind(this.controller);
+        this.controllerGameStoredData = this.controller.getStoredGameData.bind(this.controller);
 
         // Initial setup functions
-        this.player.playerLogin(this._postMessage);
         this._initNav();
     }
 
@@ -71,12 +49,14 @@ class UI {
      */
     _initNav() {
         let $mainNav = $('#main-nav');
+        let userId = this.controllerPlayerStoredData('userId');
+
         $mainNav.click((evt)=> {
             let $button = $(evt.target);
             let dialogOptions = {};
             let populateUserID = (templateName) => {
                 let $templateToPopulate = $(this.$templates[templateName]);
-                $templateToPopulate.find('.user-id').text(this.player.userId);
+                $templateToPopulate.find('.user-id').text(userId);
                 return $templateToPopulate;
             };
 
@@ -86,51 +66,54 @@ class UI {
                 dialogOptions = {
                     template: populateUserID('userInfo'),
                     focus: null,
-                    processContent: this._getPlayerInfo,
-                    processContentParams: {userId: this.player.userId, callback: this._renderPlayerInfo},
+                    processContent: this.controllerReqPlayerData,
+                    processContentParams: {userId: userId, callback: this._renderPlayerInfo},
                     processInput: null,
                     callback: null,
-                    callbackParams: {player: this.player, gameData: null, callback: null, messageType: null}
+                    callbackParams: {player: this.controllerPlayerStoredData(), gameData: null, callback: null, messageType: null}
                 };
             } else if ($button.hasClass('nav-create-game')) {
                 dialogOptions = {
                     template: this.$templates.createGame,
                     focus: '#modal .text-line-entry',
-                    processContent: this._renderCreateGameForm,
-                    processContentParams: {setSelector: '.create-game-sets', keyListenerSelectors: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'}},
-                    processInput: this._processCreateGameForm,
-                    callback: this.table.createGame,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'create-game'}
+                    processContent: this.controllerSetupForm,
+                    processContentParams: {setSelector: '.create-game-sets', keyListenerSelectors: {formSelector: '#create-modal-enter-game-name', warningSelector: '#modal .error'}, callback: this._renderSetList},
+                    processInput: this.controllerProcessForm,
+                    callback: this.controllerGetCallback('table', 'createGame'),
+                    callbackParams: {player: this.controllerPlayerStoredData(), gameData: null, callback: this.controllerUpdateBoard, messageType: 'create-game'}
                 };
             } else if ($button.hasClass('nav-join-game')) {
                 dialogOptions = {
                     template: this.$templates.joinGame,
                     focus: null,
-                    processContent: this.table.getFullGameList,
-                    processContentParams: {userId: this.player.userId, callback: this._renderGameList},
+                    processContent: this.controllerGetCallback('table', 'getFullGameList'),
+                    processContentParams: {userId: userId, callback: this._renderGameList},
                     processInput: null,
-                    callback: this.table.joinGame,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'join-game'}
+                    callback: this.controllerGetCallback('table', 'joinGame'),
+                    callbackParams: {player: this.controllerPlayerStoredData(), gameData: null, callback: this.controllerUpdateGameData, messageType: 'join-game'}
                 };
             } else if ($button.hasClass('nav-user-games')) {
                 dialogOptions = {
                     template: populateUserID('userGames'),
                     focus: null,
-                    processContent: this._getPlayerInfo,
+                    processContent: this.controllerReqPlayerData,
                     processContentParams: {joined: true, callback: this._renderGameList},
                     processInput: null,
-                    callback: this.table.joinGame,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'load-game'}
+                    callback: this.controllerGetCallback('table', 'joinGame'),
+                    callbackParams: {player: this.controllerPlayerStoredData(), gameData: null, callback: this.controllerUpdateGameData, messageType: 'load-game'}
                 };
             } else if ($button.hasClass('nav-black-market')) {
+                // replace these callbacks once getAddons() is finished
+                let tempDisplayFunc = ()=> {console.log('display black market');};
+                let tempActionFunc = ()=> {console.log('buy addon');};
                 dialogOptions = {
                     template: this.$templates.blackMarket,
                     focus: null,
-                    processContent: this.table.getAddons,
-                    processContentParams: {userId: this.player.userId, callback: this._renderGameList},
+                    processContent: this.controllerGetCallback('table', 'getAddons'),
+                    processContentParams: {userId: userId, callback: tempDisplayFunc},
                     processInput: null,
-                    callback: this.player.buyAddon,
-                    callbackParams: {player: this.player, gameData: null, callback: this.updateGame, messageType: 'buy-addon'}
+                    callback: this.controllerGetCallback('player', 'buyAddon'),
+                    callbackParams: {player: this.controllerPlayerStoredData(), gameData: null, callback: tempActionFunc, messageType: 'buy-addon'}
                 };
             }
             this._displayDialog(dialogOptions);
@@ -160,7 +143,7 @@ class UI {
         }
     }
 
-    _keystrokeListener(selectors) {
+    keystrokeListener(selectors) {
         let $textField = $(selectors.formSelector);
         $textField.val('');
         $textField.keydown(() => {
@@ -168,74 +151,12 @@ class UI {
         });
     };
 
-    _renderCreateGameForm(selectors) {
-        this.table.getSetList({selector: selectors.setSelector, callback: this._renderSetList});
-        this._keystrokeListener(selectors.keyListenerSelectors);
-    }
-
-    /*************************
-     * _processGameNameEntry
-     * processInput function for _displayDialog
-     * Gets game name user entered, checks that it's long enough and isn't already taken,
-     * then returns true above are true, which then allows _displayDialog to continue;
-     * or returns false if either above is false, which then prevents _displayDialog from continuing.
-     *
-     * @returns boolean
-     *
-     * @private
-     *************************/
-    async _processCreateGameForm() {
-        let gameName = $('#create-modal-enter-game-name').val();
-        let isValid = null;
-
-        this._displayWarning('#modal .wait-text');
-        await this._isNameAvailable(gameName).then((nameIsAvailable) => {
-            this._hideWarning('#modal .wait-text');
-            if (gameName && gameName.length >= 3 && nameIsAvailable) {
-                this.gameData.name = gameName;
-                isValid = true;
-            } else {
-                this._displayWarning('#modal .error-text');
-                isValid = false;
-            }
-        }).catch((error) => {
-            this._hideWarning('#modal .wait-text');
-            this._postMessage({
-                messageType: 'server-error',
-                messageDetails: error
-            });
-        });
-
-        return isValid;
-    }
-
-    _isNameAvailable(nameToCheck) {
-        return new Promise((resolve, reject) => {
-            this.table.getFullGameList({userId: this.player.userId, callback: (gameList) => {
-                for (let game in gameList) {
-                    if (gameList.hasOwnProperty(game) && gameList[game].name === nameToCheck) {
-                        resolve(false);
-                    }
-                }
-                resolve(true);
-            }});
-        });
-    }
-
     _displayWarning(selector) {
         $(selector).show();
     }
 
     _hideWarning(selector) {
         $(selector).hide();
-    }
-
-    async _getPlayerInfo(params) {
-        let playerData = await this.player.getInfo();
-
-        if (params.joined)
-            playerData['joined'] = params.joined;
-        params.callback(playerData);
     }
 
     _renderPlayerInfo(userInfo) {
@@ -253,30 +174,31 @@ class UI {
      * _renderSetList
      * Inserts planet set list data into markup for display in Create New Game screen
      *
-     * this.table.getSetList callback in this._renderCreateGameForm
+     * used as the callback from table.getSetList, initiated by controller.setupCreateGameForm
      *
      * @param: listSelector: $ selector for list of sets
      * @param: setList: Object retrieved from server containing everything in "/set/" (sets of planets)
      *
      * @private
      *************************/
-    _renderSetList(listSelector, setList) {
+    _renderSetList(data) {
+        let setList = data.setList;
         let $setText;
         let ui = this;
-        let $setListMarkup = $(listSelector);
+        let $setListMarkup = $(data.selector);
 
         $setListMarkup.html('');
         if (setList) {
             for (let set in setList) {
                 if (setList.hasOwnProperty(set)) {
-                    let regionList = this.helpers.capitalize(setList[set].regions);
+                    let regionList = ui.helpers.capitalize(setList[set].regions);
 
                     regionList = regionList.map((name) => {return ' ' + name;});
                     if (regionList.length > 1) {
                         regionList[regionList.length-1] = ' and' + regionList[regionList.length-1];
                     }
                     $setText = $(document.createElement('div')).addClass('set-list-row').attr('tabindex', '0').html(`
-                        <span class="no-pointer-events set-list-set-name" data-set="${set}">${set}</span>
+                        <span class="no-pointer-events set-list-set-name" data-region-set="${set}">${set}</span>
                         <div class="no-pointer-events">
                             <div class="set-list-regions">${regionList}</div>
                             <div>${setList[set].description}</div>
@@ -284,23 +206,19 @@ class UI {
                     `);
                     $setText.click(function() {
                         let $prevSelected = $('.game-list-row-selected');
-                        let gameSetEl = $(this).children()[0];
+                        let gameSetData = $(this).children()[0].getAttribute('data-region-set');
 
                         if ($(this).hasClass('game-list-row-selected')) {
                             $(this).removeClass('game-list-row-selected');
                             $('.modal-button-primary').addClass('disabled');
-                            ui.gameData = {
-                                set: ''
-                            };
+                            ui.controllerUpdateGameData({set: ''});
                         } else {
                             if ($prevSelected.length > 0) {
                                 $prevSelected.removeClass('game-list-row-selected');
                             }
                             $(this).addClass('game-list-row-selected');
                             $('.modal-button-primary').removeClass('disabled');
-                            ui.gameData = {
-                                set: gameSetEl.getAttribute('data-set')
-                            };
+                            ui.controllerUpdateGameData({set: gameSetData});
                         }
                     });
                     $setListMarkup.append($setText);
@@ -355,66 +273,48 @@ class UI {
 
             $('.game-join-button, .game-resign-button').click(function(e) {
                 let button = e.currentTarget.textContent;
-
-                ui.gameData = {
-                    name: $(this).data('gamename'),
-                    gameId: $(this).data('gameid')
-                };
-                let gameData = {
-                    player: ui.player,
-                    gameData: ui.gameData,
-                    callback: ui.updateGame,
-                    messageType: button === 'Resign' ? 'resign-game' : joinedGame ? 'load-game' : 'join-game'
+                let newGameData = {name: $(this).data('gamename'), gameId: $(this).data('gameid')};
+                // To be used if player is resigning a game
+                let redrawUserGames = ()=> {
+                    ui.controllerReqPlayerData({joined: true, callback: ui._renderGameList});
                 };
 
                 $('.game-join-button, .game-resign-button').off('click');
                 ui._hideWarning('#modal .wait-text,.error-text');
-                $('#modal').hide();
-                $('#modal-backdrop').hide();
-                ui._navButtonToggle();
-                if (button === 'Resign')
-                    $('#game-content').html('');
-                button === 'Resign' ? ui.table.resignGame(gameData) : ui.table.joinGame(gameData);
+
+                // Update the local game data with name and ID of the chosen game
+                ui.controllerUpdateGameData(newGameData);
+
+                // to be passed to resignGame or joinGame
+                let userActionData = {
+                    player: ui.controllerPlayerStoredData(),
+                    gameData: ui.controllerGameStoredData(),
+                    callback: button === 'Resign' ? redrawUserGames : ui.controllerUpdateBoard,
+                    messageType: button === 'Resign' ? 'resign-game' : joinedGame ? 'load-game' : 'join-game'
+                };
+                if (button === 'Resign') {
+                    let resignGame = ui.controllerGetCallback('table', 'resignGame');
+                    resignGame(userActionData);
+                } else {
+                    $('#modal').hide();
+                    $('#modal-backdrop').hide();
+                    ui._navButtonToggle();
+                    let joinGame = ui.controllerGetCallback('table', 'joinGame');
+                    joinGame(userActionData);
+                }
             });
         }
     }
 
     /*************************
-     * updateGame
-     * callbackParams callback function for _displayDialog
-     *
-     * @param updateData.gameId: string
-     * @param updateData.creator: string
-     * @param updateData.name: string
-     * @param updateData.playerCount: int
-     * @param updateData.playerIds: array of strings
-     * @param updateData.sets: array of strings
-     * @param updateData.isRunning: boolean
-     *************************/
-    updateGame(updateData, messageType) {
-        if (!this.game || this.game.gameData.gameId !== updateData.gameId) {
-            this.createGame(updateData); // this will cause 'load-game' message to fire from this.game
-        } else if (messageType) {
-            this._postMessage({updateData, messageType});
-        }
-    }
-
-    createGame(gameData) {
-        this.game = new Game(this.table, this.player, this._postMessage, gameData);
-    }
-
-    /*************************
-     * _postMessage
+     * postMessage
      * Displays message in sidebar
      *
      * @param payload.messageType: string
      * @param payload.messageDetails: string or null depending on server response
      * @param payload.updateData: object
-     * @param payload.
-     *
-     * @private
-     ************************/
-    _postMessage(payload) {
+     *************************/
+    postMessage(payload) {
         let messageKey = payload.messageType;
         let messageDetails = payload.messageDetails;
         let gameData = payload.updateData;
@@ -504,7 +404,7 @@ class UI {
                 $primaryButton.addClass('disabled');
                 this._navButtonToggle();
                 if (dialogOptions.callback) {
-                    dialogOptions.callbackParams.gameData = this.gameData;
+                    dialogOptions.callbackParams.gameData = this.controllerGameStoredData();
                     dialogOptions.callback(dialogOptions.callbackParams);
                 }
             }

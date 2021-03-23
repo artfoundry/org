@@ -1,8 +1,9 @@
+// Controls game board in DOM from time game loads until game unloads
 class Game {
-    constructor(table, player, uiMessager, gameData) {
+    constructor(table, player, uiMessenger, gameData) {
         this.table = table;
         this.player = player;
-        this.uiMessager = uiMessager.bind(this);
+        this.uiMessenger = uiMessenger.bind(this);
         this.gameData = gameData;
         this.cards = {
             cardTypes: {},
@@ -11,7 +12,32 @@ class Game {
         this.gameRegions = [];
 
         this._initGameListeners();
-        this.updateGame(this.gameData, 'load-game');
+    }
+
+    updateBoard(boardAction, gameData) {
+        let $gameContent = $('#game-content');
+
+        switch (boardAction) {
+            case 'load-game':
+            case 'join-game':
+            case 'create-game':
+                this._clearBoard();
+                this._setupBoard();
+                let $players = $('#players');
+                gameData.playerIds.forEach((name) => {
+                    $players.append(`<span>${name} </span>`);
+                });
+                $gameContent.find('#game-title').text(`Game: ${gameData.name}`);
+                break;
+            case 'store-cards' : this._storeCards(gameData);
+                break;
+            case 'resign-game' : this._clearBoard();
+                break;
+        }
+    }
+
+    updateOtherPlayer(userId, inGame) {
+
     }
 
     _initGameListeners() {
@@ -21,29 +47,36 @@ class Game {
 
         if (playerIsCreator && !isRunning) {
             $startButton.show().click(() => {
-                this.table.startGame(this, this.uiMessager);
+                this.table.startGame(this, this.uiMessenger);
                 $startButton.hide();
+                $startButton.off('click');
             });
         }
     }
 
-    setupGame() {
-        for (let world in this.table.gameBoards) {
-            if (this.table.gameBoards.hasOwnProperty(world)) {
+    _setupBoard() {
+        for (let world in this.table.gameRegions) {
+            if (this.table.gameRegions.hasOwnProperty(world)) {
                 this.gameRegions.push(world);
-                this.placeWorld(world, this.table.gameBoards[world]);
+                this._placeWorld(world, this.table.gameRegions[world]);
             }
         }
     }
 
-    clearGame() {
+    _clearBoard() {
         $('#game-title').html('');
         $('#game-collected-influence').html('');
         $('#game-boards').html('');
         $('#players').html('');
+        this.gameData = {};
+        this.cards = {
+            cardTypes: {},
+            cardsByRegion: {}
+        };
+        this.gameRegions = [];
     }
 
-    placeWorld(worldName, worldInfo) {
+    _placeWorld(worldName, worldInfo) {
         let $worldsContainer = $('#game-boards');
         let $newWorld = $(document.createElement('div'));
 
@@ -51,31 +84,9 @@ class Game {
         $worldsContainer.append($newWorld);
     }
 
-    storeCards(cardData) {
+    _storeCards(cardData) {
         this.cards.cardTypes = cardData.cards;
         this.cards.cardsByRegion = cardData.regions;
-    }
-
-    updateGame(gameData, boardAction) {
-        let $gameContent = $('#game-content');
-
-        switch (boardAction) {
-            case 'load-game' :
-                this.clearGame();
-                this.setupGame();
-                let $players = $('#players');
-                gameData.playerIds.forEach((name) => {
-                    $players.append(`<span>${name} </span>`);
-                });
-                $gameContent.find('#game-title').text(`Game: ${gameData.name}`);
-                break;
-            case 'exit-game' : this.clearGame();
-                break;
-        }
-    }
-
-    updateOtherPlayer(userId, inGame) {
-
     }
 }
 

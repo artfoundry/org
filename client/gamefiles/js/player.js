@@ -1,3 +1,4 @@
+// Retrieves and stores player data from server
 class Player {
     constructor(userId, accountInfo, socket) {
         this.userId = userId;
@@ -59,3 +60,5 @@ class Player {
 
     }
 }
+
+export { Player };
