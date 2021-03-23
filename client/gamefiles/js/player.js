@@ -60,3 +60,5 @@ class Player {
 
     }
 }
+
+export { Player };

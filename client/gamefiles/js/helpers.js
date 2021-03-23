@@ -16,3 +16,5 @@ class Helpers {
         return capList;
     }
 }
+
+export { Helpers };

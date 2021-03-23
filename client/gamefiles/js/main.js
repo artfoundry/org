@@ -7,7 +7,8 @@
  * Instantiates global objects and starts the app
  */
 
-import {UI} from './ui.js';
+import {Controller} from './controller.js';
+import {Player} from './player.js';
 
 const ORG_SERVER = 'http://localhost:4000';
 
@@ -27,7 +28,6 @@ let Org = {
         // need info about getting jubal account info
         return {accountInfo1: 'test info 1', accountInfo2: 'test info 2'}
     },
-    'helpers' : new Helpers(),
     'platform' : '',
     'getOS' : function() {
         let platform = window.navigator.platform,
@@ -54,16 +54,14 @@ let Org = {
         this.userId = this.getUserId();
         this.account = this.getAccountInfo();
         this.platform = this.getOS();
+        this.player = new Player(this.userId, this.account, this.socket);
         this.socket.on('connect', () => {
             console.log('Connected to server');
         });
         this.socket.on('connect-error', (error) => {
             console.log('Error connecting to server: ', error);
         });
-        let player = new Player(this.userId, this.account, this.socket);
-        // let audio = new Audio();
-        let table = new Table(this.socket);
-        new UI(player, table, this.helpers, this.socket);
+        new Controller(this.player, this.socket);
     }
 };
 

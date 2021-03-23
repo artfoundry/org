@@ -23,8 +23,9 @@ class Table {
         let callback = data.callback;
 
         this.socket.on('set-list-retrieved', (setList) => {
+            let response = {selector, setList};
             this.socket.off('set-list-retrieved');
-            callback(selector, setList);
+            callback(response);
         });
 
         this.socket.emit('get-set-list');
@@ -180,6 +181,9 @@ class Table {
      * @param data.callback: function
      *************************/
     getAddons(data) {
-
+        if (data.callback)
+            data.callback();
     }
 }
+
+export { Table };
