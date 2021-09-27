@@ -141,6 +141,7 @@ class UI {
                 });
             }
         }
+        $tempContainer.remove();
     }
 
     keystrokeListener(selectors) {
@@ -255,20 +256,22 @@ class UI {
             $('.modal-button-cancel').focus();
         } else {
             gameList.forEach((game) => {
-                let resignButton = joinedGame ? `<button class="button game-resign-button" data-gameid="${game.gameId}" data-gamename="${game.name}">Resign</button>\n` : '';
-                let turnDisplay = game.currentTurn === 0 ? 'Not started yet' : game.currentTurn;
-                let gameTurn = joinedGame ? `<span class="game-list-text">${turnDisplay}</span>` : '';
+                if (game.isRunning || game.currentTurn === 0) {
+                    let resignButton = joinedGame ? `<button class="button game-resign-button" data-gameid="${game.gameId}" data-gamename="${game.name}">Resign</button>\n` : '';
+                    let turnDisplay = game.currentTurn === 0 ? 'Not started yet' : game.currentTurn;
+                    let gameTurn = joinedGame ? `<span class="game-list-text">${turnDisplay}</span>` : '';
 
-                $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
-                    <span class="game-list-text game-list-text-name">${game.name}</span>
-                    <span class="game-list-text">${game.creator}</span>
-                    <span class="game-list-text">${game.set.name}</span>
-                    <span class="game-list-text">${game.playerCount}</span>
-                    ${gameTurn}
-                    <button class="button game-join-button" data-gameid="${game.gameId}" data-gamename="${game.name}">${joinResumeButtonLabel}</button>
-                    ${resignButton}
-                `);
-                $gameListMarkup.append($gameText);
+                    $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
+                        <span class="game-list-text game-list-text-name">${game.name}</span>
+                        <span class="game-list-text">${game.creator}</span>
+                        <span class="game-list-text">${game.set.name}</span>
+                        <span class="game-list-text">${game.playerCount}</span>
+                        ${gameTurn}
+                        <button class="button game-join-button" data-gameid="${game.gameId}" data-gamename="${game.name}">${joinResumeButtonLabel}</button>
+                        ${resignButton}
+                    `);
+                    $gameListMarkup.append($gameText);
+                }
             });
 
             $('.game-join-button, .game-resign-button').click(function(e) {
@@ -317,6 +320,7 @@ class UI {
     postMessage(payload) {
         let messageKey = payload.messageType;
         let messageDetails = payload.messageDetails;
+        let playerName = payload.player;
         let gameData = payload.updateData;
         let gameName = gameData && gameData.name;
         let creator = gameData && gameData.creator;
@@ -325,7 +329,7 @@ class UI {
 
         $message.addClass('log-message');
         switch(messageKey) {
-            case 'login': $message.text(`Login successful`); break;
+            case 'login': $message.text(`Logged in as ${playerName}`); break;
             case 'login-failed': $message.text(messageDetails); break;
             case 'create-game': $message.text(`${gameName} created by ${creator}`); break;
             case 'join-game': $message.text(`You joined ${gameName}`); break;
@@ -334,6 +338,7 @@ class UI {
             case 'other-resigned-game': $message.text(`${otherPlayer} has resigned ${gameName}`); break;
             case 'load-game': $message.text(`${gameName} loaded`); break;
             case 'already-in-game': $message.text('You are already a player in that game!'); break;
+            case 'game-setup': $message.text('Setting up the game...'); break;
             case 'game-starting': $message.text('The game is starting!'); break;
             case 'server-error': $message.text(`An error has occurred: ${messageDetails}`); break;
             case 'game-message': $message.text(messageDetails); break;

@@ -16,9 +16,7 @@ class Player {
         let data = {
             messageType: '',
             messageDetails: null,
-            updateData: {
-                player: this.userId
-            }
+            player: this.userId
         };
 
         this.socket.on('login-successful', () => {

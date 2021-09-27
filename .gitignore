@@ -11,7 +11,7 @@
 /server/node_modules/
 /server/firebaseServices-debug.log
 /server/database-debug.log
-/server/org-board-eff5da155b1b.json
+/server/org-board-eff5da155b1b.js
 /server/npm-debug.log
 
 /references

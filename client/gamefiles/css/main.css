@@ -115,15 +115,18 @@ header {
 }
 
 #game-content {
-    width: 85%;
+    width: 100%;
     height: 100%;
     padding: 10px;
     color: white;
 }
 
 #game-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    height: 100px;
+    height: 30px;
     padding: 10px 0;
 }
 
@@ -136,6 +139,41 @@ header {
     top: 0;
     font-size: 16px;
     font-weight: 600;
+}
+
+.game-playerlist-player {
+    display: inline-block;
+    margin: 5px;
+    line-height: 30px;
+}
+
+.player-influence {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.player-influence.blue {
+    background-color: blue;
+}
+
+.player-influence.yellow {
+    background-color: yellow;
+}
+
+.player-influence.red {
+    background-color: red;
+}
+
+.player-influence.green {
+    background-color: green;
+}
+
+.player-influence.white {
+    background-color: white;
 }
 
 /* Board images */
@@ -216,7 +254,7 @@ header {
 
 .game-list {
     max-height: 400px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .set-list {
@@ -227,8 +265,13 @@ header {
 
 .game-list-header-row {
     display: grid;
-    grid-template-columns: 2fr repeat(6, 1fr);
+    grid-template-columns: auto repeat(4, 150px);
+    column-gap: 5px;
     padding: 0 20px;
+}
+
+.account-modal-user-games .game-list-header-row {
+    grid-template-columns: auto repeat(6, 130px);
 }
 
 .game-list-header {
@@ -248,10 +291,15 @@ header {
 
 .game-list-row, .game-list-row-nogames {
     display: grid;
-    grid-template-columns: 2fr repeat(6, 1fr);
+    grid-template-columns: auto repeat(4, 150px);
+    column-gap: 5px;
     line-height: 1.2em;
     margin: 5px;
     padding: 0 20px;
+}
+
+.account-modal-user-games .game-list-row {
+    grid-template-columns: auto repeat(6, 130px);
 }
 
 .set-list-row:focus {

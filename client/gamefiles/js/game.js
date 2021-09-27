@@ -11,6 +11,9 @@ class Game {
         };
         this.gameRegions = [];
 
+        // bindings
+        this.table.startGame = this.table.startGame.bind(this.table);
+
         this._initGameListeners();
     }
 
@@ -23,13 +26,23 @@ class Game {
             case 'create-game':
                 this._clearBoard();
                 this._setupBoard();
-                let $players = $('#players');
-                gameData.playerIds.forEach((name) => {
-                    $players.append(`<span>${name} </span>`);
-                });
-                $gameContent.find('#game-title').text(`Game: ${gameData.name}`);
+                let $playerList = $('#game-players').html('');
+                let name = '';
+                for (let index in gameData.playerIds) {
+                    if (gameData.playerIds.hasOwnProperty(index)) {
+                        name = gameData.playerIds[index];
+                        let $playerInfo = $(document.createElement('div'));
+                        $playerInfo.addClass('game-playerlist-player');
+                        $playerInfo.append(`<span>${name}</span>`);
+                        if (gameData.isRunning) {
+                            $playerInfo.append(`<span class="player-influence ${gameData.colors[name]}">${gameData.influenceTokens[name]}</span>`);
+                        }
+                        $playerList.append($playerInfo);
+                    }
+                }
+                $gameContent.find('#game-title').text(`${gameData.name}`);
                 break;
-            case 'store-cards' : this._storeCards(gameData);
+            case 'store-cards' : this._storeCardData(gameData);
                 break;
             case 'resign-game' : this._clearBoard();
                 break;
@@ -84,7 +97,7 @@ class Game {
         $worldsContainer.append($newWorld);
     }
 
-    _storeCards(cardData) {
+    _storeCardData(cardData) {
         this.cards.cardTypes = cardData.cards;
         this.cards.cardsByRegion = cardData.regions;
     }

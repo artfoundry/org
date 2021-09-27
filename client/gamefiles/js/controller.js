@@ -28,9 +28,6 @@ class Controller {
         this.ui = new UI(this);
 
         // bindings for callbacks
-        this.getPlayerFromServer = this.getPlayerFromServer.bind(this);
-        this.processCreateGameForm = this.processCreateGameForm.bind(this);
-        this.updateGameBoard = this.updateGameBoard.bind(this);
         this.table.joinGame = this.table.joinGame.bind(this.table);
         this.table.createGame = this.table.createGame.bind(this.table);
         this.table.getFullGameList = this.table.getFullGameList.bind(this.table);
@@ -157,6 +154,7 @@ class Controller {
 
     createGame(gameData) {
         this.game = new Game(this.table, this.player, this.ui.postMessage, gameData);
+        this.game.updateBoard = this.game.updateBoard.bind(this.game);
         this.updateGameData(gameData);
     }
 

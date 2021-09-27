@@ -1,14 +1,12 @@
 class FirebaseServices {
-    constructor(GlobalData) {
+    constructor(FirebaseAdmin, FirebaseAccount, GlobalData) {
+        this.admin = FirebaseAdmin;
         this.globalData = GlobalData;
-        this.admin = require("firebase-admin");
-        // Fetch the service account key JSON file contents
-        this.serviceAccount = require("../org-board-eff5da155b1b.json");
+        this.serviceAccount = FirebaseAccount; // service account key
         this.isOnline = this._initAuth();
         if (this.isOnline) {
             // As an admin, the app has access to read and write all data, regardless of Security Rules
             this.fbDatabase = this.admin.database();
-
             // is this necessary?
             // this.ref = this.fbDatabase.ref("restricted_access/secret_document");
             // this.ref.once("value", function(snapshot) {
@@ -27,7 +25,7 @@ class FirebaseServices {
             });
             return true;
         } catch (error) {
-            alert(`Unable to connect to the server. Reload the page to try again.\n${error}`);
+            console.log(`Unable to connect to the server. Reload the page to try again.\n${error}`);
             return false;
         }
     }
@@ -218,7 +216,8 @@ class FirebaseServices {
                 playerIds: [userId],
                 set: null,
                 isRunning: false,
-                currentTurn: 0
+                currentTurn: 0,
+                influenceBids: {}
             };
             let userGameList;
             let gameId;
@@ -274,15 +273,7 @@ class FirebaseServices {
      ******************/
     joinGame(userId, gameId) {
         return new Promise ((resolve, reject) => {
-            let gameData = {
-                gameId,
-                creator: null,
-                name: null,
-                playerCount: null,
-                playerIds: [],
-                set: [],
-                currentPlayerTurn: ''
-            };
+            let gameData = {};
             let errorObject = {
                 type: '',
                 message: ''
@@ -299,11 +290,9 @@ class FirebaseServices {
                 return this.getGameInfo(gameId);
             }).then((retrievedGameInfo) => {
                 retrievedGameInfo.playerIds.push(userId);
-                gameData.name = retrievedGameInfo.name;
-                gameData.playerIds = retrievedGameInfo.playerIds;
-                gameData.playerCount = retrievedGameInfo.playerCount + 1;
-                gameData.creator = retrievedGameInfo.creator;
-                gameData.set = retrievedGameInfo.set || gameData.set;
+                gameData = retrievedGameInfo;
+                gameData.playerCount++;
+                gameData.set = gameData.set || [];
 
                 updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
                 updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
@@ -340,15 +329,7 @@ class FirebaseServices {
      ******************/
     resignGame(userId, gameId) {
         return new Promise ((resolve, reject) => {
-            let gameData = {
-                gameId,
-                creator: null,
-                name: null,
-                playerCount: null,
-                playerIds: [],
-                set: [],
-                currentPlayerTurn: ''
-            };
+            let gameData = {};
             let errorObject = {
                 type: '',
                 message: ''
@@ -410,11 +391,11 @@ class FirebaseServices {
             for (let dataType in gameData) {
                 if (gameData.hasOwnProperty(dataType)) {
                     if (playerId) {
-                        updates[`/gameIdList/${gameId}/gameData/${dataType}/${playerId}`] = gameData[dataType];
+                        updates[`/gameIdList/${gameId}/${dataType}/${playerId}`] = gameData[dataType];
                     } else if (dataType === 'isRunning') {
                         updates[`/gameIdList/${gameId}/isRunning`] = gameData[dataType];
                     } else {
-                        updates[`/gameIdList/${gameId}/gameData/${dataType}`] = gameData[dataType];
+                        updates[`/gameIdList/${gameId}/${dataType}`] = gameData[dataType];
                     }
                 }
             }
