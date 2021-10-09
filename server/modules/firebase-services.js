@@ -118,9 +118,7 @@ class FirebaseServices {
             this.checkOnlineStatus(reject);
 
             this.fbDatabase.ref('/set/').once('value').then((snapshot) => {
-                let results = snapshot.val();
-
-                resolve(results);
+                resolve(snapshot.val());
             }).catch((error) => {
                 errorObject.type = 'server-error';
                 errorObject.message = 'FirebaseServices.getSetList(): ' + error;
@@ -225,8 +223,15 @@ class FirebaseServices {
 
             this.getSetList().then((setList) => {
                 return setList;
-            }).then((setList) => {
-                return this.getBoardData(setList[gameSet].regions);
+            }).then(async (setList) => {
+                let allRegions = await this.getBoardData();
+                let usedRegions = {};
+                for (let region in allRegions) {
+                    if (Object.values(setList[gameSet].regions).includes(region)) {
+                        usedRegions[region] = allRegions[region];
+                    }
+                }
+                return usedRegions;
             }).then((regions) => {
                 gameData.set = {
                     name: gameSet,
@@ -465,28 +470,21 @@ class FirebaseServices {
         });
     }
 
-    getBoardData(boardNames) {
+    getBoardData() {
         return new Promise ((resolve, reject) => {
             let errorObject = {
                 type: '',
                 message: ''
             };
-            let boardData = {};
-
             this.checkOnlineStatus(reject);
 
-            for (let name in boardNames) {
-                if (boardNames.hasOwnProperty(name)) {
-                    this.fbDatabase.ref(`/board/${name}`).once('value').then((snapshot) => {
-                        boardData[name] = snapshot.val();
-                    }).catch((error) => {
-                        errorObject.type = 'server-error';
-                        errorObject.message = 'FirebaseServices.getBoardData(): ' + error;
-                        reject(errorObject);
-                    });
-                }
-            }
-            resolve(boardData);
+            this.fbDatabase.ref(`/board/`).once('value').then((snapshot) => {
+                resolve(snapshot.val());
+            }).catch((error) => {
+                errorObject.type = 'server-error';
+                errorObject.message = 'FirebaseServices.getBoardData(): ' + error;
+                reject(errorObject);
+            });
         });
     }
 }

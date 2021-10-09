@@ -302,29 +302,32 @@ class GameServer {
         this.playInfluencePhase(gameId, gameInfo);
     }
 
-    async playInfluencePhase(gameId, gameInfo) {
+    playInfluencePhase(gameId, gameInfo) {
         let allRegions = gameInfo.set.regions;
+        let numRegions = Object.keys(allRegions).length;
         let i = 0;
         let message = '--Influence phase--';
         this.emitResponse('game-message', message);
 
         for (let region in allRegions) {
-            await this.getInfluenceBidsForRegion(allRegions[region], gameId, gameInfo).then((bids) => {
+            this.getInfluenceBidsForRegion(allRegions[region], gameId, gameInfo).then((bids) => {
                 // notify winner of bid and store win info
                 let gameData = {winner: 'winningInfo'}; // placeholder key and values
                 this.fbServices.updateGame(gameId, gameData).then(() => {
                     let winner = this.determineBidWinner(bids, gameData);
-                    message = `${winner} won the bid for ${allRegions[i]}`;
+                    message = `${winner} won the bid for ${allRegions[region]}`;
                     this.emitResponse('game-message', message);
                 }).catch((error) => {
                     message = `Error updating game turn value: ${error.message}`;
                     this.emitResponse(error.type, error.message, message);
                 });
+                if (i === numRegions) {
+                    this.playRecoverPhase(gameId, gameInfo);
+                } else {
+                    i++;
+                }
             });
         }
-
-        this.socket.off('player-turn-done');
-        this.playRecoverPhase(gameId, gameInfo);
     }
 
     determineBidWinner(bids, gameData) {
@@ -349,7 +352,7 @@ class GameServer {
         this.emitResponse('game-message', message);
 
         return new Promise((resolve) => {
-            this.socket.on('player-turn-done', (userId, influenceBid) => {
+            this.socket.on('place-bid', (userId, influenceBid) => {
                 let gameData = {influenceBids: {userId: influenceBid}};
                 bids[userId] = influenceBid;
                 this.fbServices.updateGame(gameId, gameData).then(() => {
@@ -360,7 +363,7 @@ class GameServer {
                     this.emitResponse(error.type, error.message, message);
                 });
 
-                if (bids.keys.length === gameInfo.playerCount) {
+                if (Object.keys(bids).length === gameInfo.playerCount) {
                     resolve(bids);
                 }
             });

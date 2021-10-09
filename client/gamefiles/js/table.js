@@ -184,6 +184,15 @@ class Table {
         if (data.callback)
             data.callback();
     }
+
+    /*************************
+     * placeBid
+     *
+     * @param influenceBid: integer
+     *************************/
+    placeBid(influenceBid) {
+        this.socket.emit('place-bid', this.playerId, influenceBid)
+    }
 }
 
 export { Table };

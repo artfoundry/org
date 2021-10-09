@@ -21,6 +21,7 @@ class Game {
         let $gameContent = $('#game-content');
 
         switch (boardAction) {
+            // load, join, and create all do the same thing for updating the board (difference is for messaging in UI)
             case 'load-game':
             case 'join-game':
             case 'create-game':
@@ -79,7 +80,7 @@ class Game {
     _clearBoard() {
         $('#game-title').html('');
         $('#game-collected-influence').html('');
-        $('#game-boards').html('');
+        $('#world-boards-container').html('');
         $('#players').html('');
         this.gameData = {};
         this.cards = {
@@ -90,10 +91,27 @@ class Game {
     }
 
     _placeWorld(worldName, worldInfo) {
-        let $worldsContainer = $('#game-boards');
+        let $worldsContainer = $('#world-boards-container');
         let $newWorld = $(document.createElement('div'));
+        let $bidButton = $(document.createElement('button'));
+        let $bidEntry = $(document.createElement('input'));
+        let worldNameLowerCase = worldName.toLowerCase();
 
-        $newWorld.text(worldName).addClass('world').attr('id', `world-${worldName.toLowerCase()}`);
+        $newWorld.text(worldName).addClass('world').attr('id', `world-${worldNameLowerCase}`);
+        $bidButton.text('Place bid').addClass('button disabled').attr('tabindex', '0').click(()=> {
+            let bid = $(`#bid-world-${worldNameLowerCase}`).value;
+            this.table.placeBid(bid);
+        });
+        $bidEntry.attr('type', 'text').attr('size', '4').attr('id', `bid-world-${worldNameLowerCase}`).click(()=> {
+            let val = $(`#bid-world-${worldNameLowerCase}`).value;
+            if(val.length > 0) {
+                if(val.match(/\w+/)) {
+                    alert('Bid may only include numbers');
+                } else {
+                    $bidButton.removeClass('disabled');
+                }
+            }
+        });
         $worldsContainer.append($newWorld);
     }
 

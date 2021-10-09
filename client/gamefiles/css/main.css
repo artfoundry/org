@@ -177,10 +177,9 @@ header {
 }
 
 /* Board images */
-#game-boards {
+#world-boards-container {
     display: flex;
     justify-content: space-between;
-
 }
 
 .world {
