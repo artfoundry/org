@@ -23,7 +23,7 @@ class FirebaseServices {
     _initialize() {
         // from https://console.firebase.google.com/u/0/project/org-board/settings/general
         let config = {
-                apiKey: "AIzaSyBFc_HcCL84XhFoYr6rwRDrWddnUinsWtQ",
+                apiKey: "AIzaSyCDFHl35dTCLWXa6erWh8rcUObeOtJjQk0",
                 authDomain: "org-board.firebaseapp.com",
                 databaseURL: "https://org-board.firebaseio.com",
                 projectId: "org-board",
@@ -131,7 +131,11 @@ class FirebaseServices {
                         data[attr] = [value, item[n].value];
                     }
                 } else {
-                    data[attr] = item[n].value;
+                    if (attr === 'regions') {
+                        data[attr] = [item[n].value];
+                    } else {
+                        data[attr] = item[n].value;
+                    }
                 }
             }
         }
