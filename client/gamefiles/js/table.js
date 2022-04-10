@@ -86,7 +86,6 @@ class Table {
     joinGame(data) {
         let callback = data.callback;
         let messageType = data.messageType;
-
         this.playerId = data.player.userId;
         this.gameId = data.gameData.gameId;
         this.socket.on('joined-game', (gameData) => {
@@ -165,6 +164,11 @@ class Table {
         this.socket.on('game-message', (message) => {
             messagePackage.messageDetails = message;
             messagePackage.messageType = 'game-message';
+            uiMessageCallback(messagePackage);
+        });
+
+        this.socket.on('game-setup', ()=> {
+            messagePackage.messageType = 'game-setup';
             uiMessageCallback(messagePackage);
         });
 

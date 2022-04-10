@@ -75,12 +75,13 @@ class GameServer {
             let logMessage = '';
             this.fbServices.joinGame(userId, gameId).then((results) => {
                 let updateData = {
-                    userId: userId,
+                    userId,
                     gameId,
                     name: results.name
                 };
                 logMessage = userId + ' joined ' + results.name;
                 this.emitResponse('joined-game', results, logMessage);
+
                 logMessage = 'Message broadcasted to other players';
                 this.emitResponse('other-joined-game', updateData, logMessage);
             }).catch((error) => {
@@ -98,7 +99,9 @@ class GameServer {
             }).then(() => {
                 let params = {key: 'inGame', value: gameId};
 
-                this.fbServices.updateUser(userId, params).catch((error) => {
+                this.fbServices.updateUser(userId, params).then(() => {
+                    this.updateUserOnResume(userId, gameInfo);
+                }).catch((error) => {
                     logMessage = `Error updating user info: ${error.message}`;
                     this.emitResponse(error.type, error.message, logMessage);
                 });
@@ -174,37 +177,61 @@ class GameServer {
 
     startGame(gameId) {
         let logMessage = '';
+        let gameData = null;
 
         this.fbServices.getCardData().then((cardData) => {
             logMessage = 'retrieved card data';
             this.emitResponse('card-data', cardData, logMessage);
-        }).catch((error) => {
-            logMessage = `Error retrieving card info while trying to start game: ${error.message}`;
-            this.emitResponse(error.type, error.message, logMessage);
-        });
-
-        this.fbServices.getGameInfo(gameId).then((gameData) => {
-            this.fbServices.updateGame(gameId, {isRunning: true}).catch((error) => {
+        }).then(() => {
+            return this.fbServices.getGameInfo(gameId).then(data => {
+                gameData = data;
+            }).catch((error) => {
+                logMessage = `Error retrieving game info while trying to start game: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
+        }).then(() => {
+            return this.fbServices.updateGame(gameId, {isRunning: true, currentTurn: 1}).catch((error) => {
                 logMessage = `Error updating game info while trying to start game: ${error.message}`;
                 this.emitResponse(error.type, error.message, logMessage);
             });
-            return gameData;
-        }).then((gameData) => {
+        }).then(() => {
             logMessage = `Running setup...`;
             this.emitResponse('game-setup', null, logMessage);
-            this.gameSetup(gameData);
-
-            logMessage = `${gameId} is starting`;
-            this.emitResponse('game-starting', null, logMessage);
-            this.startTurnController(gameId, gameData);
+            return this.gameSetup(gameData);
+        }).then(() => {
+            this.playGameLoop(gameId, gameData);
         }).catch((error) => {
-            logMessage = `Error retrieving game info while trying to start game: ${error.message}`;
+            logMessage = `Error trying to start game: ${error.message}`;
+            this.emitResponse(error.type, error.message, logMessage);
+        });
+    }
+
+    playGameLoop(gameId, gameData) {
+        this.startNextTurn(gameId, gameData).then(() => {
+            return this.playExpansionPhase(gameId, gameData);
+        }).then(() => {
+            return this.playDrawPhase(gameId, gameData);
+        }).then(() => {
+            return this.playInfluencePhase(gameId, gameData);
+        }).then(() => {
+            return this.playRecoverPhase(gameId, gameData);
+        }).then(() => {
+            //for testing to prevent endless loop
+            gameData.isRunning = false;
+
+            if (gameData.isRunning) {
+                this.playGameLoop(gameId, gameData);
+            } else {
+                return this.endGame(gameId);
+            }
+        }).catch(error => {
+            const logMessage = `Error playing game loop: ${error.message}`;
             this.emitResponse(error.type, error.message, logMessage);
         });
     }
 
     /*******************
-     * gameSetup
+     * gameSetup assigns player colors and gives out starting inf tokens, then goes to deal cards
      *
      * @param gameInfo: object containing all game information (from /gameIDList/ in DB)
      */
@@ -215,42 +242,82 @@ class GameServer {
         let regions = gameInfo.set.regions;
         let colors = ['blue', 'green', 'red', 'yellow', 'white'];
         let i = 0;
-        let playerId = '';
+        let promises = [];
+        let message = '';
 
-        for (let index in playersIdList) {
-            if (playersIdList.hasOwnProperty(index)) {
-                playerId = playersIdList[index];
-                this.assignColor(gameId, playerId, colors[i]);
-                this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens);
-                i++;
-            }
+        for (const playerId of Object.values(playersIdList)) {
+            promises.push(this.assignColor(gameId, playerId, colors[i++]));
+            promises.push(this.giveInfluenceTokens(gameId, playerId, startingInfluenceTokens));
         }
+        for (const region in Object.values(regions)) {
+            promises.push(this.dealRegionCards(gameInfo, region));
+        }
+        return Promise.all(promises).then(() => {
+            message = `${gameId} is starting`;
+            this.emitResponse('game-starting', null, message);
+        }).catch(error => {
+            message = `Error while setting up game: ${error}`;
+            this.emitResponse('game-message', message);
+        });
+    }
 
-        for (let region in regions) {
-            if (regions.hasOwnProperty(region)) {
-                this.dealRegionCards(gameInfo, region);
-            }
-        }
+    updateUserOnResume(userId, gameInfo) {
+
     }
 
     assignColor(gameId, playerId, color) {
         let gameData = {'colors': color};
         let message = '';
 
-        this.fbServices.updateGame(gameId, gameData, playerId).then(() => {
-            message = `${playerId} has been assigned the color ${color}`;
-            this.emitResponse('game-message', message);
-        }).catch((error) => {
-            message = `Error updating game info while trying to give out tokens: ${error.message}`;
-            this.emitResponse(error.type, error.message, message);
+        return new Promise((resolve, reject) => {
+            this.fbServices.updateGame(gameId, gameData, playerId).then(() => {
+                message = `${playerId} has been assigned the color ${color}`;
+                this.emitResponse('game-message', message);
+                resolve();
+            }).catch((error) => {
+                message = `Error updating game info while trying to assign player colors: ${error.message}`;
+                this.emitResponse(error.type, error.message, message);
+                reject();
+            });
+        });
+    }
+
+    /****
+     * Gives out inf tokens to a player
+     * @param gameId: string (uuid)
+     * @param playerId: string
+     * @param influenceTokens: int (number of tokens to give each player)
+     * @returns {Promise<unknown[]>}
+     */
+    giveInfluenceTokens(gameId, playerId, influenceTokens) {
+        let message = '';
+
+        return new Promise((resolve, reject) => {
+            this.fbServices.getGameInfo(gameId).then((data) => {
+                return data.influenceTokens ? data.influenceTokens[playerId] : 0;
+            }).then((currentInfluenceTokens) => {
+                const gameData = {influenceTokens: currentInfluenceTokens + influenceTokens};
+                return this.fbServices.updateGame(gameId, gameData, playerId).then(() => {
+                    const plural = influenceTokens > 1 ? 's' : '';
+                    message = `${playerId} has received ${influenceTokens} Influence Token${plural}`;
+                    this.emitResponse('game-message', message);
+                    resolve();
+                });
+            }).catch((error) => {
+                message = `Error updating game info while trying to give out tokens: ${error.message}`;
+                this.emitResponse(error.type, error.message, message);
+                reject();
+            });
         });
     }
 
     dealRegionCards(gameInfo, region) {
-        
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
     }
 
-    startTurnController(gameId, gameInfo) {
+    startNextTurn(gameId, gameInfo) {
         // this should be a list of listeners that make calls to the appropriate
         // fbservices functions to update the game, with a conditional that checks (before calling the fbservices
         // function) if some condition is met (usually all players having made their turn) - if so, then
@@ -259,38 +326,56 @@ class GameServer {
         let playerOrder = Object.values(gameInfo.playerIds); // no specific ordering set
         let gameData = {currentPlayersTurn: playerOrder[0],
                         playerTurnOrder: playerOrder};
-        this.fbServices.updateGame(gameId, gameData).catch((error) => {
-            let logMessage = `Error updating game info while trying to start game: ${error.message}`;
-            this.emitResponse(error.type, error.message, logMessage);
+
+        return new Promise((resolve, reject) => {
+            this.fbServices.updateGame(gameId, gameData).then(() => {
+                this.increaseTurnNumber(gameId, ++gameInfo.currentTurn).then(() => {
+                    resolve();
+                });
+            }).catch((error) => {
+                let logMessage = `Error updating game info while trying to start next turn: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+                reject();
+            });
         });
-        this.increaseTurnNumber(gameId, gameInfo.currentTurn++);
-        this.playExpansionPhase(gameId, gameInfo);
     }
 
     increaseTurnNumber(gameId, currentTurn) {
-        let gameData = {'currentTurn': currentTurn};
+        let gameData = {currentTurn};
         let message = '';
 
-        this.fbServices.updateGame(gameId, gameData).then(() => {
-            message = `Turn ${currentTurn} is starting`;
-            this.emitResponse('game-message', message);
-        }).catch((error) => {
-            message = `Error updating game turn value: ${error.message}`;
-            this.emitResponse(error.type, error.message, message);
+        return new Promise((resolve, reject) => {
+            this.fbServices.updateGame(gameId, gameData).then(() => {
+                message = `Turn ${currentTurn} is starting`;
+                this.emitResponse('game-message', message);
+                resolve();
+            }).catch((error) => {
+                message = `Error updating game turn value: ${error.message}`;
+                this.emitResponse(error.type, error.message, message);
+                reject();
+            });
         });
     }
 
+    /******
+     * starts Expansion phase, in which influence tokens are given out
+     *
+     * @param gameId: string (uuid)
+     * @param gameInfo
+     */
     playExpansionPhase(gameId, gameInfo) {
-        let playersIdList = gameInfo.playerIds
+        let playersIdList = gameInfo.playerIds;
+        let promises = [];
         let message = '--Expansion phase--';
         this.emitResponse('game-message', message);
 
-        for (let index in playersIdList) {
-            if (playersIdList.hasOwnProperty(index)) {
-                this.giveInfluenceTokens(gameId, playersIdList[index], 1);
-            }
+        for (const playerId of Object.values(playersIdList)) {
+            promises.push(this.giveInfluenceTokens(gameId, playerId, 1));
         }
-        this.playDrawPhase(gameId, gameInfo);
+        return Promise.all(promises).catch(error => {
+            message = `Error while giving out influence tokens: ${error}`;
+            this.emitResponse('game-message', message);
+        });
     }
 
     playDrawPhase(gameId, gameInfo) {
@@ -298,36 +383,45 @@ class GameServer {
         this.emitResponse('game-message', message);
 
         // loop through regions to draw cards for each
-
-        this.playInfluencePhase(gameId, gameInfo);
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
     }
 
     playInfluencePhase(gameId, gameInfo) {
-        let allRegions = gameInfo.set.regions;
-        let numRegions = Object.keys(allRegions).length;
-        let i = 0;
-        let message = '--Influence phase--';
+        const allRegions = gameInfo.set.regions;
+        const message = '--Influence phase--';
         this.emitResponse('game-message', message);
 
-        for (let region in allRegions) {
-            this.getInfluenceBidsForRegion(allRegions[region], gameId, gameInfo).then((bids) => {
-                // notify winner of bid and store win info
-                let gameData = {winner: 'winningInfo'}; // placeholder key and values
-                this.fbServices.updateGame(gameId, gameData).then(() => {
-                    let winner = this.determineBidWinner(bids, gameData);
-                    message = `${winner} won the bid for ${allRegions[region]}`;
-                    this.emitResponse('game-message', message);
-                }).catch((error) => {
-                    message = `Error updating game turn value: ${error.message}`;
-                    this.emitResponse(error.type, error.message, message);
-                });
-                if (i === numRegions) {
-                    this.playRecoverPhase(gameId, gameInfo);
-                } else {
-                    i++;
-                }
-            });
+        // think we need to loop through the regions and set up promises,
+        // but wait for each promise to resolve before setting up the next one
+        return this.getInfluenceBids(gameId, gameInfo, allRegions);
+    }
+
+    getInfluenceBids(gameId, gameInfo, allRegions) {
+        let message = '';
+        let promises = [];
+
+        for (const region of Object.keys(allRegions)) {
+            promises.push(
+                this.getInfluenceBidsForRegion(region, gameId, gameInfo).then((bids) => {
+                    // notify winner of bid and store win info
+                    const gameData = {winner: 'winningInfo'}; // placeholder key and values
+                    return this.fbServices.updateGame(gameId, gameData).then(() => {
+                        const winner = this.determineBidWinner(bids, gameData);
+                        message = `${winner} won the bid for ${region}`;
+                        this.emitResponse('game-message', message);
+                    }).catch((error) => {
+                        message = `Error getting influence bids: ${error.message}`;
+                        this.emitResponse(error.type, error.message, message);
+                    });
+                })
+            );
         }
+        return Promise.allSettled(promises).catch(error => {
+            message = `Error while getting bids: ${error}`;
+            this.emitResponse('game-message', message);
+        });
     }
 
     determineBidWinner(bids, gameData) {
@@ -346,21 +440,22 @@ class GameServer {
         return winner;
     }
 
-    getInfluenceBidsForRegion(region, gameId, gameInfo) {
-        let bids = null;
-        let message = `Bidding on ${region}. Place your influence bid.`;
-        this.emitResponse('game-message', message);
+    getInfluenceBidsForRegion(currentRegionName, gameId, gameInfo) {
+        return new Promise((resolve, reject) => {
+            let bids = null;
+            let message = `Bidding on "${currentRegionName}". Place your influence bid.`;
+            this.emitResponse('game-message', message);
 
-        return new Promise((resolve) => {
             this.socket.on('place-bid', (userId, influenceBid) => {
                 let gameData = {influenceBids: {userId: influenceBid}};
                 bids[userId] = influenceBid;
                 this.fbServices.updateGame(gameId, gameData).then(() => {
-                    message = `You bid ${influenceBid} on ${region}. Waiting for all bidding to finish...`;
+                    message = `You bid ${influenceBid} on ${currentRegionName}. Waiting for all bidding to finish...`;
                     this.emitResponse('game-message', message);
                 }).catch((error) => {
                     message = `Error updating bidding: ${error.message}`;
                     this.emitResponse(error.type, error.message, message);
+                    reject();
                 });
 
                 if (Object.keys(bids).length === gameInfo.playerCount) {
@@ -370,50 +465,33 @@ class GameServer {
         });
     }
 
-    playRecoverPhase(gameId, gameInfo) {
+    playRecoverPhase(gameId, gameData) {
         let message = '--Recovery phase--';
         this.emitResponse('game-message', message);
 
         // ...
 
-        this.checkForEndGame(gameId, gameInfo);
-    }
-
-    giveInfluenceTokens(gameId, playerId, influenceTokens) {
-        let gameData = {influenceTokens};
-        let message = '';
-
-        this.fbServices.updateGame(gameId, gameData, playerId).then(() => {
-            let plural = influenceTokens > 1 ? 's' : '';
-            message = `${playerId} has received ${influenceTokens} Influence Token${plural}`;
-            this.emitResponse('game-message', message);
-        }).catch((error) => {
-            message = `Error updating game info while trying to give out tokens: ${error.message}`;
-            this.emitResponse(error.type, error.message, message);
+        return new Promise((resolve, reject) => {
+            resolve();
         });
     }
 
-    checkForEndGame(gameId, gameInfo) {
-        if (gameInfo.isRunning) {
-            this.increaseTurnNumber(gameId, gameInfo.currentTurn++);
-            this.playExpansionPhase(gameId, gameInfo);
-        } else {
-            this.endGame(gameId, gameInfo);
-        }
-    }
-
-    endGame(gameId, gameInfo) {
+    endGame(gameId) {
         let message = '';
         let gameData = {isRunning: false};
 
         // need code here to mark game as completed for each player, or however it should be stored
 
-        this.fbServices.updateGame(gameId, gameData).then(() => {
-            message = 'Game is over';
-            this.emitResponse('game-message', message);
-        }).catch((error) => {
-            message = `Error updating game turn value: ${error.message}`;
-            this.emitResponse(error.type, error.message, message);
+        return new Promise((resolve, reject) => {
+            this.fbServices.updateGame(gameId, gameData).then(() => {
+                message = 'Game is over';
+                this.emitResponse('game-message', message);
+                resolve();
+            }).catch((error) => {
+                message = `Error updating game turn value: ${error.message}`;
+                this.emitResponse(error.type, error.message, message);
+                reject();
+            });
         });
     }
 }

@@ -90,7 +90,7 @@ class UI {
                     processContentParams: {userId: userId, callback: this._renderGameList},
                     processInput: null,
                     callback: this.controllerGetCallback('table', 'joinGame'),
-                    callbackParams: {player: this.controllerPlayerStoredData(), gameData: null, callback: this.controllerUpdateGameData, messageType: 'join-game'}
+                    callbackParams: {player: this.controllerPlayerStoredData(), gameData: null, callback: this.controllerUpdateBoard, messageType: 'join-game'}
                 };
             } else if ($button.hasClass('nav-user-games')) {
                 dialogOptions = {
@@ -258,7 +258,7 @@ class UI {
             gameList.forEach((game) => {
                 if (game.isRunning || game.currentTurn === 0) {
                     let resignButton = joinedGame ? `<button class="button game-resign-button" data-gameid="${game.gameId}" data-gamename="${game.name}">Resign</button>\n` : '';
-                    let turnDisplay = game.currentTurn === 0 ? 'Not started yet' : game.currentTurn;
+                    let turnDisplay = game.isRunning ? game.currentTurn : 'Not started yet';
                     let gameTurn = joinedGame ? `<span class="game-list-text">${turnDisplay}</span>` : '';
 
                     $gameText = $(document.createElement('div')).addClass('game-list-row').attr('tabindex', '0').html(`
@@ -301,6 +301,7 @@ class UI {
                 } else {
                     $('#modal').hide();
                     $('#modal-backdrop').hide();
+                    $('#game-content').show();
                     ui._navButtonToggle();
                     let joinGame = ui.controllerGetCallback('table', 'joinGame');
                     joinGame(userActionData);
@@ -311,7 +312,7 @@ class UI {
 
     /*************************
      * postMessage
-     * Displays message in sidebar
+     * Displays message in log/chat window
      *
      * @param payload.messageType: string
      * @param payload.messageDetails: string or null depending on server response

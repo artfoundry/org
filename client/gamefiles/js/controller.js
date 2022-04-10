@@ -15,6 +15,7 @@ class Controller {
         //          games: []
         //      }
         // }
+
         this.player = player;
         this.socket = socket;
 

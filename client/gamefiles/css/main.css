@@ -28,7 +28,7 @@ body {
     display: inline-block;
     min-width: 100px;
     line-height: 20px;
-    margin: 0 3px;
+    margin: 5px;
     padding: 4px 7px;
     border: 2px solid darkred;
     border-radius: 3px;
@@ -96,6 +96,10 @@ header {
     height: 600px;
 }
 
+#waiting-to-start-message {
+    display: none;
+}
+
 #messages {
     position: absolute;
     width: 200px;
@@ -115,6 +119,7 @@ header {
 }
 
 #game-content {
+    display: none;
     width: 100%;
     height: 100%;
     padding: 10px;
@@ -126,11 +131,18 @@ header {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 30px;
     padding: 10px 0;
 }
 
-#game-start-button {
+.game-header-column {
+    flex-basis: 33%;
+}
+
+.game-header-column:last-child {
+    text-align: right;
+}
+
+#game-start-button, #waiting-to-start-message {
     display: none;
 }
 
@@ -185,9 +197,14 @@ header {
 .world {
     width: 135px;
     height: 160px;
+    padding-top: 135px;
     background-size: 135px 135px;
     background-repeat: no-repeat;
     text-align: center;
+}
+
+.world-name {
+    margin: 5px;
 }
 
 #world-earth {

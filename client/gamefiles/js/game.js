@@ -41,12 +41,15 @@ class Game {
                         $playerList.append($playerInfo);
                     }
                 }
-                $gameContent.find('#game-title').text(`${gameData.name}`);
+                $gameContent.show().find('#game-title').text(`${gameData.name}`);
                 break;
             case 'store-cards' : this._storeCardData(gameData);
                 break;
             case 'resign-game' : this._clearBoard();
                 break;
+        }
+        if (gameData.isRunning) {
+            $('#world-boards-container').show();
         }
     }
 
@@ -56,15 +59,28 @@ class Game {
 
     _initGameListeners() {
         let $startButton = $('#game-start-button');
+        let $waitingMessage = $('#waiting-to-start-message');
         let playerIsCreator = this.gameData.creator === this.player.userId;
         let isRunning = this.gameData.isRunning;
+        let playerCount = this.gameData.playerCount;
 
-        if (playerIsCreator && !isRunning) {
-            $startButton.show().click(() => {
-                this.table.startGame(this, this.uiMessenger);
+        if (!isRunning) {
+            if (playerIsCreator) {
+                $startButton.show();
+                $waitingMessage.hide();
+                $startButton.click(() => {
+                    if (playerCount > 1) {
+                        this.table.startGame(this, this.uiMessenger);
+                        $startButton.hide();
+                        $startButton.off('click');
+                    } else {
+                        this.uiMessenger({messageType: 'game-message', messageDetails: 'Game must have at least 2 players to start.'})
+                    }
+                });
+            } else {
                 $startButton.hide();
-                $startButton.off('click');
-            });
+                $waitingMessage.show();
+            }
         }
     }
 
@@ -82,6 +98,7 @@ class Game {
         $('#game-collected-influence').html('');
         $('#world-boards-container').html('');
         $('#players').html('');
+        $('#game-content').hide();
         this.gameData = {};
         this.cards = {
             cardTypes: {},
@@ -92,27 +109,32 @@ class Game {
 
     _placeWorld(worldName, worldInfo) {
         let $worldsContainer = $('#world-boards-container');
-        let $newWorld = $(document.createElement('div'));
+        let $newWorldContainer = $(document.createElement('div'));
+        let $newWorldName = $(document.createElement('div'));
         let $bidButton = $(document.createElement('button'));
         let $bidEntry = $(document.createElement('input'));
         let worldNameLowerCase = worldName.toLowerCase();
+        let bid = 0;
 
-        $newWorld.text(worldName).addClass('world').attr('id', `world-${worldNameLowerCase}`);
-        $bidButton.text('Place bid').addClass('button disabled').attr('tabindex', '0').click(()=> {
-            let bid = $(`#bid-world-${worldNameLowerCase}`).value;
-            this.table.placeBid(bid);
-        });
-        $bidEntry.attr('type', 'text').attr('size', '4').attr('id', `bid-world-${worldNameLowerCase}`).click(()=> {
-            let val = $(`#bid-world-${worldNameLowerCase}`).value;
-            if(val.length > 0) {
-                if(val.match(/\w+/)) {
-                    alert('Bid may only include numbers');
-                } else {
-                    $bidButton.removeClass('disabled');
-                }
+        $worldsContainer.hide();
+        $newWorldContainer.addClass('world').attr('id', `world-${worldNameLowerCase}`);
+        $newWorldName.text(worldName).addClass('world-name');
+        $bidEntry.attr('type', 'text').attr('size', '4').attr('id', `bid-world-${worldNameLowerCase}`).on('input', (event)=> {
+            bid = event.target.value;
+            if (bid.match(/\d*\D+/)) {
+                $bidButton.addClass('disabled');
+                this.uiMessenger({messageType: 'game-message', messageDetails: 'Bid must be a number of 1 or greater.'});
+            } else if (bid.match(/\d+/)) {
+                $bidButton.removeClass('disabled');
+            } else if (bid.length === 0) {
+                $bidButton.addClass('disabled');
             }
         });
-        $worldsContainer.append($newWorld);
+        $bidButton.text('Place bid').addClass('button disabled').attr('tabindex', '0').click(()=> {
+            this.table.placeBid(bid);
+        });
+        $newWorldContainer.append($newWorldName).append($bidEntry).append($bidButton);
+        $worldsContainer.append($newWorldContainer);
     }
 
     _storeCardData(cardData) {

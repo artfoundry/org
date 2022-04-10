@@ -294,18 +294,22 @@ class FirebaseServices {
             }).then(() => {
                 return this.getGameInfo(gameId);
             }).then((retrievedGameInfo) => {
-                retrievedGameInfo.playerIds.push(userId);
-                gameData = retrievedGameInfo;
-                gameData.playerCount++;
-                gameData.set = gameData.set || [];
+                if (!retrievedGameInfo.playerIds.includes(userId)) {
+                    retrievedGameInfo.playerIds.push(userId);
+                    gameData = retrievedGameInfo;
+                    gameData.playerCount++;
+                    gameData.set = gameData.set || [];
 
-                updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
-                updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
-                updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
-                updates[`/userIdList/${userId}/inGame`] = gameId;
-                this.fbDatabase.ref().update(updates).then(() => {
-                    resolve(gameData);
-                }).catch((error)=>{reject(error)});
+                    updates[`/gameIdList/${gameId}/playerCount`] = gameData.playerCount;
+                    updates[`/gameIdList/${gameId}/playerIds`] = gameData.playerIds;
+                    updates[`/userIdList/${userId}/gameIds`] = userGameIDList;
+                    updates[`/userIdList/${userId}/inGame`] = gameId;
+                    this.fbDatabase.ref().update(updates).then(() => {
+                        resolve(gameData);
+                    }).catch((error)=>{reject(error)});
+                } else {
+                    resolve(retrievedGameInfo);
+                }
             }).catch((error) => {
                 errorObject.type = 'server-error';
                 errorObject.message = 'FirebaseServices.joinGame(): ' + error;
