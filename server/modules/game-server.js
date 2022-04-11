@@ -2,11 +2,15 @@ const HTTP_PORT = 4000;
 const NUM_GAME_TURNS = 10;
 
 class GameServer {
-    constructor(fbServices, Express, http, SocketIO) {
+    constructor(fbServices, Express, http, Server) {
         this.fbServices = fbServices;
         this.app = new Express;
         this.http = http.createServer(this.app);
-        this.io = new SocketIO(this.http);
+        this.io = new Server(this.http, {
+            cors: {
+                origin: "http://localhost"
+            }
+        });
         this.socket = null;
     }
 

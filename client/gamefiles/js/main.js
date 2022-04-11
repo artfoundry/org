@@ -7,9 +7,8 @@
  * Instantiates global objects and starts the app
  */
 
-import {Controller} from './controller.js';
-import {Player} from './player.js';
-
+import { Controller } from './controller.js';
+import { Player } from './player.js';
 const ORG_SERVER = 'http://localhost:4000';
 
 let Org = {
