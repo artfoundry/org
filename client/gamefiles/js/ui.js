@@ -327,6 +327,8 @@ class UI {
         let creator = gameData && gameData.creator;
         let otherPlayer = gameData && gameData.userId;
         let $message = $(document.createElement('div'));
+        let $messages = $('#messages');
+        let messagesHeight = 0;
 
         $message.addClass('log-message');
         switch(messageKey) {
@@ -344,7 +346,11 @@ class UI {
             case 'server-error': $message.text(`An error has occurred: ${messageDetails}`); break;
             case 'game-message': $message.text(messageDetails); break;
         }
-        $('#messages').append($message);
+        $messages.append($message);
+        $('.log-message').each(function() {
+            messagesHeight += $(this).height();
+        });
+        $messages.scrollTop(messagesHeight);
     }
 
     /*************************

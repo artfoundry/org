@@ -157,22 +157,23 @@ class Table {
             gameData: this.gameData
         };
 
-        this.socket.on('card-data', (data) => {
+        this.socket.on('card-data', data => {
             this.game.updateBoard('store-cards', data);
         });
 
-        this.socket.on('game-message', (message) => {
+        this.socket.on('game-message', message => {
             messagePackage.messageDetails = message;
             messagePackage.messageType = 'game-message';
             uiMessageCallback(messagePackage);
         });
 
-        this.socket.on('game-setup', ()=> {
+        this.socket.on('game-setup', () => {
             messagePackage.messageType = 'game-setup';
             uiMessageCallback(messagePackage);
         });
 
-        this.socket.on('game-starting', ()=> {
+        this.socket.on('game-starting', data => {
+            this.game.updateBoard('load-game', data);
             messagePackage.messageType = 'game-starting';
             uiMessageCallback(messagePackage);
         });
