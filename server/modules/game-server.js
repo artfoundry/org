@@ -207,6 +207,14 @@ class GameServer {
                 this.emitResponse('game-message', error.message, logMessage);
             });
         }).then(() => {
+            return this.fbServices.getGameInfo(gameId).then(gameData => {
+                logMessage = `${gameId} is starting`;
+                this.emitResponse('game-starting', gameData, logMessage);
+            }).catch(error => {
+                logMessage = `Error retrieving game data: ${error.message}`;
+                this.emitResponse(error.type, error.message, logMessage);
+            });
+        }).then(() => {
             this.playGameLoop(gameId, gameData);
         }).catch((error) => {
             logMessage = `Error trying to start game: ${error.message}`;
@@ -260,15 +268,7 @@ class GameServer {
         for (const region in Object.values(regions)) {
             promises.push(this.dealRegionCards(gameInfo, region));
         }
-        return Promise.allSettled(promises).then(() => {
-            this.fbServices.getGameInfo(gameId).then(gameData => {
-                message = `${gameId} is starting`;
-                this.emitResponse('game-starting', gameData, message);
-            }).catch(error => {
-                message = `Error retrieving game data: ${error.message}`;
-                this.emitResponse(error.type, error.message, message);
-            });
-        });
+        return Promise.allSettled(promises);
     }
 
     updateUserOnResume(userId, gameInfo) {
