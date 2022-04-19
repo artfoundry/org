@@ -320,7 +320,7 @@ class UI {
      *************************/
     postMessage(payload) {
         let messageKey = payload.messageType;
-        let messageDetails = payload.messageDetails;
+        let messageDetails = payload.messageDetails || null;
         let playerName = payload.player;
         let gameData = payload.updateData;
         let gameName = gameData && gameData.name;

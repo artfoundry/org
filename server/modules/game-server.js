@@ -382,7 +382,12 @@ class GameServer {
         for (const playerId of Object.values(playersIdList)) {
             promises.push(this.giveInfluenceTokens(gameId, playerId, 1));
         }
-        return Promise.all(promises).catch(error => {
+        return Promise.all(promises).then(() => {
+            return this.fbServices.getGameInfo(gameId).then((data) => {
+                data.updateType = 'player-tokens';
+                this.emitResponse('update-game', data, 'Updating game board');
+            });
+        }).catch(error => {
             message = `Error while giving out influence tokens: ${error}`;
             this.emitResponse('game-message', message);
         });

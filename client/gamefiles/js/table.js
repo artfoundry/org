@@ -173,9 +173,15 @@ class Table {
         });
 
         this.socket.on('game-starting', data => {
+            this.gameData = data;
             this.game.updateBoard('load-game', data);
             messagePackage.messageType = 'game-starting';
             uiMessageCallback(messagePackage);
+        });
+
+        this.socket.on('update-game', data => {
+            this.gameData = data;
+            this.game.updateBoard('update-game', data);
         });
     }
 

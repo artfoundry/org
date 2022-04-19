@@ -36,7 +36,7 @@ class Game {
                         $playerInfo.addClass('game-playerlist-player');
                         $playerInfo.append(`<span>${name}</span>`);
                         if (gameData.isRunning) {
-                            $playerInfo.append(`<span class="player-influence ${gameData.colors[name]}">${gameData.influenceTokens[name]}</span>`);
+                            $playerInfo.append(`<span id="${name}" class="player-influence ${gameData.colors[name]}">${gameData.influenceTokens[name]}</span>`);
                         }
                         $playerList.append($playerInfo);
                     }
@@ -44,6 +44,8 @@ class Game {
                 $gameContent.show().find('#game-title').text(`${gameData.name}`);
                 break;
             case 'store-cards' : this._storeCardData(gameData);
+                break;
+            case 'update-game' : this._updateBoard(gameData);
                 break;
             case 'resign-game' : this._clearBoard();
                 break;
@@ -140,6 +142,16 @@ class Game {
     _storeCardData(cardData) {
         this.cards.cardTypes = cardData.cards;
         this.cards.cardsByRegion = cardData.regions;
+    }
+
+    _updateBoard(updateData) {
+        const updateType = updateData.updateType;
+        switch (updateType) {
+            case 'player-tokens' : $('.player-influence').each(function() {
+                const playerName = $(this).attr('id');
+                $(this).text(`${updateData.influenceTokens[playerName]}`);
+            });
+        }
     }
 }
 
